@@ -145,16 +145,19 @@ export const HomePage = () => {
               {bottleneckItems.map((item) => {
                 const percentage = Math.round((item.count / item.max) * 100) || 0;
                 return (
-                  <div key={item.label} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs font-bold text-[#3D3D3A]">
+                  <div 
+                    key={item.label} 
+                    className="group space-y-1.5 p-3 -mx-3 rounded-2xl transition-all duration-300 ease-out hover:bg-white hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 cursor-pointer relative z-0 hover:z-10"
+                  >
+                    <div className="flex items-center justify-between text-xs font-bold text-[#3D3D3A] transition-colors duration-300 group-hover:text-[#1A1A5E]">
                       <span>{item.label}</span>
-                      <span className="font-mono font-black text-[#1A1A5E] bg-[#EAEAE2] border border-[#D5D5CE] px-2 py-0.5 rounded-md">
+                      <span className="font-mono font-black text-[#1A1A5E] bg-[#EAEAE2] border border-[#D5D5CE] px-2 py-0.5 rounded-md transition-all duration-300 group-hover:bg-[#FFC800]/10 group-hover:border-[#FFC800]/30 group-hover:text-[#FFC800]">
                         {item.count}
                       </span>
                     </div>
-                    <div className="w-full bg-[#EAEAE2] rounded-full h-3 overflow-hidden border border-[#D5D5CE]">
+                    <div className="w-full bg-[#EAEAE2] rounded-full h-3 overflow-hidden border border-[#D5D5CE] transition-all duration-300 group-hover:border-[#FFC800]/20">
                       <div
-                        className="h-full rounded-full transition-all duration-300 bg-gradient-to-r from-[#FFDF40] to-[#FFC800]"
+                        className="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-[#FFDF40] to-[#FFC800] group-hover:brightness-110 group-hover:shadow-[0_0_10px_rgba(255,200,0,0.4)]"
                         style={{ width: `${Math.max(percentage, item.count > 0 ? 6 : 0)}%` }}
                       />
                     </div>

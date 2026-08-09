@@ -65,9 +65,9 @@ export const LoginPage = () => {
 
       {/* Main Login Card Bento */}
       <div className="w-full max-w-md bento-card overflow-hidden">
-        {/* Header Branding Navy Blue (#1A1A5E) */}
-        <div className="bg-[#1A1A5E] text-white p-7 text-center border-b border-[#2E3A87]">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[#1A1A5E] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40">
+        {/* Header Branding Navy Blue (#2C3154) */}
+        <div className="bg-[#2C3154] text-white p-7 text-center border-b border-[#383F6A]">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[#2C3154] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40">
             <Scale className="w-8 h-8 text-[#FFC800]" />
           </div>
           <h2 className="text-2xl font-black tracking-wider text-white">

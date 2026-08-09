@@ -32,15 +32,15 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
         />
       )}
 
-      {/* Navy Blue (#1A1A5E) Sidebar Container */}
+      {/* Navy Blue (#2C3154) Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#1A1A5E] border-r border-[#2E3A87] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#2C3154] border-r border-[#383F6A] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div>
           {/* Top Header Branding */}
-          <div className="p-6 text-center border-b border-[#2E3A87] relative">
+          <div className="p-6 text-center border-b border-[#383F6A] relative">
             <button
               onClick={() => setIsMobileOpen(false)}
               className="lg:hidden absolute top-4 right-4 text-slate-300 hover:text-white p-1"
@@ -49,11 +49,11 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             </button>
 
             {/* Logo Badge in Navy Blue background with Golden Yellow (#FFC800) Accent */}
-            <div className="mx-auto w-12 h-12 rounded-xl bg-[#1A1A5E] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40 shadow-xs">
+            <div className="mx-auto w-12 h-12 rounded-xl bg-[#2C3154] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40 shadow-xs">
               <Scale className="w-6 h-6" />
             </div>
             
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2E3A87] border border-white/10 text-white text-[10px] font-bold mb-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#383F6A] border border-white/10 text-white text-[10px] font-bold mb-1">
               <Sparkles className="w-3 h-3 text-[#FFC800]" />
               <span>Kanwil Kemenkumham Riau</span>
             </div>
@@ -79,18 +79,17 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                       isActive
-                        ? 'bg-[#2E3A87] text-white font-black border-l-4 border-[#FFC800]'
-                        : 'text-slate-200 hover:bg-[#2E3A87]/60 hover:text-white'
+                        ? 'bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md'
+                        : 'text-slate-200 hover:bg-[#383F6A] hover:text-white'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#FFC800]' : 'text-slate-300'}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#1A1A5E]' : 'text-slate-300'}`} />
                         <span className="tracking-wide">{item.label}</span>
                       </div>
-                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#FFC800]" />}
                     </>
                   )}
                 </NavLink>
@@ -100,8 +99,8 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
         </div>
 
         {/* User Profile Card & Logout */}
-        <div className="p-4 border-t border-[#2E3A87] bg-[#14144B]">
-          <div className="p-3 rounded-xl bg-[#2E3A87]/60 border border-white/10 mb-3 space-y-2">
+        <div className="p-4 border-t border-[#383F6A] bg-[#222645]">
+          <div className="p-3 rounded-xl bg-[#383F6A]/60 border border-white/10 mb-3 space-y-2">
             <div className="flex items-center gap-2.5">
               <img
                 src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'}
