@@ -154,7 +154,7 @@ export const HomePage = () => {
                     </div>
                     <div className="w-full bg-[#EAEAE2] rounded-full h-3 overflow-hidden border border-[#D5D5CE]">
                       <div
-                        className="bg-[#1A1A5E] h-full rounded-full transition-all duration-300"
+                        className="h-full rounded-full transition-all duration-300 bg-gradient-to-r from-[#FFDF40] to-[#FFC800]"
                         style={{ width: `${Math.max(percentage, item.count > 0 ? 6 : 0)}%` }}
                       />
                     </div>

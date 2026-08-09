@@ -125,6 +125,12 @@
   color: #ffffff;
 }
 
+.flat-card-dark.flat-card-hover:hover, 
+.bento-card-dark.bento-card-hover:hover {
+  background-color: #1A1A5E;
+  border-color: #FFC800;
+}
+
 .flat-card-amber, .bento-card-amber, .clay-card-amber, .glass-card-amber {
   background: #FFFDF0;
   border-radius: 16px;
