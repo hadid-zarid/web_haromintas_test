@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #F5F5F0;
+    color: #3D3D3A;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+}
+
+/* Custom Clean Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #EAEAE2;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E3A87;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1A1A5E;
+}
+
+/* =========================================================
+   EXPLICIT COLOR SYSTEM DEFINITION:
+   - Navy Blue: #1A1A5E (Primary Header, Footer, Sidebar, Primary Buttons)
+   - Golden Yellow: #FFC800 (Accent: Active indicators, underlines, highlights)
+   - Royal Indigo: #2E3A87 (Hover states, links, secondary accents)
+   - Off-White: #F5F5F0 (Page background)
+   - Charcoal: #3D3D3A (Primary text color)
+   ========================================================= */
+
+/* Flat Card & Panel Base */
+.flat-card, .flat-panel, .bento-card, .bento-panel, .clay-panel, .glass-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E2E2DC;
+  box-shadow: 0 1px 3px rgba(26, 26, 94, 0.03);
+}
+
+/* Flat Card Hoverable */
+.flat-card-hover, .bento-card-hover, .clay-panel-hover, .glass-panel-hover {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E2E2DC;
+  transition: all 0.15s ease-in-out;
+}
+.flat-card-hover:hover, .bento-card-hover:hover, .clay-panel-hover:hover, .glass-panel-hover:hover {
+  border-color: #2E3A87;
+  background-color: #ffffff;
+}
+
+/* Flat Inputs & Selects */
+.flat-input, .bento-input, .clay-input, .glass-input {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #D5D5CE;
+  transition: all 0.15s ease-in-out;
+  color: #3D3D3A;
+}
+.flat-input:focus, .bento-input:focus, .clay-input:focus, .glass-input:focus {
+  background: #ffffff;
+  border-color: #1A1A5E;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(26, 26, 94, 0.15);
+}
+
+/* Flat Buttons */
+.flat-btn {
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Primary Button: Navy Blue #1A1A5E -> Royal Indigo #2E3A87 hover */
+.flat-btn-primary, .flat-btn-navy, .flat-btn-amber, .bento-btn-amber, .clay-btn-amber {
+  background: #1A1A5E;
+  color: #ffffff;
+  border: 1px solid #1A1A5E;
+}
+.flat-btn-primary:hover, .flat-btn-navy:hover, .flat-btn-amber:hover, .bento-btn-amber:hover, .clay-btn-amber:hover {
+  background: #2E3A87;
+  border-color: #2E3A87;
+}
+
+/* Secondary Button */
+.flat-btn-secondary, .flat-btn-slate, .bento-btn-secondary, .bento-btn-slate, .clay-btn-slate {
+  background: #EAEAE2;
+  color: #1A1A5E;
+  border: 1px solid #D5D5CE;
+}
+.flat-btn-secondary:hover, .flat-btn-slate:hover, .bento-btn-secondary:hover, .bento-btn-slate:hover, .clay-btn-slate:hover {
+  background: #2E3A87;
+  color: #ffffff;
+  border-color: #2E3A87;
+}
+
+/* Danger / Status Red */
+.flat-btn-danger, .bento-btn-danger, .clay-btn-danger {
+  background: #DC2626;
+  color: #ffffff;
+  border: 1px solid #DC2626;
+}
+.flat-btn-danger:hover, .bento-btn-danger:hover, .clay-btn-danger:hover {
+  background: #B91C1C;
+  border-color: #B91C1C;
+}
+
+/* Cards with Navy Header or Dark Variant (#1A1A5E) */
+.flat-card-dark, .bento-card-dark, .clay-card-navy, .glass-card-navy {
+  background: #1A1A5E;
+  border-radius: 16px;
+  border: 1px solid #2E3A87;
+  color: #ffffff;
+}
+
+.flat-card-amber, .bento-card-amber, .clay-card-amber, .glass-card-amber {
+  background: #FFFDF0;
+  border-radius: 16px;
+  border: 1px solid #FFE885;
+  color: #3D3D3A;
+}
+
+.flat-card-slate, .bento-card-slate, .clay-card-slate, .glass-card-slate {
+  background: #F5F5F0;
+  border-radius: 16px;
+  border: 1px solid #D5D5CE;
+  color: #3D3D3A;
+}
+
+.flat-card-emerald, .bento-card-emerald, .clay-card-emerald, .glass-card-emerald {
+  background: #ECFDF5;
+  border-radius: 16px;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+}
+
+/* Badges */
+.flat-badge, .bento-badge, .clay-badge {
+  border-radius: 9999px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+}
+
+.flat-badge-navy, .flat-badge-amber, .bento-badge-amber, .clay-badge-amber {
+  background: #EAEAE2;
+  color: #1A1A5E;
+  border: 1px solid #D5D5CE;
+}
+
+.flat-badge-gold {
+  background: #FFFDF0;
+  color: #1A1A5E;
+  border: 1px solid #FFC800;
+}
+
+.flat-badge-emerald, .bento-badge-emerald, .clay-badge-emerald {
+  background: #D1FAE5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.flat-badge-blue, .bento-badge-blue, .clay-badge-blue {
+  background: #E0E7FF;
+  color: #1A1A5E;
+  border: 1px solid #C7D2FE;
+}
+
+.flat-badge-purple, .bento-badge-purple, .clay-badge-purple {
+  background: #F3E8FF;
+  color: #7E22CE;
+  border: 1px solid #E9D5FF;
+}
+
+.flat-badge-rose, .bento-badge-rose, .clay-badge-rose {
+  background: #FFE4E6;
+  color: #BE123C;
+  border: 1px solid #FECDD3;
+}
+
+.flat-badge-slate, .bento-badge-slate, .clay-badge-slate {
+  background: #EAEAE2;
+  color: #3D3D3A;
+  border: 1px solid #D5D5CE;
+}
