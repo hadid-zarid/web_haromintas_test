@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Scale, LogIn } from 'lucide-react';
+import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 
 export const PublicNavbar = () => {
   return (
@@ -9,8 +10,8 @@ export const PublicNavbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo & System Name */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-900 text-white flex items-center justify-center font-bold border border-blue-700/50">
-              <Scale className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center font-bold border border-blue-700/50 shadow-sm overflow-hidden shrink-0">
+              <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-base font-black tracking-wider text-white">HARMONITAS</h1>

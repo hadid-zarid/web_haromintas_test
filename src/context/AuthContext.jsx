@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       role: roleName,
       nip: '19900000 202000 1 001',
       unit: 'Instansi Pemerintah',
-      email: `${roleName.toLowerCase().replace(/\s+/g, '')}@kemenkumham.go.id`,
+      email: `${roleName.toLowerCase().replace(/\s+/g, '')}@kemenkum.go.id`,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
     };
     setUser(matchedUser);

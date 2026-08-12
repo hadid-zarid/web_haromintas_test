@@ -59,7 +59,7 @@ export const PanduanPage = () => {
           <div>
             <h2 className="text-xl font-black tracking-tight text-white">Buku Panduan Sistem HARMONITAS</h2>
             <p className="text-xs text-slate-300 mt-1 font-semibold leading-relaxed">
-              Petunjuk operasional HARMONITAS (Harmonisasi Ranperda dan Ranperkada Tuntas) sebagai upaya menyederhanakan proses harmonisasi rancangan peraturan daerah (Ranperda) dan rancangan peraturan kepala daerah (Ranperkada) untuk Kanwil Kemenkumham Riau dan Biro Hukum Setda Provinsi Riau.
+              Petunjuk operasional HARMONITAS (Harmonisasi Ranperda dan Ranperkada Tuntas) sebagai upaya menyederhanakan proses harmonisasi rancangan peraturan daerah (Ranperda) dan rancangan peraturan kepala daerah (Ranperkada) untuk Kanwil Kemenkum Riau dan Biro Hukum Setda Provinsi Riau.
             </p>
           </div>
         </div>

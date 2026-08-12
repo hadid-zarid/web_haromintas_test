@@ -5,7 +5,8 @@ import Breadcrumb from './Breadcrumb';
 import RoleBadge from '../common/RoleBadge';
 import { useAuth } from '../../context/AuthContext';
 import SessionTimeoutModal from '../modals/SessionTimeoutModal';
-import { Menu, Bell, User } from 'lucide-react';
+import NotificationDropdown from './NotificationDropdown';
+import { Menu, User } from 'lucide-react';
 
 export const AppLayout = ({ children }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -56,14 +57,8 @@ export const AppLayout = ({ children }) => {
           <div className="flex items-center gap-2.5 shrink-0">
             <RoleBadge role={role} />
 
-            {/* Notification Bell Button */}
-            <button 
-              className="relative p-2 rounded-lg text-[#1A1A5E] flat-btn-secondary"
-              title="Notifikasi"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FFC800]" />
-            </button>
+            {/* Notification Dropdown */}
+            <NotificationDropdown />
 
             {/* User Profile Button */}
             <button

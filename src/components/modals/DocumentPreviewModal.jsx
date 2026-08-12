@@ -59,9 +59,9 @@ export const DocumentPreviewModal = ({ isOpen, onClose, document, regTitle }) =>
             </div>
             <h4 className="text-base font-bold text-slate-100">{document.fileName}</h4>
             <p className="text-xs text-slate-400 max-w-md mt-1 mb-6">
-              Pratinjau resmi PDF Kemenkumham Kanwil & Biro Hukum Provinsi.
+              Pratinjau resmi PDF Kemenkum Kanwil & Biro Hukum Provinsi.
             </p>
-            
+
             {/* Visual Simulated PDF Paper preview */}
             <div className="w-full max-w-2xl bg-white text-slate-800 rounded-lg p-6 text-left shadow-2xl border border-slate-300 font-serif text-xs leading-relaxed overflow-hidden hidden sm:block">
               <div className="text-center border-b pb-3 mb-3 border-slate-300">
@@ -92,7 +92,7 @@ export const DocumentPreviewModal = ({ isOpen, onClose, document, regTitle }) =>
           >
             Tutup
           </button>
-          
+
           <div className="flex items-center gap-2">
             <button
               type="button"

@@ -2,13 +2,14 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import RoleBadge from '../common/RoleBadge';
+import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 
-import { 
-  Scale, 
-  Home, 
-  FileText, 
-  BookOpen, 
-  LogOut, 
+import {
+  Scale,
+  Home,
+  FileText,
+  BookOpen,
+  LogOut,
   X,
   Sparkles
 } from 'lucide-react';
@@ -26,7 +27,7 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
     <>
       {/* Mobile Backdrop */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-[#1A1A5E]/60 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -34,9 +35,8 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
 
       {/* Navy Blue (#2C3154) Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#2C3154] border-r border-[#383F6A] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out ${
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#2C3154] border-r border-[#383F6A] text-white flex flex-col justify-between transition-transform duration-200 ease-in-out ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         <div>
           {/* Top Header Branding */}
@@ -48,21 +48,21 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Logo Badge in Navy Blue background with Golden Yellow (#FFC800) Accent */}
-            <div className="mx-auto w-12 h-12 rounded-xl bg-[#2C3154] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40 shadow-xs">
-              <Scale className="w-6 h-6" />
+            {/* Logo Badge */}
+            <div className="mx-auto w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-3 border border-[#FFC800]/40 shadow-sm overflow-hidden">
+              <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
             </div>
-            
+
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#383F6A] border border-white/10 text-white text-[10px] font-bold mb-1">
               <Sparkles className="w-3 h-3 text-[#FFC800]" />
-              <span>Kanwil Kemenkumham Riau</span>
+              <span>Kanwil Kemenkum Riau</span>
             </div>
 
             <h2 className="text-xl font-black tracking-wider text-white">
               HARMONITAS
             </h2>
             <p className="text-[10px] text-[#FFC800] leading-tight mt-0.5 px-1 font-bold tracking-wide">
-              Harmonisasi Ranperda & Ranperkada Tuntas
+              Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
             </p>
           </div>
 
@@ -77,10 +77,9 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   to={item.path}
                   onClick={() => setIsMobileOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md'
-                        : 'text-slate-200 hover:bg-[#383F6A] hover:text-white'
+                    `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${isActive
+                      ? 'bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md'
+                      : 'text-slate-200 hover:bg-[#383F6A] hover:text-white'
                     }`
                   }
                 >

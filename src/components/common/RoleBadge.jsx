@@ -4,9 +4,9 @@ import { Shield } from 'lucide-react';
 export const RoleBadge = ({ role, className = '' }) => {
   const getBadgeStyle = (r) => {
     switch (r) {
-      case 'Proja 1':
-      case 'Proja 2':
-      case 'Proja 3':
+      case 'Pokja 1':
+      case 'Pokja 2':
+      case 'Pokja 3':
         return 'flat-badge-blue';
       case 'Kakanwil':
         return 'flat-badge-amber';

@@ -1,21 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PublicNavbar from '../components/layout/PublicNavbar';
-import { 
-  FileCheck2, 
-  SearchCheck, 
-  FileSpreadsheet, 
-  CheckCircle2, 
-  ArrowRight, 
-  Building2, 
-  ShieldCheck, 
-  BookOpen, 
-  PhoneCall, 
-  Mail, 
+import {
+  FileCheck2,
+  SearchCheck,
+  FileSpreadsheet,
+  CheckCircle2,
+  ArrowRight,
+  Building2,
+  ShieldCheck,
+  BookOpen,
+  PhoneCall,
+  Mail,
   MapPin,
   Scale
 } from 'lucide-react';
 import { INITIAL_PERATURAN, KABUPATEN_LIST } from '../mock/mockPeraturan';
+import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 
 export const LandingPage = () => {
   const totalPeraturan = INITIAL_PERATURAN.length;
@@ -64,15 +65,15 @@ export const LandingPage = () => {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-xs font-bold">
                 <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <span>HARMONITAS - Harmonisasi Ranperda & Ranperkada Tuntas</span>
+                <span>HARMONITAS - Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas</span>
               </div>
-              
+
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
                 Penyederhanaan Proses Harmonisasi Ranperda & Ranperkada
               </h1>
-              
+
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-medium">
-                Aplikasi HARMONITAS (Harmonisasi Ranperda dan Ranperkada Tuntas) dirancang khusus sebagai upaya menyederhanakan proses harmonisasi Rancangan Peraturan Daerah (Ranperda) dan Rancangan Peraturan Kepala Daerah (Ranperkada) secara terintegrasi dan tuntas.
+                Aplikasi HARMONITAS (Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas) dirancang khusus sebagai upaya menyederhanakan proses harmonisasi Rancangan Peraturan Daerah (Ranperda) dan Rancangan Peraturan Kepala Daerah (Ranperkada) secara terintegrasi dan tuntas.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-4">
@@ -97,8 +98,8 @@ export const LandingPage = () => {
             {/* Quick Stats Bento Cards */}
             <div className="lg:col-span-5 grid grid-cols-1 gap-4">
               <div className="bento-card-dark p-6 rounded-2xl flex items-center gap-4 text-white">
-                <div className="p-3 bg-amber-500 text-slate-950 rounded-xl font-bold">
-                  <Scale className="w-6 h-6" />
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                  <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-3xl font-black text-white">{totalPeraturan}+</span>
@@ -146,8 +147,8 @@ export const LandingPage = () => {
             {workflowSteps.map((step) => {
               const Icon = step.icon;
               return (
-                <div 
-                  key={step.step} 
+                <div
+                  key={step.step}
                   className={`${step.cardClass} bento-card-hover p-6 rounded-2xl space-y-3`}
                 >
                   <div className="flex items-center justify-between">
@@ -171,10 +172,10 @@ export const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800 text-xs">
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
-                  <Scale className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                  <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
                 </div>
-                <span className="font-black text-sm text-white">HARMONITAS KEMENKUMHAM</span>
+                <span className="font-black text-sm text-white">HARMONITAS KEMENKUM</span>
               </div>
               <p className="text-slate-300 leading-relaxed font-medium">
                 Harmonisasi Ranperda dan Ranperkada Tuntas - Kantor Wilayah Kementerian Hukum dan HAM & Biro Hukum Setda Provinsi Riau.
@@ -190,7 +191,7 @@ export const LandingPage = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-amber-400" />
-                  <span>harmonitas.kanwil@kemenkumham.go.id</span>
+                  <span>harmonitas.kanwil@kemenkum.go.id</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-amber-400" />
@@ -210,7 +211,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="pt-6 text-center text-[11px] text-slate-400 font-bold">
-            © {new Date().getFullYear()} HARMONITAS Kanwil Kemenkumham & Biro Hukum Riau. Seluruh Hak Cipta Dilindungi.
+            © {new Date().getFullYear()} HARMONITAS Kanwil Kemenkum & Biro Hukum Riau. Seluruh Hak Cipta Dilindungi.
           </div>
         </div>
       </footer>

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { ROLES, MOCK_USERS } from '../mock/mockUsers';
 import { Scale, LogIn, Lock, User, ShieldCheck, ArrowLeft, Sparkles } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 
 export const LoginPage = () => {
   const [selectedRole, setSelectedRole] = useState(ROLES.PROJA_1);
@@ -67,14 +68,14 @@ export const LoginPage = () => {
       <div className="w-full max-w-md bento-card overflow-hidden">
         {/* Header Branding Navy Blue (#2C3154) */}
         <div className="bg-[#2C3154] text-white p-7 text-center border-b border-[#383F6A]">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[#2C3154] text-[#FFC800] flex items-center justify-center font-black mb-3 border border-[#FFC800]/40">
-            <Scale className="w-8 h-8 text-[#FFC800]" />
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-3 shadow-sm overflow-hidden shrink-0 border border-[#FFC800]/40">
+            <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-2xl font-black tracking-wider text-white">
             HARMONITAS
           </h2>
           <p className="text-xs text-[#FFC800] font-extrabold mt-1">
-            Harmonisasi Ranperda dan Ranperkada Tuntas
+            Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
           </p>
           <p className="text-[11px] text-slate-200 font-medium mt-1 leading-snug">
             Upaya menyederhanakan proses harmonisasi rancangan peraturan daerah dan rancangan peraturan kepala daerah.
@@ -161,7 +162,7 @@ export const LoginPage = () => {
         </form>
 
         <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 text-center text-[10px] text-slate-500 font-bold">
-          HARMONITAS Kanwil Kemenkumham Riau • Hak Akses Terenkripsi
+          HARMONITAS Kanwil Kemenkum Riau • Hak Akses Terenkripsi
         </div>
       </div>
     </div>
