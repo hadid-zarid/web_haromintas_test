@@ -1,5 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
+
 import { AuthProvider } from './context/AuthContext';
 import { PeraturanProvider } from './context/PeraturanContext';
 import { ToastProvider } from './context/ToastContext';
@@ -13,20 +19,41 @@ import HomePage from './pages/HomePage';
 import PeraturanListPage from './pages/PeraturanListPage';
 import PeraturanDetailPage from './pages/PeraturanDetailPage';
 import PanduanPage from './pages/PanduanPage';
+import AIAssistantPage from './pages/AIAssistantPage';
 
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <PeraturanProvider>
-          <ToastProvider>
-            <Toast />
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
 
-              {/* Protected Internal Dashboard Routes */}
+      <AuthProvider>
+
+        <PeraturanProvider>
+
+          <ToastProvider>
+
+            <Toast />
+
+            <Routes>
+
+              {/* =========================
+                  PUBLIC ROUTES
+              ========================== */}
+
+              <Route
+                path="/"
+                element={<LandingPage />}
+              />
+
+              <Route
+                path="/login"
+                element={<LoginPage />}
+              />
+
+
+              {/* =========================
+                  PROTECTED ROUTES
+              ========================== */}
+
               <Route
                 path="/home"
                 element={
@@ -35,6 +62,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
 
               <Route
                 path="/peraturan"
@@ -45,6 +73,7 @@ export default function App() {
                 }
               />
 
+
               <Route
                 path="/peraturan/:id"
                 element={
@@ -53,6 +82,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
 
               <Route
                 path="/panduan"
@@ -63,12 +93,38 @@ export default function App() {
                 }
               />
 
-              {/* Fallback Redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+
+              {/* =========================
+                  HARMONITAS AI
+              ========================== */}
+
+              <Route
+                path="/ai"
+                element={
+                  <ProtectedRoute>
+                    <AIAssistantPage />
+                  </ProtectedRoute>
+                }
+              />
+
+
+              {/* =========================
+                  FALLBACK
+              ========================== */}
+
+              <Route
+                path="*"
+                element={<Navigate to="/" replace />}
+              />
+
             </Routes>
+
           </ToastProvider>
+
         </PeraturanProvider>
+
       </AuthProvider>
+
     </BrowserRouter>
   );
 }
