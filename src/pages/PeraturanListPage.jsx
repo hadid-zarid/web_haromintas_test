@@ -1,21 +1,25 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { usePeraturan } from '../context/PeraturanContext';
-import AppLayout from '../components/layout/AppLayout';
-import StatusBadge from '../components/common/StatusBadge';
-import EmptyState from '../components/common/EmptyState';
-import AddPeraturanModal from '../components/modals/AddPeraturanModal';
-import AdvancedFilterModal from '../components/modals/AdvancedFilterModal';
-import { 
-  Search, 
-  PlusCircle, 
-  ChevronLeft, 
-  ChevronRight, 
-  RotateCcw, 
-  SlidersHorizontal
-} from 'lucide-react';
-import { KABUPATEN_LIST, JENIS_PERATURAN, STATUS_PERATURAN } from '../mock/mockPeraturan';
+import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { usePeraturan } from "../context/PeraturanContext";
+import AppLayout from "../components/layout/AppLayout";
+import StatusBadge from "../components/common/StatusBadge";
+import EmptyState from "../components/common/EmptyState";
+import AddPeraturanModal from "../components/modals/AddPeraturanModal";
+import AdvancedFilterModal from "../components/modals/AdvancedFilterModal";
+import {
+  Search,
+  PlusCircle,
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  SlidersHorizontal,
+} from "lucide-react";
+import {
+  KABUPATEN_LIST,
+  JENIS_PERATURAN,
+  STATUS_PERATURAN,
+} from "../mock/mockPeraturan";
 
 export const PeraturanListPage = () => {
   const { role: currentRole } = useAuth();
@@ -27,17 +31,17 @@ export const PeraturanListPage = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Search & Filters state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedKabupaten, setSelectedKabupaten] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedJenis, setSelectedJenis] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedKabupaten, setSelectedKabupaten] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedJenis, setSelectedJenis] = useState("");
   const [advancedFilters, setAdvancedFilters] = useState({
-    kabupaten: '',
-    status: '',
-    jenis: '',
-    proja: '',
-    startDate: '',
-    endDate: ''
+    kabupaten: "",
+    status: "",
+    jenis: "",
+    proja: "",
+    startDate: "",
+    endDate: "",
   });
 
   // Pagination state
@@ -47,7 +51,7 @@ export const PeraturanListPage = () => {
   // Filter Data Logic per Role + Search + Filters
   const filteredData = useMemo(() => {
     return peraturanList.filter((item) => {
-      if (['Proja 1', 'Proja 2', 'Proja 3'].includes(currentRole)) {
+      if (["Proja 1", "Proja 2", "Proja 3"].includes(currentRole)) {
         if (item.proja !== currentRole) return false;
       }
 
@@ -58,18 +62,34 @@ export const PeraturanListPage = () => {
         if (!matchesJudul && !matchesNomor) return false;
       }
 
-      if (selectedKabupaten && item.kabupaten !== selectedKabupaten) return false;
+      if (selectedKabupaten && item.kabupaten !== selectedKabupaten)
+        return false;
       if (selectedStatus && item.status !== selectedStatus) return false;
       if (selectedJenis && item.jenis !== selectedJenis) return false;
 
-      if (advancedFilters.kabupaten && item.kabupaten !== advancedFilters.kabupaten) return false;
-      if (advancedFilters.status && item.status !== advancedFilters.status) return false;
-      if (advancedFilters.jenis && item.jenis !== advancedFilters.jenis) return false;
-      if (advancedFilters.proja && item.proja !== advancedFilters.proja) return false;
+      if (
+        advancedFilters.kabupaten &&
+        item.kabupaten !== advancedFilters.kabupaten
+      )
+        return false;
+      if (advancedFilters.status && item.status !== advancedFilters.status)
+        return false;
+      if (advancedFilters.jenis && item.jenis !== advancedFilters.jenis)
+        return false;
+      if (advancedFilters.proja && item.proja !== advancedFilters.proja)
+        return false;
 
       return true;
     });
-  }, [peraturanList, currentRole, searchQuery, selectedKabupaten, selectedStatus, selectedJenis, advancedFilters]);
+  }, [
+    peraturanList,
+    currentRole,
+    searchQuery,
+    selectedKabupaten,
+    selectedStatus,
+    selectedJenis,
+    advancedFilters,
+  ]);
 
   // Paginated Data
   const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
@@ -78,7 +98,17 @@ export const PeraturanListPage = () => {
     return filteredData.slice(start, start + pageSize);
   }, [filteredData, currentPage]);
 
-  const canAddPeraturan = ['Proja 1', 'Proja 2', 'Proja 3'].includes(currentRole);
+  const canAddPeraturan = ["Proja 1", "Proja 2", "Proja 3"].includes(
+    currentRole,
+  );
+
+  const activeFilterCount = [
+    searchQuery,
+    selectedKabupaten,
+    selectedStatus,
+    selectedJenis,
+    ...Object.values(advancedFilters),
+  ].filter(Boolean).length;
 
   const handleRowClick = (id) => {
     markAsRead(id);
@@ -86,23 +116,32 @@ export const PeraturanListPage = () => {
   };
 
   const handleResetAllFilters = () => {
-    setSearchQuery('');
-    setSelectedKabupaten('');
-    setSelectedStatus('');
-    setSelectedJenis('');
-    setAdvancedFilters({ kabupaten: '', status: '', jenis: '', proja: '', startDate: '', endDate: '' });
+    setSearchQuery("");
+    setSelectedKabupaten("");
+    setSelectedStatus("");
+    setSelectedJenis("");
+    setAdvancedFilters({
+      kabupaten: "",
+      status: "",
+      jenis: "",
+      proja: "",
+      startDate: "",
+      endDate: "",
+    });
     setCurrentPage(1);
   };
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        {/* Control Bar Flat 2.0 */}
-        <div className="flat-card p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Search Input Flat */}
-            <div className="relative flex-1 min-w-[260px]">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+        {/* Search & Filter Controls */}
+        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+          {/* Primary Actions */}
+          <div className="flex flex-col gap-3 p-4 sm:p-5 lg:flex-row lg:items-center">
+            <div className="relative min-w-0 flex-1">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+                <Search className="h-4 w-4" />
+              </span>
               <input
                 type="text"
                 value={searchQuery}
@@ -111,82 +150,153 @@ export const PeraturanListPage = () => {
                   setCurrentPage(1);
                 }}
                 placeholder="Cari berdasarkan judul atau nomor peraturan..."
-                className="w-full text-xs pl-10 pr-4 py-2.5 flat-input text-slate-800 font-semibold"
+                className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-12 pr-4 text-xs font-semibold text-slate-800 outline-none transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-[#1A1A5E]/40 focus:bg-white focus:ring-4 focus:ring-[#1A1A5E]/5"
               />
             </div>
 
-            {/* Quick Dropdown Filters Flat */}
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                value={selectedKabupaten}
-                onChange={(e) => { setSelectedKabupaten(e.target.value); setCurrentPage(1); }}
-                className="text-xs p-2.5 flat-input font-bold text-slate-800"
-              >
-                <option value="">Semua Kabupaten/Kota</option>
-                {KABUPATEN_LIST.map(k => <option key={k} value={k}>{k}</option>)}
-              </select>
-
-              <select
-                value={selectedStatus}
-                onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
-                className="text-xs p-2.5 flat-input font-bold text-slate-800"
-              >
-                <option value="">Semua Status</option>
-                {Object.values(STATUS_PERATURAN).map(s => (
-                  <option key={s} value={s}>{s.toUpperCase()}</option>
-                ))}
-              </select>
-
-              <select
-                value={selectedJenis}
-                onChange={(e) => { setSelectedJenis(e.target.value); setCurrentPage(1); }}
-                className="text-xs p-2.5 flat-input font-bold text-slate-800"
-              >
-                <option value="">Semua Jenis</option>
-                {JENIS_PERATURAN.map(j => <option key={j} value={j}>{j}</option>)}
-              </select>
-
+            <div className="flex flex-col gap-2.5 sm:flex-row">
               <button
+                type="button"
                 onClick={() => setIsFilterModalOpen(true)}
-                className="px-3.5 py-2.5 text-xs font-bold flat-btn-secondary flex items-center gap-1.5"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-xs font-black text-[#1A1A5E] transition-all hover:border-[#1A1A5E]/20 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-[#1A1A5E]/5"
                 title="Filter Lanjutan"
               >
-                <SlidersHorizontal className="w-4 h-4 text-slate-700" />
-                <span className="hidden sm:inline">Filter Lanjutan</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-slate-100">
+                  <SlidersHorizontal className="h-4 w-4" />
+                </span>
+                <span>Filter Lanjutan</span>
+                {activeFilterCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FFC800] px-1.5 text-[10px] font-black text-[#1A1A5E]">
+                    {activeFilterCount}
+                  </span>
+                )}
               </button>
 
-              {(searchQuery || selectedKabupaten || selectedStatus || selectedJenis || advancedFilters.kabupaten) && (
+              {/* Add Regulation */}
+              {canAddPeraturan && (
                 <button
-                  onClick={handleResetAllFilters}
-                  className="px-3 py-2.5 text-xs font-bold flat-btn-danger flex items-center gap-1"
+                  type="button"
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#1A1A5E] px-5 text-xs font-black text-white shadow-[0_8px_20px_rgba(26,26,94,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[#25256f] hover:shadow-[0_12px_24px_rgba(26,26,94,0.22)] focus:outline-none focus:ring-4 focus:ring-[#1A1A5E]/15"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Reset</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/10">
+                    <PlusCircle className="h-4 w-4" />
+                  </span>
+                  <span>Tambah Peraturan</span>
                 </button>
               )}
             </div>
-
-            {/* "+ Tambah Peraturan" Button Flat */}
-            {canAddPeraturan && (
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="px-4 py-2.5 flat-btn-amber text-white font-bold text-xs flex items-center gap-2 shrink-0"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>+ Tambah Peraturan</span>
-              </button>
-            )}
           </div>
-        </div>
 
-        {/* Datatable Flat 2.0 Container */}
-        <div className="flat-card overflow-hidden">
+          {/* Quick Filters */}
+          <div className="border-t border-slate-100 bg-slate-50/70 px-4 py-3.5 sm:px-5">
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#1A1A5E] shadow-sm ring-1 ring-slate-200">
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                </span>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#1A1A5E]">
+                    Filter Cepat
+                  </p>
+                  <p className="text-[9px] font-semibold text-slate-500">
+                    Saring daftar sesuai kebutuhan
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid flex-1 grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4 xl:max-w-4xl">
+                <select
+                  value={selectedKabupaten}
+                  onChange={(e) => {
+                    setSelectedKabupaten(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-800 outline-none transition-all hover:border-slate-300 focus:border-[#1A1A5E]/40 focus:ring-4 focus:ring-[#1A1A5E]/5"
+                >
+                  <option value="">Semua Kabupaten/Kota</option>
+                  {KABUPATEN_LIST.map((k) => (
+                    <option key={k} value={k}>
+                      {k}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => {
+                    setSelectedStatus(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-800 outline-none transition-all hover:border-slate-300 focus:border-[#1A1A5E]/40 focus:ring-4 focus:ring-[#1A1A5E]/5"
+                >
+                  <option value="">Semua Status</option>
+                  {Object.values(STATUS_PERATURAN).map((s) => (
+                    <option key={s} value={s}>
+                      {s.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedJenis}
+                  onChange={(e) => {
+                    setSelectedJenis(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-800 outline-none transition-all hover:border-slate-300 focus:border-[#1A1A5E]/40 focus:ring-4 focus:ring-[#1A1A5E]/5"
+                >
+                  <option value="">Semua Jenis</option>
+                  {JENIS_PERATURAN.map((j) => (
+                    <option key={j} value={j}>
+                      {j}
+                    </option>
+                  ))}
+                </select>
+
+                {activeFilterCount > 0 ? (
+                  <button
+                    type="button"
+                    onClick={handleResetAllFilters}
+                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 text-xs font-black text-red-600 transition-all hover:border-red-300 hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-100"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Reset Filter</span>
+                  </button>
+                ) : (
+                  <div className="hidden h-11 items-center justify-center rounded-xl border border-dashed border-slate-200 px-4 text-[10px] font-bold text-slate-400 lg:flex">
+                    Belum ada filter aktif
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Datatable Container */}
+        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+          <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-black text-[#1A1A5E]">
+                Daftar Permohonan Peraturan
+              </h3>
+              <p className="mt-0.5 text-[10px] font-semibold text-slate-500">
+                Klik salah satu baris untuk melihat detail permohonan
+              </p>
+            </div>
+            <span className="inline-flex w-fit items-center rounded-full border border-[#1A1A5E]/10 bg-[#1A1A5E]/5 px-3 py-1.5 text-[10px] font-black text-[#1A1A5E]">
+              {filteredData.length} Peraturan
+            </span>
+          </div>
+
           {paginatedData.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full min-w-[1180px] text-left text-xs">
                 <thead className="bg-slate-100 text-slate-800 font-black border-b border-slate-200 uppercase tracking-wider">
                   <tr>
-                    <th className="py-3.5 px-4 w-12 text-center">Status Baca</th>
+                    <th className="py-3.5 px-4 w-12 text-center">
+                      Status Baca
+                    </th>
                     <th className="py-3.5 px-4">Nomor Berkas</th>
                     <th className="py-3.5 px-4">Judul Peraturan</th>
                     <th className="py-3.5 px-4">Kabupaten / Kota</th>
@@ -204,7 +314,9 @@ export const PeraturanListPage = () => {
                         key={row.id}
                         onClick={() => handleRowClick(row.id)}
                         className={`cursor-pointer transition-colors hover:bg-slate-50 ${
-                          isUnread ? 'bg-amber-50/70 font-black text-slate-900' : 'text-slate-700'
+                          isUnread
+                            ? "bg-amber-50/70 font-black text-slate-900"
+                            : "text-slate-700"
                         }`}
                       >
                         <td className="py-3.5 px-4 text-center">
@@ -223,7 +335,9 @@ export const PeraturanListPage = () => {
                         </td>
 
                         <td className="py-3.5 px-4 max-w-md">
-                          <p className={`line-clamp-2 leading-relaxed ${isUnread ? 'font-black text-slate-900' : 'font-semibold text-slate-700'}`}>
+                          <p
+                            className={`line-clamp-2 leading-relaxed ${isUnread ? "font-black text-slate-900" : "font-semibold text-slate-700"}`}
+                          >
                             {row.judul}
                           </p>
                         </td>
@@ -233,7 +347,7 @@ export const PeraturanListPage = () => {
                         </td>
 
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-800 font-bold">
+                          <span className="inline-flex rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-800">
                             {row.jenis}
                           </span>
                         </td>
@@ -262,7 +376,7 @@ export const PeraturanListPage = () => {
               actionBtn={
                 <button
                   onClick={handleResetAllFilters}
-                  className="px-4 py-2 flat-btn-amber text-white text-xs font-bold"
+                  className="rounded-xl bg-[#1A1A5E] px-4 py-2.5 text-xs font-black text-white transition-colors hover:bg-[#25256f]"
                 >
                   Reset Semua Filter
                 </button>
@@ -272,45 +386,68 @@ export const PeraturanListPage = () => {
 
           {/* Pagination Footer Flat 2.0 */}
           {filteredData.length > 0 && (
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-700 font-semibold">
+            <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 p-4 text-xs font-semibold text-slate-700 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                Menampilkan <span className="font-black text-slate-900">{((currentPage - 1) * pageSize) + 1}</span> - <span className="font-black text-slate-900">{Math.min(currentPage * pageSize, filteredData.length)}</span> dari <span className="font-black text-slate-900">{filteredData.length}</span> total peraturan
+                Menampilkan{" "}
+                <span className="font-black text-slate-900">
+                  {(currentPage - 1) * pageSize + 1}
+                </span>{" "}
+                -{" "}
+                <span className="font-black text-slate-900">
+                  {Math.min(currentPage * pageSize, filteredData.length)}
+                </span>{" "}
+                dari{" "}
+                <span className="font-black text-slate-900">
+                  {filteredData.length}
+                </span>{" "}
+                total peraturan
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  className="w-8 h-8 rounded-lg flat-btn-secondary flex items-center justify-center text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Halaman sebelumnya"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                      currentPage === page
-                        ? 'flat-btn-amber text-white'
-                        : 'flat-btn-secondary text-slate-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setCurrentPage(page)}
+                      className={`h-9 min-w-9 rounded-xl px-2 text-xs font-black transition-all ${
+                        currentPage === page
+                          ? "bg-[#1A1A5E] text-white shadow-md"
+                          : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-100"
+                      }`}
+                      aria-label={`Halaman ${page}`}
+                      aria-current={currentPage === page ? "page" : undefined}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
 
                 <button
+                  type="button"
                   disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  className="w-8 h-8 rounded-lg flat-btn-secondary flex items-center justify-center text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Halaman berikutnya"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
-        </div>
+        </section>
       </div>
 
       {/* Modals */}
@@ -323,7 +460,10 @@ export const PeraturanListPage = () => {
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
         filters={advancedFilters}
-        onApplyFilters={(newF) => { setAdvancedFilters(newF); setCurrentPage(1); }}
+        onApplyFilters={(newF) => {
+          setAdvancedFilters(newF);
+          setCurrentPage(1);
+        }}
         onResetFilters={handleResetAllFilters}
       />
     </AppLayout>

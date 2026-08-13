@@ -1,8 +1,6 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import RoleBadge from '../common/RoleBadge';
-import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import logoHarmonitas from "../../assets/LOGO HARMONITAS.png";
 
 import {
   Home,
@@ -12,29 +10,23 @@ import {
   X,
   Sparkles,
   Bot,
-} from 'lucide-react';
+} from "lucide-react";
 
-const Sidebar = ({
-  isMobileOpen,
-  setIsMobileOpen,
-  onTriggerLogout,
-}) => {
-  const { user, role } = useAuth();
-
+const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
   const navItems = [
     {
-      label: 'Dashboard',
-      path: '/home',
+      label: "Dashboard",
+      path: "/home",
       icon: Home,
     },
     {
-      label: 'Permohonan Peraturan',
-      path: '/peraturan',
+      label: "Permohonan Peraturan",
+      path: "/peraturan",
       icon: FileText,
     },
     {
-      label: 'Buku Panduan',
-      path: '/panduan',
+      label: "Buku Panduan",
+      path: "/panduan",
       icon: BookOpen,
     },
   ];
@@ -63,20 +55,18 @@ const Sidebar = ({
           transition-transform duration-200 ease-in-out
           ${
             isMobileOpen
-              ? 'translate-x-0'
-              : '-translate-x-full lg:translate-x-0'
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
           }`}
       >
         {/* =========================================
             TOP SECTION
         ========================================= */}
         <div className="overflow-y-auto">
-
           {/* =========================================
               BRANDING
           ========================================= */}
           <div className="p-6 text-center border-b border-[#383F6A] relative">
-
             {/* Mobile Close */}
             <button
               type="button"
@@ -99,9 +89,7 @@ const Sidebar = ({
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#383F6A] border border-white/10 text-white text-[10px] font-bold mb-1">
               <Sparkles className="w-3 h-3 text-[#FFC800]" />
 
-              <span>
-                Kanwil Kemenkum Riau
-              </span>
+              <span>Kanwil Kemenkum Riau</span>
             </div>
 
             {/* Application Name */}
@@ -118,7 +106,6 @@ const Sidebar = ({
               MAIN NAVIGATION
           ========================================= */}
           <nav className="p-3.5 space-y-1.5 mt-2">
-
             <p className="px-3 text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">
               Navigasi Utama
             </p>
@@ -134,26 +121,20 @@ const Sidebar = ({
                   className={({ isActive }) =>
                     `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md'
-                        : 'text-slate-200 hover:bg-[#383F6A] hover:text-white'
+                        ? "bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md"
+                        : "text-slate-200 hover:bg-[#383F6A] hover:text-white"
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <div className="flex items-center gap-3">
-
                       <Icon
                         className={`w-4 h-4 shrink-0 ${
-                          isActive
-                            ? 'text-[#1A1A5E]'
-                            : 'text-slate-300'
+                          isActive ? "text-[#1A1A5E]" : "text-slate-300"
                         }`}
                       />
 
-                      <span className="tracking-wide">
-                        {item.label}
-                      </span>
-
+                      <span className="tracking-wide">{item.label}</span>
                     </div>
                   )}
                 </NavLink>
@@ -165,7 +146,6 @@ const Sidebar = ({
               AI SECTION
           ========================================= */}
           <div className="px-3.5 mt-4">
-
             <p className="px-3 text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">
               Layanan AI
             </p>
@@ -175,9 +155,7 @@ const Sidebar = ({
               onClick={() => setIsMobileOpen(false)}
               className={({ isActive }) =>
                 `group relative block overflow-hidden rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? 'shadow-lg shadow-black/20'
-                    : 'hover:shadow-md'
+                  isActive ? "shadow-lg shadow-black/20" : "hover:shadow-md"
                 }`
               }
             >
@@ -185,49 +163,39 @@ const Sidebar = ({
                 <div
                   className={`relative px-3.5 py-3 ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#FFD54F] to-[#FFB300]'
-                      : 'bg-gradient-to-r from-[#383F6A] to-[#343A61] hover:from-[#454C75] hover:to-[#3B426B]'
+                      ? "bg-gradient-to-r from-[#FFD54F] to-[#FFB300]"
+                      : "bg-gradient-to-r from-[#383F6A] to-[#343A61] hover:from-[#454C75] hover:to-[#3B426B]"
                   }`}
                 >
-
                   {/* Decorative Glow */}
                   <div
                     className={`absolute -right-5 -top-5 w-16 h-16 rounded-full blur-xl ${
-                      isActive
-                        ? 'bg-white/30'
-                        : 'bg-[#FFC800]/10'
+                      isActive ? "bg-white/30" : "bg-[#FFC800]/10"
                     }`}
                   />
 
                   <div className="relative flex items-center gap-3">
-
                     {/* AI Icon */}
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                         isActive
-                          ? 'bg-[#2C3154]'
-                          : 'bg-[#FFC800]/10 border border-[#FFC800]/20'
+                          ? "bg-[#2C3154]"
+                          : "bg-[#FFC800]/10 border border-[#FFC800]/20"
                       }`}
                     >
                       <Bot
                         className={`w-5 h-5 ${
-                          isActive
-                            ? 'text-[#FFC800]'
-                            : 'text-[#FFC800]'
+                          isActive ? "text-[#FFC800]" : "text-[#FFC800]"
                         }`}
                       />
                     </div>
 
                     {/* Text */}
                     <div className="min-w-0 flex-1">
-
                       <div className="flex items-center gap-1.5">
-
                         <span
                           className={`text-xs font-black ${
-                            isActive
-                              ? 'text-[#1A1A5E]'
-                              : 'text-white'
+                            isActive ? "text-[#1A1A5E]" : "text-white"
                           }`}
                         >
                           HARMONITAS AI
@@ -235,91 +203,35 @@ const Sidebar = ({
 
                         <Sparkles
                           className={`w-3 h-3 ${
-                            isActive
-                              ? 'text-[#1A1A5E]'
-                              : 'text-[#FFC800]'
+                            isActive ? "text-[#1A1A5E]" : "text-[#FFC800]"
                           }`}
                         />
-
                       </div>
 
                       <p
                         className={`text-[9px] mt-0.5 leading-tight ${
-                          isActive
-                            ? 'text-[#1A1A5E]/70'
-                            : 'text-slate-300'
+                          isActive ? "text-[#1A1A5E]/70" : "text-slate-300"
                         }`}
                       >
                         Asisten AI peraturan
                       </p>
-
                     </div>
 
                     {/* Active Indicator */}
                     {isActive && (
                       <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A5E] shrink-0" />
                     )}
-
                   </div>
-
                 </div>
               )}
             </NavLink>
           </div>
-
         </div>
 
         {/* =========================================
-            BOTTOM USER SECTION
+            BOTTOM LOGOUT SECTION
         ========================================= */}
         <div className="p-4 border-t border-[#383F6A] bg-[#222645]">
-
-          {/* User Card */}
-          <div className="p-3 rounded-xl bg-[#383F6A]/60 border border-white/10 mb-3 space-y-2">
-
-            {/* User Info */}
-            <div className="flex items-center gap-2.5">
-
-              <img
-                src={
-                  user?.avatar ||
-                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
-                }
-                alt={user?.name || 'User'}
-                className="w-8 h-8 rounded-full border-2 border-[#FFC800] object-cover shrink-0"
-              />
-
-              <div className="min-w-0 flex-1">
-
-                <p className="text-xs font-bold text-white truncate">
-                  {user?.name || 'Operator Kanwil'}
-                </p>
-
-                <p className="text-[10px] text-slate-300 truncate">
-                  NIP: {user?.nip || '-'}
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* Role + Online */}
-            <div className="flex items-center justify-between pt-2 border-t border-white/10">
-
-              <RoleBadge role={role} />
-
-              <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-
-                Online
-
-              </span>
-
-            </div>
-
-          </div>
-
           {/* Logout */}
           <button
             type="button"
@@ -328,11 +240,8 @@ const Sidebar = ({
           >
             <LogOut className="w-4 h-4" />
 
-            <span>
-              Keluar / Logout
-            </span>
+            <span>Keluar / Logout</span>
           </button>
-
         </div>
       </aside>
     </>
