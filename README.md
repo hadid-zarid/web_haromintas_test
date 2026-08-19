@@ -1,15 +1,16 @@
 # HARMONITAS (Harmonisasi Ranperda dan Ranperkada Tuntas)
 ### Kanwil Kementerian Hukum dan HAM Riau
 
-Aplikasi Sistem Informasi Harmonisasi dan Fasilitasi Ranperda & Ranperkada berbasis **Full-Stack Monolith (Laravel 11 + Inertia.js + React 19)**.
+Aplikasi Sistem Informasi Harmonisasi dan Fasilitasi Ranperda & Ranperkada berbasis **Full-Stack Monolith (Laravel 13 + Inertia.js + React 19)**.
 
 ---
 
 ## 🚀 Tech Stack
 
-- **Backend Framework**: Laravel 11 / 12 (PHP 8.3+)
-- **Frontend Framework**: React 19
-- **Glue / Adapter**: Inertia.js (`@inertiajs/react` & `inertiajs/inertia-laravel`)
+- **Backend Framework**: Laravel 13 (v13.26.1)
+- **PHP Version**: PHP 8.3 (v8.3.6+)
+- **Frontend Framework**: React 19 (v19.2.0)
+- **Glue / Adapter**: Inertia.js (`@inertiajs/react` v2.0 & `inertiajs/inertia-laravel` v3.3)
 - **Styling**: Tailwind CSS v4 + Custom Flat Navy & Golden Yellow Token System
 - **Icons & Charts**: Lucide React, Recharts
 - **Build Tool**: Vite + `laravel-vite-plugin`
