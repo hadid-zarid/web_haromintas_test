@@ -54,22 +54,69 @@ web_harmonitas/
 
 ---
 
-## ⚡ Cara Menjalankan Proyek
+## ⚡ Cara Menjalankan Proyek (Untuk Pertama Kali / Baru Clone)
 
-### 1. Prasyarat
-- PHP >= 8.2 (dengan extension `curl`, `mbstring`, `openssl`, `pdo_mysql`)
-- Composer >= 2.0
-- Node.js >= 18.0 & npm
+### 1. Prasyarat Sistem
+* **PHP** >= 8.2 (Extension wajib aktif: `pdo_mysql`, `mbstring`, `openssl`, `curl`, `fileinfo`)
+* **Composer** >= 2.x
+* **Node.js** >= 18.x & **npm**
+* **MySQL / MariaDB** (via XAMPP, Laragon, atau native service)
 
-### 2. Jalankan Dev Server
+---
 
-Buka **dua terminal**:
+### 2. Langkah Setup Lengkap (Step-by-Step)
+
+Buka terminal di folder proyek dan jalankan perintah berikut secara berurutan:
+
+```bash
+# 1. Install dependencies backend (PHP)
+composer install
+
+# 2. Install dependencies frontend (JavaScript/React)
+npm install
+
+# 3. Buat file konfigurasi environment (.env)
+cp .env.example .env
+# Jika di Windows PowerShell:
+# copy .env.example .env
+
+# 4. Generate Application Key Laravel
+php artisan key:generate
+
+# 5. Hubungkan direktori storage file dokumen
+php artisan storage:link
+```
+
+---
+
+### 3. Setup Database (MySQL)
+
+1. Pastikan **MySQL di XAMPP / Laragon** sudah berjalan (*Start*).
+2. Buka **phpMyAdmin** (`http://localhost/phpmyadmin`).
+3. Masuk ke tab **SQL** atau **Import**, lalu jalankan file:
+   📂 `database/schema_harmonitas.sql`
+   *(Database `harmonitas` dan seluruh tabel + akun demo akan otomatis dibuat)*.
+4. Sesuaikan file `.env` jika username/password database berbeda:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=harmonitas
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+---
+
+### 4. Menjalankan Server Aplikasi
+
+Jalankan **dua terminal**:
 
 **Terminal 1 (Backend Laravel Server):**
 ```bash
 php artisan serve
 ```
-*(Server berjalan di `http://127.0.0.1:8000`)*
+*(Server backend berjalan di `http://127.0.0.1:8000`)*
 
 **Terminal 2 (Frontend Vite Server):**
 ```bash
@@ -77,6 +124,20 @@ npm run dev
 ```
 
 Buka browser dan akses **`http://127.0.0.1:8000`**.
+
+---
+
+### 🔑 Akun Demo Pengguna (Default Password: `password`)
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin@harmonitas.go.id` | `password` |
+| **Pokja 1** | `pokja1@harmonitas.go.id` | `password` |
+| **Pokja 2** | `pokja2@harmonitas.go.id` | `password` |
+| **Pokja 3** | `pokja3@harmonitas.go.id` | `password` |
+| **Biro Hukum Prov** | `birohukum.riau@harmonitas.go.id` | `password` |
+| **Bagian Hukum Siak** | `baghukum.siak@harmonitas.go.id` | `password` |
+| **Pimpinan Kakanwil** | `kakanwil.riau@harmonitas.go.id` | `password` |
 
 ---
 

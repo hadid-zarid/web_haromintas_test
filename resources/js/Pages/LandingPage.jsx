@@ -4,7 +4,6 @@ import PublicNavbar from "../components/layout/PublicNavbar";
 import {
   FileCheck2,
   SearchCheck,
-  FileSpreadsheet,
   CheckCircle2,
   ArrowRight,
   Building2,
@@ -16,8 +15,10 @@ import {
   Scale,
   Layers3,
   UsersRound,
-  FolderArchive,
   Eye,
+  Sparkles,
+  Bot,
+  ChevronRight,
 } from "lucide-react";
 import { INITIAL_PERATURAN, KABUPATEN_LIST } from "../mock/mockPeraturan";
 import logoHarmonitas from "../assets/LOGO HARMONITAS.png";
@@ -29,143 +30,184 @@ export const LandingPage = () => {
     (p) => p.status === "selesai",
   ).length;
 
+  const valuePillars = [
+    { label: "Sinergi Terintegrasi" },
+    { label: "Proses Efisien" },
+    { label: "Regulasi Berkualitas" },
+    { label: "#RiauBedelau", isHashtag: true },
+  ];
+
+  const pokjaList = [
+    {
+      pokja: "POKJA 1",
+      badge: "bg-blue-100 text-blue-800 border-blue-200",
+      accent: "border-l-blue-600",
+      wilayah: [
+        "Pemerintah Provinsi Riau",
+        "Kabupaten Siak",
+        "Kabupaten Kampar",
+        "Kabupaten Indragiri Hilir",
+        "Kabupaten Bengkalis",
+      ],
+    },
+    {
+      pokja: "POKJA 2",
+      badge: "bg-amber-100 text-amber-800 border-amber-200",
+      accent: "border-l-amber-500",
+      wilayah: [
+        "Kabupaten Rokan Hulu",
+        "Kabupaten Indragiri Hulu",
+        "Kabupaten Kepulauan Meranti",
+        "Kota Dumai",
+      ],
+    },
+    {
+      pokja: "POKJA 3",
+      badge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      accent: "border-l-emerald-600",
+      wilayah: [
+        "Kabupaten Kuantan Singingi",
+        "Kabupaten Pelalawan",
+        "Kabupaten Rokan Hilir",
+        "Kota Pekanbaru",
+      ],
+    },
+  ];
+
   const workflowSteps = [
     {
       step: "01",
-      title: "Input Dokumen",
-      desc: "Tim Proja Kanwil mengunggah Draft Rancangan Peraturan & Analisa Konsepsi.",
-      icon: FileSpreadsheet,
-      cardClass: "border-indigo-800 bg-[#211d6f] text-white",
-      badgeClass: "border-white/10 bg-white/10 text-amber-300",
-      iconClass: "border-white/15 bg-white/10 text-amber-300",
-      descClass: "text-indigo-100/80",
-      dividerClass: "border-white/10 text-indigo-200",
-      accentClass: "bg-amber-400",
-      dotClass: "bg-amber-400",
+      title: "Input & AI Pra-Harmonisasi",
+      desc: "Tim Pokja Kanwil mengunggah Draf Regulasi. Asisten AI memindai kesesuaian format dan teknik perundang-undangan (UU 12/2011 & UU 13/2022).",
+      icon: Bot,
+      badgeClass: "border-amber-200 bg-amber-50 text-amber-800",
+      iconClass: "border-amber-200 bg-amber-100/80 text-amber-700",
+      accentClass: "bg-amber-500",
     },
     {
       step: "02",
-      title: "Pemeriksaan & Harmonisasi",
-      desc: "Analisis pasal sandingan, rapat harmonisasi, dan penyusunan Surat Hasil Harmonisasi.",
+      title: "Rapat Pleno Harmonisasi",
+      desc: "Pelaksanaan rapat pembahasan bersama pemrakarsa daerah dan perancang peraturan, kemudian Pokja mengunggah dokumen luaran resmi.",
       icon: SearchCheck,
-      cardClass: "border-amber-200 bg-amber-50 text-slate-900",
-      badgeClass: "border-amber-200 bg-amber-100 text-amber-800",
-      iconClass: "border-amber-200 bg-white text-amber-600",
-      descClass: "text-slate-600",
-      dividerClass: "border-amber-200/80 text-amber-800",
-      accentClass: "bg-amber-400",
-      dotClass: "bg-amber-500",
+      badgeClass: "border-blue-200 bg-blue-50 text-blue-800",
+      iconClass: "border-blue-200 bg-blue-100/80 text-blue-700",
+      accentClass: "bg-blue-600",
     },
     {
       step: "03",
-      title: "Fasilitasi Biro Hukum",
-      desc: "Penelaahan komprehensif oleh Biro Hukum Provinsi dan penyesuaian akhir.",
+      title: "Validasi Biro / Bagian Hukum",
+      desc: "Biro Hukum Pemprov atau Bagian Hukum Pemkab/Pemkot menerima notifikasi, menelaah naskah hasil rapat, dan memberikan keputusan akhir.",
       icon: FileCheck2,
-      cardClass: "border-slate-200 bg-white text-slate-900",
-      badgeClass: "border-slate-200 bg-slate-100 text-slate-600",
-      iconClass: "border-slate-200 bg-slate-100 text-indigo-700",
-      descClass: "text-slate-600",
-      dividerClass: "border-slate-200 text-slate-600",
-      accentClass: "bg-indigo-600",
-      dotClass: "bg-indigo-600",
+      badgeClass: "border-purple-200 bg-purple-50 text-purple-800",
+      iconClass: "border-purple-200 bg-purple-100/80 text-purple-700",
+      accentClass: "bg-purple-600",
     },
     {
       step: "04",
-      title: "Selesai & Pengarsipan",
-      desc: "Penerbitan Surat Hasil Fasilitasi resmi & pengarsipan digital terintegrasi.",
+      title: "Disetujui (Tuntas) & Arsip",
+      desc: "Berkas disetujui, status berubah menjadi Tuntas, dan seluruh naskah final tersimpan dalam repositori arsip digital terintegrasi.",
       icon: CheckCircle2,
-      cardClass: "border-emerald-200 bg-emerald-50 text-emerald-950",
-      badgeClass: "border-emerald-200 bg-emerald-100 text-emerald-800",
-      iconClass: "border-emerald-200 bg-white text-emerald-600",
-      descClass: "text-emerald-800/80",
-      dividerClass: "border-emerald-200 text-emerald-800",
-      accentClass: "bg-emerald-500",
-      dotClass: "bg-emerald-500",
+      badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-800",
+      iconClass: "border-emerald-200 bg-emerald-100/80 text-emerald-700",
+      accentClass: "bg-emerald-600",
     },
   ];
 
   const systemHighlights = [
     {
-      title: "Proses Terintegrasi",
-      desc: "Pengajuan, pemeriksaan, fasilitasi, dan pengarsipan berada dalam satu alur kerja.",
+      title: "Sinergi Terintegrasi",
+      desc: "Menghubungkan secara langsung Kanwil Kemenkumham Riau dengan Biro Hukum Pemprov dan Bagian Hukum Kab/Kota.",
       icon: Layers3,
-      iconClass: "bg-amber-400/15 text-amber-300 border-amber-400/20",
+      iconClass: "bg-blue-50 text-blue-600 border-blue-100",
     },
     {
-      title: "Kolaborasi Antarinstansi",
-      desc: "Memudahkan koordinasi Tim Proja Kanwil dan Biro Hukum Provinsi pada setiap tahap.",
+      title: "Proses Efisien & Terpadu",
+      desc: "Pengajuan berkas, telaah AI, rapat pleno, validasi respon, hingga penerbitan surat selesai dalam satu alur terstruktur.",
       icon: UsersRound,
-      iconClass: "bg-indigo-400/15 text-indigo-200 border-indigo-400/20",
+      iconClass: "bg-amber-50 text-amber-600 border-amber-100",
     },
     {
-      title: "Dokumen Terpusat",
-      desc: "Draft, hasil pemeriksaan, dan surat resmi tersimpan secara tertata dan mudah ditelusuri.",
-      icon: FolderArchive,
-      iconClass: "bg-emerald-400/15 text-emerald-300 border-emerald-400/20",
+      title: "AI Legal Drafting Checker",
+      desc: "Asisten cerdas pendeteksi format naskah hukum, hierarki konsiderans, dan konsistensi pasal berdasarkan UU 12/2011.",
+      icon: Sparkles,
+      iconClass: "bg-purple-50 text-purple-600 border-purple-100",
     },
     {
-      title: "Status Lebih Transparan",
-      desc: "Perkembangan setiap berkas dapat dipantau berdasarkan tahapan prosesnya.",
+      title: "Regulasi Berkualitas & Akuntabel",
+      desc: "Menjamin produk hukum daerah selaras dengan peraturan yang lebih tinggi dan dapat dipantau perkembangannya secara transparan.",
       icon: Eye,
-      iconClass: "bg-sky-400/15 text-sky-300 border-sky-400/20",
+      iconClass: "bg-emerald-50 text-emerald-600 border-emerald-100",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col text-slate-800">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col selection:bg-amber-400 selection:text-slate-950 font-sans antialiased">
+      {/* Sticky Navbar */}
       <PublicNavbar />
 
-      {/* Hero Section */}
+      {/* Hero Section — FULL SCREEN DONKER / DARK NAVY */}
       <section
         id="beranda"
-        className="relative bg-[#0f172a] text-white py-16 lg:py-24 border-b border-slate-800"
+        className="relative min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)] flex flex-col justify-between bg-[#0f172a] text-white pt-10 sm:pt-14 pb-6 sm:pb-8 overflow-hidden border-b border-slate-800"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-amber-400 text-xs font-bold">
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <span>
-                  HARMONITAS - Harmonisasi dan Fasilitasi Ranperda dan
-                  Ranperkada Tuntas
+        {/* Ambient Glows & Wave Elements */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
+        <div className="pointer-events-none absolute -top-24 left-1/3 w-[600px] h-[350px] bg-blue-600/20 rounded-full blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-12 right-10 w-[400px] h-[280px] bg-amber-500/10 rounded-full blur-[100px]" />
+
+        {/* Main Hero Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full my-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left Hero Content */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              {/* Badge Identitas */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-800/90 border border-slate-700/80 text-amber-400 text-xs font-bold shadow-sm backdrop-blur-md">
+                <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="tracking-wide">
+                  HARMONITAS • KANWIL KEMENTERIAN HUKUM RIAU
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
-                Penyederhanaan Proses Harmonisasi Ranperda & Ranperkada
-              </h1>
+              {/* Judul Utama Banner */}
+              <div className="space-y-2">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none text-white">
+                  HARMONITAS
+                </h1>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-amber-400 tracking-tight leading-snug">
+                  Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
+                </h2>
+              </div>
 
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-medium">
-                Aplikasi HARMONITAS (Harmonisasi dan Fasilitasi Ranperda dan
-                Ranperkada Tuntas) dirancang khusus sebagai upaya
-                menyederhanakan proses harmonisasi Rancangan Peraturan Daerah
-                (Ranperda) dan Rancangan Peraturan Kepala Daerah (Ranperkada)
-                secara terintegrasi dan tuntas.
+              {/* Kalimat Deskripsi Sesuai Banner */}
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
+                Mewujudkan sinergi terintegrasi untuk regulasi daerah yang berkualitas, efektif, dan berdaya guna.
               </p>
 
-              <div className="pt-2 flex flex-wrap items-center gap-4">
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                 <Link
-                  to="/login"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bento-btn-amber text-white font-black text-sm shadow-xs transition-all"
+                  href="/login"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Masuk ke System Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <a
-                  href="#alur"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bento-btn-secondary text-slate-800 font-bold text-sm transition-all"
+                  href="#tentang"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-sm transition-all hover:text-white"
                 >
-                  <BookOpen className="w-4 h-4" />
-                  <span>Lihat Alur Kerja</span>
+                  <BookOpen className="w-4 h-4 text-amber-400" />
+                  <span>Pelajari Alur Kerja</span>
                 </a>
               </div>
             </div>
 
-            {/* Quick Stats Bento Cards */}
+            {/* Right Bento Stats Cards */}
             <div className="lg:col-span-5 grid grid-cols-1 gap-4">
-              <div className="bento-card-dark p-6 rounded-2xl flex items-center gap-4 text-white">
-                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+              {/* Card 1: Total Permohonan */}
+              <div className="bg-slate-800/80 border border-slate-700/80 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-white hover:border-amber-400/40 transition-all shadow-md">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm p-1 overflow-hidden shrink-0">
                   <img
                     src={logoHarmonitas}
                     alt="Logo Harmonitas"
@@ -176,45 +218,77 @@ export const LandingPage = () => {
                   <span className="text-3xl font-black text-white">
                     {totalPeraturan}+
                   </span>
-                  <p className="text-xs text-slate-400 font-bold">
+                  <p className="text-xs text-slate-300 font-bold">
                     Total Berkas Permohonan Terdaftar
                   </p>
+                  <span className="text-[10px] text-amber-400 font-semibold">Ranperda & Ranperkada</span>
                 </div>
               </div>
 
-              <div className="bento-card-dark p-6 rounded-2xl flex items-center gap-4 text-white">
-                <div className="p-3 bg-slate-800 text-slate-200 rounded-xl font-bold">
+              {/* Card 2: 13 Wilayah */}
+              <div className="bg-slate-800/80 border border-slate-700/80 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-white hover:border-blue-400/40 transition-all shadow-md">
+                <div className="p-3 bg-slate-700/80 text-blue-300 rounded-xl font-bold border border-slate-600 shrink-0">
                   <Building2 className="w-6 h-6" />
                 </div>
                 <div>
                   <span className="text-3xl font-black text-white">
                     {totalKabupaten} Wilayah
                   </span>
-                  <p className="text-xs text-slate-400 font-bold">
-                    Kabupaten & Kota Terlayani
+                  <p className="text-xs text-slate-300 font-bold">
+                    1 Pemprov & 12 Pemkab/Pemkot Terlayani
                   </p>
+                  <span className="text-[10px] text-blue-400 font-semibold">Dibina oleh 3 Pokja Kanwil Riau</span>
                 </div>
               </div>
 
-              <div className="bento-card-dark p-6 rounded-2xl flex items-center gap-4 text-white">
-                <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl font-bold border border-emerald-500/30">
+              {/* Card 3: Berkas Tuntas */}
+              <div className="bg-slate-800/80 border border-slate-700/80 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-white hover:border-emerald-400/40 transition-all shadow-md">
+                <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl font-bold border border-emerald-500/30 shrink-0">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
                   <span className="text-3xl font-black text-white">
                     {totalSelesai} Berkas
                   </span>
-                  <p className="text-xs text-slate-400 font-bold">
-                    Fasilitasi Selesai & Terbit
+                  <p className="text-xs text-slate-300 font-bold">
+                    Fasilitasi Selesai & Tuntas
                   </p>
+                  <span className="text-[10px] text-emerald-400 font-semibold">Validasi Resmi Biro Hukum</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Value Pillars Bottom Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-8 relative z-10">
+          <div className="border-t border-slate-800/80 pt-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center text-center">
+              {valuePillars.map((item, idx) => (
+                <div
+                  key={item.label}
+                  className="flex items-center justify-center gap-3 text-xs sm:text-sm font-bold tracking-wide"
+                >
+                  <span
+                    className={
+                      item.isHashtag
+                        ? "text-amber-400 font-black tracking-wider"
+                        : "text-slate-300 hover:text-white transition-colors"
+                    }
+                  >
+                    {item.label}
+                  </span>
+                  {idx < valuePillars.length - 1 && (
+                    <span className="hidden md:inline-block text-slate-700">|</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Tentang Sistem Section */}
+      {/* Tentang Sistem Section (LIGHT THEME) */}
       <section
         id="tentang"
         className="relative scroll-mt-24 overflow-hidden border-b border-slate-200 bg-white py-20 sm:py-24"
@@ -224,46 +298,36 @@ export const LandingPage = () => {
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5 space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-700">
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Tentang Sistem</span>
               </div>
 
-              <h2 className="mt-5 text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-4xl">
-                Satu sistem untuk proses harmonisasi yang lebih tertata
+              <h2 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight text-slate-900">
+                Satu Sistem untuk Harmonisasi yang Lebih Tertata & Terintegrasi
               </h2>
 
-              <div className="mt-5 space-y-4 text-sm font-medium leading-relaxed text-slate-600 sm:text-base">
+              <div className="space-y-4 text-sm sm:text-base font-medium leading-relaxed text-slate-600">
                 <p>
-                  <strong className="font-black text-slate-900">
-                    HARMONITAS
-                  </strong>{" "}
-                  adalah sistem informasi yang mendukung proses harmonisasi dan
-                  fasilitasi Rancangan Peraturan Daerah serta Rancangan
-                  Peraturan Kepala Daerah secara terintegrasi.
+                  <strong className="font-black text-slate-900">HARMONITAS</strong> adalah sistem informasi terpadu yang memfasilitasi koordinasi harmonisasi Rancangan Peraturan Daerah (Ranperda) dan Rancangan Peraturan Kepala Daerah (Ranperkada) di lingkungan <strong className="text-indigo-900">Provinsi Riau</strong>.
                 </p>
                 <p>
-                  Sistem ini membantu setiap pihak menjalankan proses dari
-                  pengajuan dokumen, pemeriksaan, fasilitasi, hingga pengarsipan
-                  hasil secara lebih terstruktur, transparan, dan mudah
-                  ditelusuri.
+                  Sistem ini mendukung terwujudnya regulasi daerah yang berkualitas, efektif, dan berdaya guna melalui integrasi pengajuan dokumen, telaah cerdas berbasis AI, rapat pleno, hingga persetujuan dan pengarsipan digital.
                 </p>
               </div>
 
-              <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                 <div className="flex gap-3.5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-200 bg-white text-amber-600 shadow-sm">
                     <Scale className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-800">
-                      Tujuan Utama
+                      Tujuan Pokok
                     </p>
                     <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-700">
-                      Mewujudkan proses harmonisasi produk hukum daerah yang
-                      konsisten, terdokumentasi, dan memberikan kepastian pada
-                      setiap tahapan.
+                      Mewujudkan sinergi terintegrasi untuk regulasi daerah yang berkualitas, konsisten, dan memberikan kepastian hukum di setiap tahapan.
                     </p>
                   </div>
                 </div>
@@ -271,147 +335,166 @@ export const LandingPage = () => {
 
               <a
                 href="#alur"
-                className="mt-7 inline-flex items-center gap-2 text-sm font-black text-indigo-700 transition-colors hover:text-indigo-900"
+                className="inline-flex items-center gap-2 text-sm font-black text-indigo-700 transition-colors hover:text-indigo-900"
               >
-                <span>Pelajari alur kerja sistem</span>
+                <span>Pelajari alur kerja 4 tahap</span>
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
 
+            {/* System Highlights Cards */}
             <div className="lg:col-span-7">
-              <div className="relative overflow-hidden rounded-[30px] border border-slate-800 bg-[#0f172a] p-5 text-white shadow-[0_28px_80px_-35px_rgba(15,23,42,0.65)] sm:p-7">
-                <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-indigo-600/25 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
-
-                <div className="relative mb-6 flex items-center gap-4 border-b border-white/10 pb-6">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-1 shadow-sm">
-                    <img
-                      src={logoHarmonitas}
-                      alt="Logo Harmonitas"
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-lg font-black tracking-tight text-white">
-                      HARMONITAS
-                    </p>
-                    <p className="mt-0.5 text-xs font-bold text-slate-400">
-                      Harmonisasi Ranperda & Ranperkada Tuntas
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative grid gap-4 sm:grid-cols-2">
-                  {systemHighlights.map((item) => {
-                    const Icon = item.icon;
-                    return (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {systemHighlights.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.title}
+                      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300 group"
+                    >
                       <div
-                        key={item.title}
-                        className="rounded-2xl border border-white/10 bg-white/[0.055] p-5 transition-colors duration-300 hover:bg-white/[0.085]"
+                        className={`${item.iconClass} flex h-11 w-11 items-center justify-center rounded-xl border mb-4 transition-transform group-hover:scale-105`}
                       >
-                        <div
-                          className={`${item.iconClass} flex h-10 w-10 items-center justify-center rounded-xl border`}
-                        >
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <h3 className="mt-4 text-sm font-black text-white">
-                          {item.title}
-                        </h3>
-                        <p className="mt-2 text-xs font-medium leading-relaxed text-slate-400">
-                          {item.desc}
-                        </p>
+                        <Icon className="h-5 w-5" aria-hidden="true" />
                       </div>
-                    );
-                  })}
-                </div>
+                      <h3 className="text-sm font-black text-slate-900">
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">
+                        {item.desc}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Alur Kerja Section Bento Grid */}
+      {/* Pembagian Wilayah Pokja Section (LIGHT THEME) */}
+      <section
+        id="wilayah"
+        className="relative overflow-hidden bg-[#f8fafc] border-b border-slate-200 py-20 sm:py-24"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-blue-700 mb-4">
+              <Building2 className="w-3.5 h-3.5 text-blue-600" />
+              <span>Cakupan Wilayah Kerja</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+              Pembagian Kelompok Kerja (Pokja) Kanwil Riau
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-600 font-medium">
+              Pelayanan harmonisasi 1 Pemerintah Provinsi dan 12 Kabupaten/Kota yang terbagi ke dalam 3 Pokja pembinaan:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {pokjaList.map((p) => (
+              <div
+                key={p.pokja}
+                className={`bg-white border border-slate-200 border-l-4 ${p.accent} rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300`}
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-lg font-black text-slate-900">{p.pokja}</h3>
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${p.badge}`}>
+                    {p.wilayah.length} Wilayah
+                  </span>
+                </div>
+                <ul className="space-y-2.5">
+                  {p.wilayah.map((w) => (
+                    <li key={w} className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+                      <ChevronRight className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{w}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Alur Kerja Section (LIGHT THEME) */}
       <section
         id="alur"
-        className="relative overflow-hidden bg-[#f8fafc] py-20 sm:py-24"
+        className="relative overflow-hidden bg-white border-b border-slate-200 py-20 sm:py-24"
       >
         <div className="pointer-events-none absolute -left-24 top-16 h-64 w-64 rounded-full bg-indigo-100/60 blur-3xl" />
         <div className="pointer-events-none absolute -right-20 bottom-0 h-64 w-64 rounded-full bg-amber-100/70 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto mb-12 max-w-3xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-700 shadow-sm">
+          <div className="mx-auto mb-14 max-w-3xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-700 shadow-sm">
               <Scale className="h-3.5 w-3.5 text-amber-500" />
-              <span>PASIH & E-Harmonisasi</span>
+              <span>SOP & Alur Harmonisasi</span>
             </div>
-            <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-              Alur Kerja Pengarsipan & Harmonisasi
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight tracking-tight text-slate-900">
+              Alur Kerja Harmonisasi Terstruktur
             </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-600 sm:text-base">
-              Empat tahap pemeriksaan yang terstruktur dan terstandarisasi untuk
-              menjamin kepastian hukum produk peraturan daerah.
+            <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base font-medium leading-relaxed text-slate-600">
+              Empat tahap terstandarisasi untuk menjamin kepastian hukum dan efisiensi penyusunan produk peraturan daerah.
             </p>
           </div>
 
-          <div className="rounded-[30px] border border-slate-200/80 bg-white/80 p-4 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.4)] backdrop-blur-sm sm:p-6 lg:p-8">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-              {workflowSteps.map((step, index) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.step} className="relative">
-                    <article
-                      className={`${step.cardClass} group relative flex h-full min-h-[270px] flex-col overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}
-                    >
-                      <div
-                        className={`absolute inset-x-0 top-0 h-1 ${step.accentClass}`}
-                      />
-                      <span className="pointer-events-none absolute -bottom-8 -right-1 text-[92px] font-black leading-none opacity-[0.045]">
-                        {step.step}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {workflowSteps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div
+                  key={step.step}
+                  className="relative group bg-slate-50/80 border border-slate-200 rounded-3xl p-6 flex flex-col justify-between shadow-sm hover:shadow-lg hover:-translate-y-1 hover:bg-white hover:border-slate-300 transition-all duration-300"
+                >
+                  <div className={`absolute inset-x-0 top-0 h-1.5 rounded-t-3xl ${step.accentClass}`} />
+                  <div>
+                    {/* Top Step Header */}
+                    <div className="flex items-center justify-between mb-5 pt-1">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${step.badgeClass}`}>
+                        Tahap {step.step}
                       </span>
-
-                      <div className="relative flex items-center justify-between gap-4">
-                        <span
-                          className={`${step.badgeClass} inline-flex rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em]`}
-                        >
-                          Tahap {step.step}
-                        </span>
-                        <div
-                          className={`${step.iconClass} flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-sm transition-transform duration-300 group-hover:scale-105`}
-                        >
-                          <Icon className="h-6 w-6" aria-hidden="true" />
-                        </div>
+                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border shadow-xs ${step.iconClass} transition-transform group-hover:scale-105`}>
+                        <Icon className="w-5 h-5" />
                       </div>
+                    </div>
 
-                      <div className="relative mt-7 flex-1">
-                        <h3 className="text-lg font-black leading-snug tracking-tight">
-                          {step.title}
-                        </h3>
-                        <p
-                          className={`${step.descClass} mt-3 text-sm font-medium leading-relaxed`}
-                        >
-                          {step.desc}
-                        </p>
-                      </div>
-
-                      <div
-                        className={`${step.dividerClass} relative mt-6 flex items-center gap-2 border-t pt-4 text-[10px] font-black uppercase tracking-[0.15em]`}
-                      >
-                        <span
-                          className={`${step.dotClass} h-2 w-2 rounded-full`}
-                        />
-                        <span>Proses {index + 1} dari 4</span>
-                      </div>
-                    </article>
-
-                    {index < workflowSteps.length - 1 && (
-                      <div className="absolute -right-[19px] top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-indigo-700 shadow-md lg:flex">
-                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </div>
-                    )}
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                      {step.title}
+                    </h3>
+                    <p className="mt-3 text-xs sm:text-sm font-medium text-slate-600 leading-relaxed">
+                      {step.desc}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-200 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                    <span className={`w-2 h-2 rounded-full ${step.accentClass}`} />
+                    <span>Langkah {index + 1} dari 4</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section (NAVY ACCENT) */}
+      <section className="relative overflow-hidden bg-[#0f172a] text-white py-16 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+            Siap Mengakses Layanan HARMONITAS?
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-medium">
+            Masuk dengan akun resmi Pokja Kanwil Riau atau Biro/Bagian Hukum Pemda untuk mengelola dan memantau berkas permohonan.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-105"
+            >
+              <span>Login ke Dashboard Sistem</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -419,49 +502,55 @@ export const LandingPage = () => {
       {/* Footer Section */}
       <footer
         id="kontak"
-        className="mt-auto bg-[#0f172a] text-white pt-12 pb-8 border-t border-slate-800"
+        className="bg-[#0b1329] text-white pt-12 pb-8 border-t border-slate-800 mt-auto"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-slate-800 text-xs">
+            {/* Column 1: Info */}
             <div>
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1 shadow-sm overflow-hidden shrink-0">
                   <img
                     src={logoHarmonitas}
                     alt="Logo Harmonitas"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="font-black text-sm text-white">
-                  HARMONITAS KEMENKUM
-                </span>
+                <div>
+                  <span className="font-black text-sm text-white block">
+                    HARMONITAS KEMENKUM
+                  </span>
+                  <span className="text-[10px] text-amber-400 font-bold">KANWIL PROVINSI RIAU</span>
+                </div>
               </div>
               <p className="text-slate-300 leading-relaxed font-medium">
-                Harmonisasi Ranperda dan Ranperkada Tuntas - Kantor Wilayah
-                Kementerian Hukum dan HAM & Biro Hukum Setda Provinsi Riau.
+                Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas — Kantor Wilayah
+                Kementerian Hukum Riau & Biro Hukum Setda Provinsi Riau.
               </p>
             </div>
 
+            {/* Column 2: Kontak */}
             <div>
               <h4 className="font-black text-white text-sm mb-3">
                 Kontak Layanan
               </h4>
               <ul className="space-y-2.5 text-slate-300 font-medium">
                 <li className="flex items-center gap-2">
-                  <PhoneCall className="w-4 h-4 text-amber-400" />
-                  <span>(022) 7208000 - Layanan Harmonisasi</span>
+                  <PhoneCall className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>(0761) 853000 - Layanan Harmonisasi</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-amber-400" />
+                  <Mail className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>harmonitas.kanwil@kemenkum.go.id</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-amber-400" />
-                  <span>Jl. Jend. Sudirman No.233, Kota Pekanbaru, Riau</span>
+                  <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Jl. Jend. Sudirman No. 233, Kota Pekanbaru, Riau</span>
                 </li>
               </ul>
             </div>
 
+            {/* Column 3: Quick Links */}
             <div>
               <h4 className="font-black text-white text-sm mb-3">
                 Akses Cepat
@@ -469,18 +558,18 @@ export const LandingPage = () => {
               <ul className="space-y-2 text-slate-300 font-medium">
                 <li>
                   <Link
-                    to="/login"
+                    href="/login"
                     className="hover:text-amber-400 transition-colors"
                   >
-                    Login Petugas Kanwil
+                    Login Petugas Pokja Kanwil
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/login"
+                    href="/login"
                     className="hover:text-amber-400 transition-colors"
                   >
-                    Login Biro Hukum
+                    Login Biro / Bagian Hukum Daerah
                   </Link>
                 </li>
                 <li>
@@ -488,7 +577,7 @@ export const LandingPage = () => {
                     href="#alur"
                     className="hover:text-amber-400 transition-colors"
                   >
-                    Dokumentasi Alur Kerja
+                    Dokumentasi SOP Alur Kerja
                   </a>
                 </li>
               </ul>
@@ -496,7 +585,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="pt-6 text-center text-[11px] text-slate-400 font-bold">
-            © {new Date().getFullYear()} HARMONITAS Kanwil Kemenkum & Biro
+            © {new Date().getFullYear()} HARMONITAS Kanwil Kementerian Hukum Riau & Biro
             Hukum Riau. Seluruh Hak Cipta Dilindungi.
           </div>
         </div>
