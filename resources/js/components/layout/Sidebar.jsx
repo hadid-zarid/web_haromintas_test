@@ -48,7 +48,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
       ========================================= */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-[#1A1A5E]/60 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-[#101B4F]/65 backdrop-blur-sm lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -58,8 +58,8 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
       ========================================= */}
       <aside
         className={`fixed top-0 bottom-0 left-0 z-40 w-64
-          bg-[#2C3154]
-          border-r border-[#383F6A]
+          bg-gradient-to-b from-[#303661] via-[#383F6F] to-[#454C7D]
+          border-r border-white/10
           text-white
           flex flex-col justify-between
           transition-transform duration-200 ease-in-out
@@ -76,7 +76,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
           {/* =========================================
               BRANDING
           ========================================= */}
-          <div className="p-6 text-center border-b border-[#383F6A] relative">
+          <div className="relative border-b border-white/10 px-5 pb-5 pt-6 text-center">
             {/* Mobile Close */}
             <button
               type="button"
@@ -87,7 +87,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             </button>
 
             {/* Logo */}
-            <div className="mx-auto w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-3 border border-[#FFC800]/40 shadow-sm overflow-hidden">
+            <div className="mx-auto mb-3 flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border border-white/70 bg-white p-1 shadow-[0_10px_24px_rgba(8,14,49,0.24)]">
               <img
                 src={logoHarmonitas}
                 alt="Logo HARMONITAS"
@@ -96,17 +96,17 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             </div>
 
             {/* Institution Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#383F6A] border border-white/10 text-white text-[10px] font-bold mb-1">
+            <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[9px] font-bold text-white/85">
               <Sparkles className="w-3 h-3 text-[#FFC800]" />
               <span>Kanwil Kemenkum Riau</span>
             </div>
 
             {/* Application Name */}
-            <h2 className="text-xl font-black tracking-wider text-white">
+            <h2 className="text-xl font-extrabold tracking-[0.12em] text-white">
               HARMONITAS
             </h2>
 
-            <p className="text-[10px] text-[#FFC800] leading-tight mt-0.5 px-1 font-bold tracking-wide">
+            <p className="mt-1 px-1 text-[9px] font-semibold leading-tight tracking-wide text-[#FFE76D]">
               Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
             </p>
           </div>
@@ -115,7 +115,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               MAIN NAVIGATION
           ========================================= */}
           <nav className="p-3.5 space-y-1.5 mt-2">
-            <p className="px-3 text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">
+            <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
               Navigasi Utama
             </p>
 
@@ -130,14 +130,14 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   onClick={() => setIsMobileOpen(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                     isActive
-                      ? "bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] font-black shadow-md"
-                      : "text-slate-200 hover:bg-[#383F6A] hover:text-white"
+                      ? "bg-[#FFC800] text-[#101B4F] font-extrabold shadow-[0_8px_18px_rgba(8,14,49,0.2)]"
+                      : "text-white/75 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
                       className={`w-4 h-4 shrink-0 ${
-                        isActive ? "text-[#1A1A5E]" : "text-slate-300"
+                        isActive ? "text-[#101B4F]" : "text-white/65"
                       }`}
                     />
                     <span className="tracking-wide">{item.label}</span>
@@ -181,7 +181,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               AI SECTION
           ========================================= */}
           <div className="px-3.5 mt-4">
-            <p className="px-3 text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">
+            <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
               Layanan AI
             </p>
 
@@ -195,8 +195,8 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               <div
                 className={`relative px-3.5 py-3 ${
                   isAiActive
-                    ? "bg-gradient-to-r from-[#FFD54F] to-[#FFB300]"
-                    : "bg-gradient-to-r from-[#383F6A] to-[#343A61] hover:from-[#454C75] hover:to-[#3B426B]"
+                    ? "bg-[#FFC800]"
+                    : "bg-white/[0.08] hover:bg-white/[0.13]"
                 }`}
               >
                 {/* Decorative Glow */}
@@ -211,7 +211,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   <div
                     className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                       isAiActive
-                        ? "bg-[#2C3154]"
+                        ? "bg-[#303661]"
                         : "bg-[#FFC800]/10 border border-[#FFC800]/20"
                     }`}
                   >
@@ -223,7 +223,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                     <div className="flex items-center gap-1.5">
                       <span
                         className={`text-xs font-black ${
-                          isAiActive ? "text-[#1A1A5E]" : "text-white"
+                        isAiActive ? "text-[#101B4F]" : "text-white"
                         }`}
                       >
                         HARMONITAS AI
@@ -231,14 +231,14 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
 
                       <Sparkles
                         className={`w-3 h-3 ${
-                          isAiActive ? "text-[#1A1A5E]" : "text-[#FFC800]"
+                          isAiActive ? "text-[#101B4F]" : "text-[#FFC800]"
                         }`}
                       />
                     </div>
 
                     <p
                       className={`text-[9px] mt-0.5 leading-tight ${
-                        isAiActive ? "text-[#1A1A5E]/70" : "text-slate-300"
+                        isAiActive ? "text-[#101B4F]/65" : "text-white/55"
                       }`}
                     >
                       Asisten AI peraturan
@@ -247,7 +247,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
 
                   {/* Active Indicator */}
                   {isAiActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A5E] shrink-0" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#101B4F]" />
                   )}
                 </div>
               </div>
@@ -258,7 +258,12 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
         {/* =========================================
             BOTTOM LOGOUT SECTION
         ========================================= */}
+<<<<<<< Updated upstream
         <div className="p-4 border-t border-[#383F6A] bg-[#222645]">
+=======
+        <div className="border-t border-white/10 bg-[#252B56]/75 p-4">
+          {/* Logout */}
+>>>>>>> Stashed changes
           <button
             type="button"
             onClick={onTriggerLogout}

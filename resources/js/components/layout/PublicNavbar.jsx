@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { LogIn, Menu, X, ShieldCheck } from 'lucide-react';
+import { Globe2, LogIn, Mail, Menu, Phone, X } from 'lucide-react';
 import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 
 export const PublicNavbar = () => {
@@ -15,91 +15,114 @@ export const PublicNavbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0b1329]/95 backdrop-blur-md text-white border-b border-slate-800 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo & System Name */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white flex items-center justify-center p-1 border border-slate-700 shadow-md overflow-hidden shrink-0 transition-transform group-hover:scale-105">
-              <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-base sm:text-lg font-black tracking-wider text-white">HARMONITAS</h1>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-md">RIAU</span>
-              </div>
-              <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold tracking-wide">HARMONISASI DAN FASILITASI RANPERDA & RANPERKADA TUNTAS</p>
-            </div>
+    <header className="sticky top-0 z-50 shadow-[0_8px_24px_rgba(28,36,81,0.06)]">
+      <div className="hidden bg-gradient-to-r from-[#101B4F] to-[#303661] text-white sm:block">
+        <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-4 text-[10px] font-semibold sm:px-6 lg:px-8">
+          <div className="flex items-center gap-5 text-white/80">
+            <span className="inline-flex items-center gap-1.5">
+              <Mail className="h-3 w-3 text-[#FFC800]" />
+              harmonitas.kanwil@kemenkum.go.id
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Phone className="h-3 w-3 text-[#FFC800]" />
+              (0761) 853000
+            </span>
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 text-white/80">
+            <Globe2 className="h-3 w-3 text-[#FFC800]" />
+            ID
+            <span className="text-white/35">|</span>
+            EN
+          </span>
+        </div>
+      </div>
+
+      <div className="border-b border-[#E2E6EF] bg-white/95 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="group flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#E2E6EF] bg-white p-1 shadow-sm transition-transform duration-200 group-hover:scale-105">
+              <img
+                src={logoHarmonitas}
+                alt="Logo HARMONITAS"
+                className="h-full w-full object-contain"
+              />
+            </span>
+
+            <span className="min-w-0">
+              <span className="flex items-center gap-2">
+                <span className="text-[17px] font-extrabold tracking-[0.08em] text-[#303661]">
+                  HARMONITAS
+                </span>
+                <span className="hidden rounded-full bg-[#FFF3B8] px-2 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-[#7B6100] sm:inline-flex">
+                  Riau
+                </span>
+              </span>
+              <span className="hidden truncate text-[9px] font-semibold tracking-wide text-[#6F778B] sm:block">
+                Harmonisasi dan Fasilitasi Ranperda & Ranperkada Tuntas
+              </span>
+            </span>
           </Link>
 
-          {/* Desktop Navigation Items */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-bold">
+          <nav className="hidden items-center gap-6 lg:flex">
             {navLinks.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="text-slate-300 hover:text-amber-400 transition-colors py-1 relative group"
+                className="group relative py-2 text-[12px] font-bold text-[#4E566B] transition-colors hover:text-[#303661]"
               >
                 {item.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                <span className="absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 w-0 rounded-full bg-[#FFC800] transition-all duration-200 group-hover:w-full" />
               </a>
             ))}
           </nav>
 
-          {/* Desktop CTA Login Button */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden items-center gap-3 lg:flex">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#303661] to-[#454C7D] px-5 text-xs font-bold text-white shadow-[0_8px_18px_rgba(48,54,97,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_11px_24px_rgba(48,54,97,0.28)]"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Masuk / Login</span>
+              <LogIn className="h-4 w-4" />
+              Masuk
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex items-center gap-2 lg:hidden">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-black text-xs shadow-sm"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#303661] px-3 text-[11px] font-bold text-white shadow-sm"
             >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Login</span>
+              <LogIn className="h-3.5 w-3.5" />
+              Masuk
             </Link>
+
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-              aria-label="Toggle Menu"
+              type="button"
+              onClick={() => setMobileMenuOpen((current) => !current)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#E2E6EF] bg-[#F7F8FC] text-[#303661]"
+              aria-label={mobileMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0f172a] border-b border-slate-800 px-4 pt-3 pb-5 space-y-2 animate-in slide-in-from-top-2 duration-200">
-          {navLinks.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-            >
-              {item.name}
-            </a>
-          ))}
-          <div className="pt-2 border-t border-slate-800">
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-xs shadow-md"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Masuk ke Dashboard Sistem</span>
-            </Link>
-          </div>
+        <div className="border-b border-[#E2E6EF] bg-white px-4 pb-5 pt-2 shadow-lg lg:hidden">
+          <nav className="mx-auto max-w-7xl space-y-1">
+            {navLinks.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-xl px-4 py-3 text-sm font-semibold text-[#4E566B] transition-colors hover:bg-[#EEF1F8] hover:text-[#303661]"
+              >
+                {item.name}
+              </a>
+            ))}
+          </nav>
         </div>
       )}
     </header>

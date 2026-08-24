@@ -4,72 +4,59 @@ import { TrendingUp } from 'lucide-react';
 export const MetricCard = ({ title, value, icon: Icon, variant = 'total', subtext }) => {
   const variantStyles = {
     total: {
-      card: 'bg-[#323864] text-white shadow-sm border border-[#3E4576]',
-      textTitle: 'text-white/90',
-      textVal: 'text-white',
-      sub: 'text-white/80',
-      iconBox: 'bg-white/10 text-white border border-white/20'
+      card: 'bg-gradient-to-br from-[#303661] to-[#4B5286] border-white/10',
+      iconBox: 'border-white/15 bg-white/10 text-white',
+      subtext: 'text-white/70',
     },
     proses: {
-      card: 'bg-gradient-to-br from-[#FFC837] to-[#FF8008] text-white shadow-sm border border-[#FF9800]/50',
-      textTitle: 'text-white/90',
-      textVal: 'text-white',
-      sub: 'text-white/90',
-      iconBox: 'bg-white/20 text-white border border-white/30'
+      card: 'bg-gradient-to-br from-[#FFBC4A] to-[#FF8F2D] border-[#FF9E30]/40',
+      iconBox: 'border-white/25 bg-white/15 text-white',
+      subtext: 'text-white/85',
     },
     analisis: {
-      card: 'bg-gradient-to-br from-[#27A169] to-[#127A4A] text-white shadow-sm border border-[#1A8754]/50',
-      textTitle: 'text-white/90',
-      textVal: 'text-white',
-      sub: 'text-white/90',
-      iconBox: 'bg-white/20 text-white border border-white/30'
+      card: 'bg-gradient-to-br from-[#40518F] to-[#303661] border-white/10',
+      iconBox: 'border-white/15 bg-white/10 text-white',
+      subtext: 'text-white/70',
     },
     selesai: {
-      card: 'bg-[#323864] text-white shadow-sm border border-[#3E4576]',
-      textTitle: 'text-white/90',
-      textVal: 'text-white',
-      sub: 'text-white/80',
-      iconBox: 'bg-white/10 text-white border border-white/20'
-    }
+      card: 'bg-gradient-to-br from-[#269666] to-[#177A52] border-[#18835A]/40',
+      iconBox: 'border-white/20 bg-white/15 text-white',
+      subtext: 'text-white/80',
+    },
   };
 
-  const style = variantStyles[variant] || variantStyles.total;
-
-  // Use dummy trend percentage for UI preview if subtext is available
   const trendValues = {
     total: '+15%',
     proses: '+12%',
     analisis: '+8%',
-    selesai: '+9%'
+    selesai: '+9%',
   };
 
+  const style = variantStyles[variant] || variantStyles.total;
+
   return (
-    <div className={`group p-6 ${style.card} hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_12px_30px_rgba(0,0,0,0.15)] hover:brightness-105 transition-all duration-500 ease-out rounded-[20px] flex flex-col min-h-[140px] cursor-pointer`}>
-      <div className="flex items-start justify-between">
-        <div>
-          <span className={`text-[15px] font-bold tracking-wide ${style.textTitle} block leading-snug max-w-[140px]`}>
-            {title}
-          </span>
-        </div>
+    <article
+      className={`group flex min-h-[132px] cursor-default flex-col justify-between rounded-[18px] border p-5 text-white shadow-[0_12px_24px_rgba(30,39,89,0.13)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_17px_34px_rgba(30,39,89,0.2)] ${style.card}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="max-w-[150px] text-sm font-bold leading-5 text-white/90">{title}</p>
         {Icon && (
-          <div className={`w-11 h-11 rounded-2xl ${style.iconBox} flex items-center justify-center shrink-0 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-[10deg]`}>
-            <Icon className="w-5 h-5" />
-          </div>
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${style.iconBox}`}>
+            <Icon className="h-5 w-5" />
+          </span>
         )}
       </div>
 
-      <div className="mt-4">
-        <span className={`text-4xl font-bold tracking-tight leading-none ${style.textVal}`}>
-          {value}
-        </span>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <span className="text-4xl font-extrabold leading-none tracking-tight">{value}</span>
         {subtext && (
-          <div className={`flex items-center gap-1.5 mt-2 text-[10px] ${style.sub} font-medium`}>
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>{trendValues[variant]} dari bulan lalu</span>
-          </div>
+          <span className={`mb-0.5 inline-flex items-center gap-1 text-[9px] font-semibold ${style.subtext}`}>
+            <TrendingUp className="h-3 w-3" />
+            {trendValues[variant]}
+          </span>
         )}
       </div>
-    </div>
+    </article>
   );
 };
 
