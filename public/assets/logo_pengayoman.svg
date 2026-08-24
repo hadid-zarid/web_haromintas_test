@@ -1,0 +1,31 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#FFD700" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top Central Arch -->
+    <path d="M 190 148 A 60 60 0 0 1 310 148" />
+
+    <!-- Middle Left Arch -->
+    <path d="M 130 196 A 58 58 0 0 1 246 196" />
+
+    <!-- Middle Right Arch -->
+    <path d="M 254 196 A 58 58 0 0 1 370 196" />
+
+    <!-- Outer Bottom Left Arch -->
+    <path d="M 75 240 A 55 55 0 0 1 185 240" />
+
+    <!-- Outer Bottom Right Arch -->
+    <path d="M 315 240 A 55 55 0 0 1 425 240" />
+
+    <!-- Outer Left Trunk & Root -->
+    <path d="M 115 365 L 210 365 L 210 195" />
+
+    <!-- Inner Left Center Vertical Trunk -->
+    <path d="M 237 375 L 237 148" />
+
+    <!-- Inner Right Center Vertical Trunk -->
+    <path d="M 263 375 L 263 148" />
+
+    <!-- Outer Right Trunk & Root -->
+    <path d="M 385 365 L 290 365 L 290 195" />
+  </g>
+  <text x="250" y="418" text-anchor="middle" fill="#FFD700" font-size="34" font-weight="900" font-family="Arial, Helvetica, sans-serif" letter-spacing="6">PENGAYOMAN</text>
+</svg>

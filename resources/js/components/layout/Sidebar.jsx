@@ -10,8 +10,12 @@ import {
   X,
   Sparkles,
   Bot,
+<<<<<<< Updated upstream
   Users,
   ShieldCheck
+=======
+  FileOutput,
+>>>>>>> Stashed changes
 } from "lucide-react";
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
@@ -30,6 +34,11 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
       label: "Permohonan Peraturan",
       path: "/peraturan",
       icon: FileText,
+    },
+    {
+      label: "Draft Generate Surat",
+      path: "/draft-generate",
+      icon: FileOutput,
     },
     {
       label: "Buku Panduan",

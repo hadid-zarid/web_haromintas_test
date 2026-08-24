@@ -10,6 +10,7 @@ export const Breadcrumb = () => {
   const routeNameMap = {
     home: 'Beranda Dashboard',
     peraturan: 'Daftar Peraturan',
+    'draft-generate': 'Draft Generate Surat',
     panduan: 'Panduan Penggunaan',
     ai: 'Harmonitas AI'
   };

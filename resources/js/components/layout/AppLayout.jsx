@@ -12,7 +12,7 @@ import NotificationDropdown from "./NotificationDropdown";
 
 import { Building2, ChevronDown, IdCard, Menu, User } from "lucide-react";
 
-export const AppLayout = ({ children }) => {
+export const AppLayout = ({ children, title }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -55,28 +55,40 @@ export const AppLayout = ({ children }) => {
   /* =========================================
      PAGE TITLE
   ========================================== */
-  const getHeaderTitle = (pathname) => {
-    if (pathname === "/home") {
+  const getHeaderTitle = (currentPath) => {
+    if (title) {
+      return title;
+    }
+
+    if (currentPath === "/home") {
       return "Dashboard";
     }
 
+<<<<<<< Updated upstream
     if (pathname.startsWith("/admin/users")) {
       return "Manajemen Akun & Hak Akses (RBAC)";
     }
 
     if (pathname.includes("/peraturan/")) {
+=======
+    if (currentPath.includes("/peraturan/")) {
+>>>>>>> Stashed changes
       return "Detail Permohonan Peraturan";
     }
 
-    if (pathname === "/peraturan") {
+    if (currentPath === "/peraturan") {
       return "Permohonan Peraturan";
     }
 
-    if (pathname === "/panduan") {
+    if (currentPath === "/draft-generate") {
+      return "Draft Generate Surat";
+    }
+
+    if (currentPath === "/panduan") {
       return "Buku Panduan";
     }
 
-    if (pathname === "/ai") {
+    if (currentPath === "/ai") {
       return "HARMONITAS AI";
     }
 
@@ -271,8 +283,13 @@ export const AppLayout = ({ children }) => {
         ================================== */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-7 lg:p-8">
           {/* Page Header */}
+<<<<<<< Updated upstream
           <div className="mb-7">
             <h2 className="text-2xl font-extrabold tracking-tight text-[#20283D] sm:text-3xl">
+=======
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A5E] tracking-tight">
+>>>>>>> Stashed changes
               {getHeaderTitle(pathname)}
             </h2>
 
