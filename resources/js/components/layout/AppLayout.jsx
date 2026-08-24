@@ -60,6 +60,10 @@ export const AppLayout = ({ children }) => {
       return "Dashboard";
     }
 
+    if (pathname.startsWith("/admin/users")) {
+      return "Manajemen Akun & Hak Akses (RBAC)";
+    }
+
     if (pathname.includes("/peraturan/")) {
       return "Detail Permohonan Peraturan";
     }

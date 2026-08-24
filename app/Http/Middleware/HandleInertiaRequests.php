@@ -8,9 +8,7 @@ use Inertia\Middleware;
 class HandleInertiaRequests extends Middleware
 {
     /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
+     * The root template that is loaded on the first page visit.
      *
      * @var string
      */
@@ -35,9 +33,41 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        if ($user) {
+            $user->loadMissing(['timKerja', 'roleRelation']);
+        }
+
         return [
             ...parent::share($request),
-            //
+            'auth' => [
+                'user' => $user ? [
+                    'id' => $user->user_id,
+                    'user_id' => $user->user_id,
+                    'name' => $user->nama,
+                    'nama' => $user->nama,
+                    'email' => $user->email,
+                    'nip' => $user->nip,
+                    'no_hp' => $user->no_hp,
+                    'role' => $user->role,
+                    'role_id' => $user->role_id,
+                    'status' => $user->status,
+                    'avatar_path' => $user->avatar_path,
+                    'tim_kerja_id' => $user->tim_kerja_id,
+                    'tim_kerja' => $user->timKerja ? [
+                        'id' => $user->timKerja->tim_kerja_id,
+                        'tim_kerja_id' => $user->timKerja->tim_kerja_id,
+                        'nama_tim_kerja' => $user->timKerja->nama_tim_kerja,
+                        'keterangan' => $user->timKerja->keterangan,
+                    ] : null,
+                ] : null,
+            ],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+                'info' => fn () => $request->session()->get('info'),
+            ],
         ];
     }
 }

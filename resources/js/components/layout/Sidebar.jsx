@@ -10,11 +10,15 @@ import {
   X,
   Sparkles,
   Bot,
+  Users,
+  ShieldCheck
 } from "lucide-react";
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
-  const { url } = usePage();
+  const { url, props } = usePage();
   const currentPath = url.split('?')[0];
+  const authUser = props?.auth?.user;
+  const isAdmin = authUser?.role === 'ADMIN';
 
   const navItems = [
     {
@@ -35,6 +39,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
   ];
 
   const isAiActive = currentPath.startsWith("/ai");
+  const isManageAccountsActive = currentPath.startsWith("/admin/users");
 
   return (
     <>
@@ -93,7 +98,6 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             {/* Institution Badge */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#383F6A] border border-white/10 text-white text-[10px] font-bold mb-1">
               <Sparkles className="w-3 h-3 text-[#FFC800]" />
-
               <span>Kanwil Kemenkum Riau</span>
             </div>
 
@@ -144,6 +148,36 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
           </nav>
 
           {/* =========================================
+              ADMIN SECTION (ONLY FOR ROLE === 'ADMIN')
+          ========================================= */}
+          {isAdmin && (
+            <div className="px-3.5 mt-4">
+              <p className="px-3 text-[10px] font-bold text-purple-300 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-purple-400" />
+                <span>Manajemen Sistem</span>
+              </p>
+
+              <Link
+                href="/admin/users"
+                onClick={() => setIsMobileOpen(false)}
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
+                  isManageAccountsActive
+                    ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-black shadow-md"
+                    : "text-purple-200 hover:bg-[#383F6A] hover:text-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Users className="w-4 h-4 shrink-0" />
+                  <span className="tracking-wide">Kelola Akun (Users)</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded bg-purple-400/20 text-purple-200 text-[9px] font-black uppercase">
+                  Admin
+                </span>
+              </Link>
+            </div>
+          )}
+
+          {/* =========================================
               AI SECTION
           ========================================= */}
           <div className="px-3.5 mt-4">
@@ -181,9 +215,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                         : "bg-[#FFC800]/10 border border-[#FFC800]/20"
                     }`}
                   >
-                    <Bot
-                      className="w-5 h-5 text-[#FFC800]"
-                    />
+                    <Bot className="w-5 h-5 text-[#FFC800]" />
                   </div>
 
                   {/* Text */}
@@ -227,11 +259,10 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             BOTTOM LOGOUT SECTION
         ========================================= */}
         <div className="p-4 border-t border-[#383F6A] bg-[#222645]">
-          {/* Logout */}
           <button
             type="button"
             onClick={onTriggerLogout}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold flat-btn-danger"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold bg-rose-600/20 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 transition-all duration-150"
           >
             <LogOut className="w-4 h-4" />
             <span>Keluar / Logout</span>

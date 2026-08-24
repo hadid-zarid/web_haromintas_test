@@ -1,48 +1,71 @@
-import React, { createContext, useContext, useState } from 'react';
-import { MOCK_USERS, ROLES } from '../mock/mockUsers';
+import React, { createContext, useContext } from 'react';
+import { usePage, router } from '@inertiajs/react';
+import { MOCK_USERS } from '../mock/mockUsers';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Default to Proja 1 if available or null (user can select role at login)
-  const [user, setUser] = useState(() => {
-    const savedRole = localStorage.getItem('app_user_role');
-    if (savedRole) {
-      return MOCK_USERS.find(u => u.role === savedRole) || MOCK_USERS[0];
-    }
-    return MOCK_USERS[0]; // Default logged-in user simulation
-  });
-
-  const login = (roleName) => {
-    const matchedUser = MOCK_USERS.find(u => u.role === roleName) || {
-      id: 'usr-custom',
-      name: `User ${roleName}`,
-      role: roleName,
-      nip: '19900000 202000 1 001',
-      unit: 'Instansi Pemerintah',
-      email: `${roleName.toLowerCase().replace(/\s+/g, '')}@kemenkum.go.id`,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
-    };
-    setUser(matchedUser);
-    localStorage.setItem('app_user_role', roleName);
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('app_user_role');
-  };
-
   return (
-    <AuthContext.Provider value={{ user, role: user?.role || null, login, logout, availableUsers: MOCK_USERS }}>
+    <AuthContext.Provider value={{}}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  let authUser = null;
+  
+  try {
+    const page = usePage();
+    authUser = page.props?.auth?.user;
+  } catch (e) {
+    // Fallback if accessed outside Inertia component tree
+    authUser = null;
   }
-  return context;
+
+  let unit = 'Kantor Wilayah Kementerian Hukum Riau';
+  if ((authUser?.role === 'TIM_KERJA' || authUser?.role === 'POKJA') && authUser.tim_kerja) {
+    unit = `Kanwil Riau - ${authUser.tim_kerja.nama_tim_kerja}`;
+  } else if (authUser?.role === 'BIRO_HUKUM') {
+    unit = 'Biro Hukum Provinsi Riau';
+  } else if (authUser?.role === 'ADMIN') {
+    unit = 'Administrator Sistem Kanwil Riau';
+  } else if (authUser?.role === 'PIMPINAN') {
+    unit = 'Pimpinan Kanwil Kemenkumham Riau';
+  }
+
+  const user = authUser ? {
+    ...authUser,
+    id: authUser.user_id || authUser.id,
+    name: authUser.nama || authUser.name,
+    unit,
+    avatar: authUser.avatar_path || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
+  } : null;
+
+  const role = user?.role || null;
+
+  const login = (credentials) => {
+    if (typeof credentials === 'object' && credentials.email) {
+      router.post('/login', credentials);
+    }
+  };
+
+  const logout = () => {
+    router.post('/logout');
+  };
+
+  return {
+    user,
+    role,
+    isAdmin: role === 'ADMIN',
+    isTimKerja: role === 'TIM_KERJA' || role === 'POKJA',
+    isPokja: role === 'TIM_KERJA' || role === 'POKJA',
+    isBiroHukum: role === 'BIRO_HUKUM',
+    isPimpinan: role === 'PIMPINAN',
+    login,
+    logout,
+    availableUsers: MOCK_USERS,
+  };
 };
+
+export default AuthContext;
