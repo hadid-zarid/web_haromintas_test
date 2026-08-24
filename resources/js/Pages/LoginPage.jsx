@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-<<<<<<< Updated upstream
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { 
-  Lock, 
-  Mail, 
-  LogIn, 
-  ArrowLeft, 
-  Sparkles, 
-  Eye, 
-  EyeOff, 
-  ShieldCheck, 
-  CheckCircle2, 
+import {
+  Lock,
+  Mail,
+  LogIn,
+  ArrowLeft,
+  Sparkles,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  CheckCircle2,
   AlertCircle,
   Building,
   KeyRound
@@ -244,8 +243,8 @@ export const LoginPage = ({ demoUsers = [] }) => {
                       type="button"
                       onClick={() => handleSelectDemo(demo)}
                       className={`p-2.5 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between ${
-                        data.email === demo.email 
-                          ? 'border-[#1A1A5E] bg-[#1A1A5E]/5 ring-2 ring-[#FFC800]/50' 
+                        data.email === demo.email
+                          ? 'border-[#1A1A5E] bg-[#1A1A5E]/5 ring-2 ring-[#FFC800]/50'
                           : 'border-[#E2E2DC] bg-[#F8F8F5] hover:bg-white hover:border-[#1A1A5E]/30'
                       }`}
                     >
@@ -280,179 +279,6 @@ export const LoginPage = ({ demoUsers = [] }) => {
         <div className="px-6 py-3.5 bg-[#F8F8F5] border-t border-[#E2E2DC] text-center text-[10px] text-slate-500 font-bold flex items-center justify-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>Sistem Informasi Terenkripsi • Kanwil Kemenkumham Provinsi Riau</span>
-=======
-import { router } from '@inertiajs/react';
-import { ArrowLeft, Lock, LogIn, ShieldCheck, Sparkles, User } from 'lucide-react';
-
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { MOCK_USERS, ROLES } from '../mock/mockUsers';
-import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
-
-export const LoginPage = () => {
-  const [selectedRole, setSelectedRole] = useState(ROLES.PROJA_1);
-  const [username, setUsername] = useState('operator.riau');
-  const [password, setPassword] = useState('••••••••');
-
-  const { login } = useAuth();
-  const { showToast } = useToast();
-
-  const handleRoleChange = (event) => {
-    const roleValue = event.target.value;
-    setSelectedRole(roleValue);
-
-    const matchedUser = MOCK_USERS.find((user) => user.role === roleValue);
-    if (matchedUser) {
-      setUsername(matchedUser.email.split('@')[0]);
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    login(selectedRole);
-    showToast(`Berhasil masuk sebagai ${selectedRole}`, 'success');
-    router.visit('/home');
-  };
-
-  const getRoleDescription = (role) => {
-    switch (role) {
-      case ROLES.PROJA_1:
-      case ROLES.PROJA_2:
-      case ROLES.PROJA_3:
-        return 'Akses input permohonan dan penyusunan Surat Hasil Harmonisasi wilayah Riau.';
-      case ROLES.KAKANWIL:
-        return 'Akses pemantauan eksekutif dan pengawasan seluruh berkas permohonan Riau.';
-      case ROLES.KADIV:
-        return 'Akses verifikasi Divisi P3H dan evaluasi permohonan.';
-      case ROLES.BIRO_HUKUM:
-        return 'Akses pemeriksaan tingkat provinsi dan pengunggahan Surat Hasil Fasilitasi.';
-      default:
-        return '';
-    }
-  };
-
-  return (
-    <div className="login-legal-bg min-h-screen overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
-      <button
-        type="button"
-        onClick={() => router.visit('/')}
-        className="absolute left-4 top-5 z-20 inline-flex h-11 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 text-xs font-semibold text-white shadow-sm backdrop-blur-md transition-colors hover:bg-white/15 sm:left-8 sm:top-8"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Kembali ke Beranda
-      </button>
-
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-12rem)] max-w-7xl items-center justify-center">
-        <div className="w-full max-w-[560px] overflow-hidden rounded-[28px] border border-white/80 bg-white shadow-[0_30px_80px_rgba(5,12,49,0.35)]">
-          <div className="px-6 pb-5 pt-8 text-center sm:px-10 sm:pt-10">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-[22px] border border-[#E2E6EF] bg-white p-2 shadow-[0_12px_28px_rgba(30,39,89,0.13)]">
-              <img
-                src={logoHarmonitas}
-                alt="Logo HARMONITAS"
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            <div className="mt-5 flex items-center justify-center gap-2">
-              <p className="text-lg font-extrabold tracking-[0.08em] text-[#303661]">HARMONITAS</p>
-              <span className="rounded-full bg-[#EEF1F8] px-2 py-0.5 text-[9px] font-extrabold text-[#6473B5]">Provinsi Riau</span>
-            </div>
-
-            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-[#232638] sm:text-[34px]">
-              Masuk ke Dashboard
-            </h1>
-            <p className="mx-auto mt-2 max-w-sm text-xs font-medium leading-5 text-[#73798A]">
-              Gunakan akun petugas yang telah terdaftar untuk mengakses layanan HARMONITAS.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-7 sm:px-10 sm:pb-9">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="username" className="mb-1.5 block text-xs font-bold text-[#30384A]">
-                  Username Petugas
-                </label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#9AA1B1]">
-                    <User className="h-4 w-4" />
-                  </span>
-                  <input
-                    id="username"
-                    type="text"
-                    required
-                    value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    placeholder="Masukkan username"
-                    className="bento-input px-3 py-2.5 pl-10 text-xs font-semibold"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="mb-1.5 block text-xs font-bold text-[#30384A]">
-                  Kata Sandi
-                </label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#9AA1B1]">
-                    <Lock className="h-4 w-4" />
-                  </span>
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder="Masukkan kata sandi"
-                    className="bento-input px-3 py-2.5 pl-10 text-xs font-semibold"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-[#EDF0F5] pt-4">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <label htmlFor="role" className="flex items-center gap-2 text-xs font-bold text-[#30384A]">
-                  <ShieldCheck className="h-4 w-4 text-[#3269D8]" />
-                  Simulasi Hak Akses
-                </label>
-                <span className="inline-flex items-center gap-1 rounded-full border border-[#FFE1A9] bg-[#FFF8E9] px-2.5 py-1 text-[9px] font-bold text-[#B56A00]">
-                  <Sparkles className="h-3 w-3" />
-                  Tanpa Backend
-                </span>
-              </div>
-
-              <select
-                id="role"
-                value={selectedRole}
-                onChange={handleRoleChange}
-                className="bento-input cursor-pointer px-3 py-2.5 text-xs font-semibold"
-              >
-                {Object.values(ROLES).map((roleName) => (
-                  <option key={roleName} value={roleName}>
-                    {roleName}
-                  </option>
-                ))}
-              </select>
-
-              <div className="mt-3 rounded-xl border border-[#DDE5F3] bg-[#F5F8FE] px-3.5 py-3 text-[10px] font-medium leading-5 text-[#606A7E]">
-                <span className="font-bold text-[#303661]">Keterangan akses:</span>{' '}
-                {getRoleDescription(selectedRole)}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#303661] to-[#454C7D] px-4 text-xs font-bold text-white shadow-[0_10px_22px_rgba(48,54,97,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(48,54,97,0.3)]"
-            >
-              <LogIn className="h-4 w-4" />
-              Masuk ke Dashboard
-            </button>
-
-            <p className="text-center text-[10px] font-medium text-[#98A0B1]">
-              Autentikasi aman untuk pengguna resmi HARMONITAS.
-            </p>
-          </form>
->>>>>>> Stashed changes
         </div>
       </div>
     </div>

@@ -258,12 +258,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
         {/* =========================================
             BOTTOM LOGOUT SECTION
         ========================================= */}
-<<<<<<< Updated upstream
-        <div className="p-4 border-t border-[#383F6A] bg-[#222645]">
-=======
         <div className="border-t border-white/10 bg-[#252B56]/75 p-4">
-          {/* Logout */}
->>>>>>> Stashed changes
           <button
             type="button"
             onClick={onTriggerLogout}
