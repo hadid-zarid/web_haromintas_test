@@ -102,7 +102,8 @@ export const DraftGenerateModal = ({
   isOpen,
   onClose,
   initialType = 'perda', // Jenis awal: 'perda' atau 'perkada'
-  onSaveHistory
+  onSaveHistory,
+  isModal = true
 }) => {
   /*
   |--------------------------------------------------------------------------
@@ -457,8 +458,7 @@ export const DraftGenerateModal = ({
       });
     }
 
-    const printContent =
-      printAreaRef.current;
+    const printContent = printAreaRef.current;
 
     if (!printContent) return;
 
@@ -477,62 +477,142 @@ export const DraftGenerateModal = ({
       <!DOCTYPE html>
       <html>
         <head>
+          <meta charset="utf-8">
           <title>
-            Cetak - Surat Selesai
-            ${letterType.toUpperCase()}
-            - W.4-PP.04.02-${formData.nomorSurat}
+            Cetak - Surat Selesai ${letterType.toUpperCase()} - W.4-PP.04.02-${formData.nomorSurat}
           </title>
 
           <style>
             @page {
               size: A4 portrait;
-              margin: 20mm 20mm 20mm 20mm;
+              margin: 15mm 20mm 20mm 20mm;
+            }
+
+            * {
+              box-sizing: border-box;
             }
 
             body {
-              font-family:
-                Arial,
-                Helvetica,
-                "Bookman Old Style",
-                sans-serif;
-
+              font-family: Arial, Helvetica, "Bookman Old Style", sans-serif;
               font-size: 11pt;
-              line-height: 1.35;
+              line-height: 1.4;
               color: #000000;
-
               margin: 0;
               padding: 0;
               background: #ffffff;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
             }
 
-            .kop-border {
-              border-bottom: 2px solid #000000;
-              padding-bottom: 6px;
-              margin-bottom: 16px;
+            /* Container reset in print window */
+            body > div, .print-paper {
+              width: 100% !important;
+              max-width: 100% !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              box-shadow: none !important;
+              border: none !important;
+              background: #ffffff !important;
+              min-height: auto !important;
             }
 
-            .meta-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 16px;
-              font-size: 11pt;
+            /* Flexbox utility fallbacks for print window */
+            .flex { display: flex !important; }
+            .flex-col { flex-direction: column !important; }
+            .items-center { align-items: center !important; }
+            .justify-between { justify-content: space-between !important; }
+            .justify-end { justify-content: flex-end !important; }
+            .shrink-0 { flex-shrink: 0 !important; }
+            .flex-1 { flex: 1 1 0% !important; }
+
+            /* Table layout */
+            table { width: 100% !important; border-collapse: collapse !important; }
+            td { vertical-align: top; }
+
+            .align-middle { vertical-align: middle !important; }
+            .align-top { vertical-align: top !important; }
+            .text-center { text-align: center !important; }
+            .text-right { text-align: right !important; }
+            .text-left { text-align: left !important; }
+            .text-justify { text-align: justify !important; text-justify: inter-word !important; }
+            .whitespace-nowrap { white-space: nowrap !important; }
+
+            .indent-9 { text-indent: 38px !important; }
+
+            /* Signature Block Fallback for Print */
+            .signature-container {
+              margin-top: 40px !important;
+              width: 100% !important;
+              display: flex !important;
+              justify-content: flex-end !important;
             }
 
-            .meta-table td {
-              vertical-align: top;
-              padding: 1px 0;
+            .signature-box {
+              width: 260px !important;
+              margin-left: auto !important;
+              float: right !important;
+              text-align: left !important;
+              font-size: 11pt !important;
             }
 
             p {
               margin: 0 0 12px 0;
               text-align: justify;
-              text-justify: inter-word;
               line-height: 1.4;
             }
 
-            .text-indent {
-              text-indent: 38px;
+            ol {
+              margin: 0;
+              padding-left: 20px;
             }
+
+            li {
+              margin-bottom: 2px;
+            }
+
+            /* Utility class map override */
+            .w-24 { width: 90px !important; min-width: 90px !important; }
+            .w-20 { width: 75px !important; }
+            .h-24 { height: 90px !important; }
+            .w-16 { width: 70px !important; }
+            .w-4 { width: 15px !important; }
+            .w-64 { width: 260px !important; }
+            .w-full { width: 100% !important; }
+
+            .m-0 { margin: 0 !important; }
+            .mb-1 { margin-bottom: 4px !important; }
+            .mb-4 { margin-bottom: 16px !important; }
+            .mb-5 { margin-bottom: 20px !important; }
+            .mb-14 { margin-bottom: 56px !important; }
+            .mt-0\.5 { margin-top: 2px !important; }
+            .mt-1 { margin-top: 4px !important; }
+            .mt-8 { margin-top: 30px !important; }
+            .mt-10 { margin-top: 40px !important; }
+            .my-5 { margin-top: 20px !important; margin-bottom: 20px !important; }
+            .pb-2 { padding-bottom: 8px !important; }
+            .pr-4 { padding-right: 16px !important; }
+            .py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+            .py-0\.5 { padding-top: 2px !important; padding-bottom: 2px !important; }
+            .pl-5 { padding-left: 20px !important; }
+
+            .border-b-2 { border-bottom: 2.5px solid #000000 !important; }
+            .border-black { border-color: #000000 !important; }
+
+            .text-\[12pt\] { font-size: 12pt !important; }
+            .text-\[13pt\] { font-size: 13pt !important; }
+            .text-\[9pt\] { font-size: 9pt !important; }
+            .text-\[10pt\] { font-size: 10pt !important; }
+            .text-\[11pt\] { font-size: 11pt !important; }
+
+            .font-normal { font-weight: normal !important; }
+            .font-bold { font-weight: bold !important; }
+            .tracking-wide { letter-spacing: 0.5px !important; }
+            .uppercase { text-transform: uppercase !important; }
+            .leading-tight { line-height: 1.25 !important; }
+            .leading-snug { line-height: 1.4 !important; }
+            .leading-relaxed { line-height: 1.5 !important; }
+            .underline { text-decoration: underline !important; }
+            .text-blue-700 { color: #1d4ed8 !important; }
           </style>
         </head>
 
@@ -541,11 +621,12 @@ export const DraftGenerateModal = ({
 
           <script>
             window.onload = function() {
-              window.print();
-
               setTimeout(function() {
-                window.close();
-              }, 600);
+                window.print();
+                setTimeout(function() {
+                  window.close();
+                }, 500);
+              }, 350);
             };
           </script>
         </body>
@@ -881,17 +962,11 @@ Tembusan:
   | RENDER COMPONENT
   |--------------------------------------------------------------------------
   */
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Generator ${letterType === 'perda'
-          ? 'Surat Selesai PERDA'
-          : 'Surat Selesai PERKADA'
-        }`}
-      size="5xl"
-    >
-      <div className="space-y-5">
+  const content = (
+    <div className="space-y-5">
+      {/* =====================================================
+          HEADER TOOLBAR
+      ====================================================== */}
 
         {/* =====================================================
             HEADER TOOLBAR
@@ -943,8 +1018,8 @@ Tembusan:
             </button>
           </div>
 
-          {/* Navigasi tab */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          {/* Navigasi tab & Akses Cepat Unduh */}
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
 
             <div className="flex items-center gap-1 p-1 bg-white border border-[#E2E2DC] rounded-xl">
 
@@ -985,6 +1060,33 @@ Tembusan:
               </button>
 
             </div>
+
+            {/* Tombol Akses Cepat Unduh Word & PDF */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadDocx}
+                disabled={isDownloading}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#2B579A] hover:bg-[#1E3E6D] text-white text-xs font-black shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                title="Unduh Surat dalam Format Microsoft Word (.docx)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{isDownloading ? 'Proses...' : 'Download Word (.docx)'}</span>
+                <span className="sm:hidden">Word</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#FFD54F] to-[#FFB300] hover:from-[#FFE082] hover:to-[#FFC107] text-[#1A1A5E] text-xs font-black shadow-xs transition-all cursor-pointer"
+                title="Cetak atau Simpan Dokumen sebagai File PDF"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Cetak / Simpan PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </button>
+            </div>
+
           </div>
         </div>
 
@@ -1311,7 +1413,7 @@ Tembusan:
           <div className="space-y-4">
 
             {/* Document Sheet Viewer */}
-            <div className="bg-[#525659] p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center max-h-[62vh] overflow-y-auto">
+            <div className={`bg-[#525659] p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center ${isModal ? 'max-h-[62vh] overflow-y-auto' : 'min-h-[750px] py-8'}`}>
 
               {/* Paper Sheet */}
               <div
@@ -1521,15 +1623,15 @@ Tembusan:
                 {/* =================================================
                     TANDA TANGAN
                 ================================================== */}
-                <div className="mt-10 flex justify-end">
+                <div className="mt-10 flex justify-end signature-container" style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
 
-                  <div className="w-64 text-left text-[11pt]">
+                  <div className="w-64 text-left text-[11pt] signature-box" style={{ width: '260px', marginLeft: 'auto', textAlign: 'left' }}>
 
-                    <p className="mb-14">
+                    <p className="mb-14" style={{ marginBottom: '56px', margin: '0 0 56px 0' }}>
                       {formData.jabatanKakanwil}
                     </p>
 
-                    <p className="font-normal">
+                    <p className="font-normal" style={{ margin: 0 }}>
                       {formData.namaKakanwil}
                     </p>
 
@@ -1639,6 +1741,24 @@ Tembusan:
         )}
 
       </div>
+  );
+
+  if (!isModal) {
+    if (!isOpen) return null;
+    return content;
+  }
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Generator ${letterType === 'perda'
+          ? 'Surat Selesai PERDA'
+          : 'Surat Selesai PERKADA'
+        }`}
+      size="5xl"
+    >
+      {content}
     </Modal>
   );
 };

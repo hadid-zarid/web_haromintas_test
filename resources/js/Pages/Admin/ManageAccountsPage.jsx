@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '../../components/layout/AppLayout';
 import RoleBadge from '../../components/common/RoleBadge';
@@ -33,6 +33,33 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [selectedRole, setSelectedRole] = useState(filters.role || 'ALL');
   const [selectedStatus, setSelectedStatus] = useState(filters.status || 'ALL');
+
+  const isFirstRender = useRef(true);
+
+  // Live search otomatis saat mengetik (debounced 300ms) atau mengubah filter dropdown
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      router.get(
+        '/admin/users',
+        {
+          search: searchTerm,
+          role: selectedRole,
+          status: selectedStatus,
+        },
+        {
+          preserveState: true,
+          replace: true,
+        }
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, selectedRole, selectedStatus]);
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

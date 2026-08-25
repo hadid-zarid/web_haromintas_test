@@ -122,20 +122,35 @@ Route::middleware('auth')->group(function () {
                 ], 500);
             }
 
-            $placeholders = [
-                '{{NOMOR_SURAT}}' => htmlspecialchars($nomorSurat, ENT_XML1, 'UTF-8'),
-                '{{TANGGAL_SURAT}}' => htmlspecialchars($tanggalSurat, ENT_XML1, 'UTF-8'),
-                '{{HAL}}' => htmlspecialchars($hal, ENT_XML1, 'UTF-8'),
-                '{{JABATAN_PEMRAKARSA}}' => htmlspecialchars($jabatanPemrakarsa, ENT_XML1, 'UTF-8'),
-                '{{IBUKOTA}}' => htmlspecialchars($ibukota, ENT_XML1, 'UTF-8'),
-                '{{NOMOR_SURAT_PEMRAKARSA}}' => htmlspecialchars($nomorSuratP, ENT_XML1, 'UTF-8'),
-                '{{TANGGAL_SURAT_PEMRAKARSA}}' => htmlspecialchars($tanggalSuratP, ENT_XML1, 'UTF-8'),
-                '{{JENIS_PERATURAN}}' => htmlspecialchars($jenisPeraturan, ENT_XML1, 'UTF-8'),
-                '{{ASAL_PEMRAKARSA}}' => htmlspecialchars($asalPemrakarsa, ENT_XML1, 'UTF-8'),
-                '{{JUDUL_PERATURAN}}' => htmlspecialchars($judulPeraturan, ENT_XML1, 'UTF-8'),
+            $replacements = [
+                'NOMOR_SURAT' => $nomorSurat,
+                'TANGGAL_SURAT' => $tanggalSurat,
+                'HAL' => $hal,
+                'JABATAN_PEMRAKARSA' => $jabatanPemrakarsa,
+                'IBUKOTA' => $ibukota,
+                'NOMOR_SURAT_P' => $nomorSuratP,
+                'TANGGAL_SURAT_P' => $tanggalSuratP,
+                'JENIS_PERATURAN' => $jenisPeraturan,
+                'ASAL_PEMRAKARSA' => $asalPemrakarsa,
+                'JUDUL_PERATURAN' => $judulPeraturan,
             ];
 
-            $xml = str_replace(array_keys($placeholders), array_values($placeholders), $xml);
+            // 1. Hapus tag fldSimple agar tidak dianggap sebagai Word Field kosong
+            $xml = preg_replace('/<\/?w:fldSimple[^>]*>/i', '', $xml);
+
+            // 2. Hapus marker fldChar (begin, separate, end) agar Word memperlakukan teks sebagai teks polos permanen
+            $xml = preg_replace('/<w:fldChar[^>]*\/>/i', '', $xml);
+
+            // 3. Hapus tag instruksi MERGEFIELD
+            $xml = preg_replace('/<w:instrText[^>]*>.*?<\/w:instrText>/i', '', $xml);
+
+            // 4. Ganti placeholder «KEY» dan {{KEY}} dengan nilai input dari form
+            foreach ($replacements as $key => $val) {
+                $safeVal = htmlspecialchars($val, ENT_XML1, 'UTF-8');
+                $xml = str_replace("«{$key}»", $safeVal, $xml);
+                $xml = str_replace("{{{$key}}}", $safeVal, $xml);
+            }
+
             $zip->addFromString('word/document.xml', $xml);
             $zip->close();
 

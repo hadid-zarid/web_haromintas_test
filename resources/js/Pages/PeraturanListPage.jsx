@@ -66,10 +66,21 @@ export const PeraturanListPage = ({
     setPerPage(filters.per_page || 10);
   }, [filters]);
 
-  // Modals state
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingPermohonan, setEditingPermohonan] = useState(null);
-  const [deletingPermohonan, setDeletingPermohonan] = useState(null);
+  const isFirstRender = useRef(true);
+
+  // Live search otomatis saat mengetik (debounced 300ms)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      triggerQuery({ page: 1 });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const addFileInputRef = useRef(null);
 

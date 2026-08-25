@@ -18,6 +18,8 @@ export const LogoPengayoman = ({
         role="img"
         aria-label="Logo Pengayoman"
       >
+        {/* Background Box for Vector Print Compatibility */}
+        <rect width="400" height="360" fill={bgColor} />
         <g
           fill="none"
           stroke={symbolColor}
