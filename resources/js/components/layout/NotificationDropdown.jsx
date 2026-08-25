@@ -108,28 +108,31 @@ export const NotificationDropdown = () => {
           {/* List */}
           <div className="max-h-[28rem] overflow-y-auto">
             {displayedNotifications.length > 0 ? (
-              displayedNotifications.map(notif => (
-                <div key={notif.id} className={`p-4 flex gap-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 ${notif.unread ? 'bg-blue-50/30' : ''}`}>
-                  <div className="relative shrink-0">
-                    <img src={notif.avatar} alt={notif.user} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
-                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                      <notif.icon className={`w-3.5 h-3.5 ${notif.iconColor}`} />
+              displayedNotifications.map(notif => {
+                const IconComp = notif.icon;
+                return (
+                  <div key={notif.id} className={`p-4 flex gap-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 ${notif.unread ? 'bg-blue-50/30' : ''}`}>
+                    <div className="relative shrink-0">
+                      <img src={notif.avatar} alt={notif.user} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                        {IconComp && <IconComp className={`w-3.5 h-3.5 ${notif.iconColor}`} />}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-700 leading-relaxed">
-                      <span className="font-bold text-[#1A1A5E] mr-1">{notif.user}</span>
-                      {notif.action}
-                    </p>
-                    <p className="text-[10px] text-slate-400 mt-1.5 font-semibold">{notif.time}</p>
-                  </div>
-                  {notif.unread && (
-                    <div className="shrink-0 flex items-center justify-center mt-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        <span className="font-bold text-[#1A1A5E] mr-1">{notif.user}</span>
+                        {notif.action}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-1.5 font-semibold">{notif.time}</p>
                     </div>
-                  )}
-                </div>
-              ))
+                    {notif.unread && (
+                      <div className="shrink-0 flex items-center justify-center mt-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             ) : (
               <div className="p-8 text-center text-xs font-semibold text-slate-500">
                 Tidak ada notifikasi
