@@ -54,8 +54,31 @@ export const PeraturanListPage = ({
   const [sortDir, setSortDir] = useState(filters.sort_dir || "desc");
   const [perPage, setPerPage] = useState(filters.per_page || 10);
 
+  // Modal & Action States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingPermohonan, setEditingPermohonan] = useState(null);
+  const [deletingPermohonan, setDeletingPermohonan] = useState(null);
+
+  // Tracks previous search term to avoid redundant re-fetches & loops
+  const prevSearchRef = useRef(filters.search || "");
+
+  // Live search otomatis saat mengetik (debounced 300ms)
+  useEffect(() => {
+    if (prevSearchRef.current === searchTerm) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      prevSearchRef.current = searchTerm;
+      triggerQuery({ page: 1, search: searchTerm });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Sync state when props change
   useEffect(() => {
+    prevSearchRef.current = filters.search || "";
     setSearchTerm(filters.search || "");
     setSelectedKabupaten(filters.kabupaten_id || "ALL");
     setSelectedJenis(filters.jenis_regulasi_id || "ALL");
@@ -65,22 +88,6 @@ export const PeraturanListPage = ({
     setSortDir(filters.sort_dir || "desc");
     setPerPage(filters.per_page || 10);
   }, [filters]);
-
-  const isFirstRender = useRef(true);
-
-  // Live search otomatis saat mengetik (debounced 300ms)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      triggerQuery({ page: 1 });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   const addFileInputRef = useRef(null);
 

@@ -171,6 +171,12 @@ export const LoginPage = ({ demoUsers = [] }) => {
                 <label className="block text-xs font-extrabold text-[#1A1A5E]">
                   Kata Sandi / Password
                 </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[11px] font-bold text-[#1A1A5E] hover:text-[#2C3154] hover:underline"
+                >
+                  Lupa Kata Sandi?
+                </Link>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
