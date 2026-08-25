@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import AppLayout from '../components/layout/AppLayout';
 import { 
   ChevronDown, 
@@ -50,6 +51,7 @@ export const PanduanPage = () => {
 
   return (
     <AppLayout>
+      <Head title="Buku Panduan - HARMONITAS" />
       <div className="space-y-6 max-w-5xl mx-auto">
         {/* Page Header Flat Card */}
         <div className="flat-card-dark text-white p-7 flex items-center gap-5">

@@ -10,12 +10,9 @@ import {
   X,
   Sparkles,
   Bot,
-<<<<<<< Updated upstream
   Users,
-  ShieldCheck
-=======
+  ShieldCheck,
   FileOutput,
->>>>>>> Stashed changes
 } from "lucide-react";
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {

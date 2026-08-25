@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import AppLayout from '../components/layout/AppLayout';
 
 import {
@@ -131,6 +132,7 @@ const AIAssistantPage = () => {
 
   return (
     <AppLayout>
+      <Head title="Asisten AI Pra-Harmonisasi - HARMONITAS" />
       <div className="space-y-6">
 
 

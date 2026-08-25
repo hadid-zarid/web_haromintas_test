@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
   ArrowRight,
   BookOpen,
@@ -137,6 +137,7 @@ export const LandingPage = () => {
       className="min-h-screen overflow-x-hidden bg-[#F5F7FA] text-[#1E293B]"
       style={{ fontFamily: '"Outfit", ui-sans-serif, system-ui, sans-serif' }}
     >
+      <Head title="HARMONITAS - Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas" />
       <PublicNavbar />
 
       <main>

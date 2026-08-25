@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import {
-  Lock,
-  Mail,
-  LogIn,
-  ArrowLeft,
-  Sparkles,
-  Eye,
-  EyeOff,
-  ShieldCheck,
-  CheckCircle2,
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { 
+  Lock, 
+  Mail, 
+  LogIn, 
+  ArrowLeft, 
+  Sparkles, 
+  Eye, 
+  EyeOff, 
+  ShieldCheck, 
+  CheckCircle2, 
   AlertCircle,
   Building,
   KeyRound
@@ -43,6 +43,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
 
   return (
     <div className="min-h-screen bg-[#F4F5F9] flex flex-col justify-center items-center p-4 sm:p-6">
+      <Head title="Masuk ke Sistem - HARMONITAS" />
       {/* Top Header Controls */}
       <div className="w-full max-w-xl mb-4 flex items-center justify-between">
         <Link

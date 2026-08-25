@@ -64,15 +64,11 @@ export const AppLayout = ({ children, title }) => {
       return "Dashboard";
     }
 
-<<<<<<< Updated upstream
-    if (pathname.startsWith("/admin/users")) {
+    if (currentPath.startsWith("/admin/users")) {
       return "Manajemen Akun & Hak Akses (RBAC)";
     }
 
-    if (pathname.includes("/peraturan/")) {
-=======
     if (currentPath.includes("/peraturan/")) {
->>>>>>> Stashed changes
       return "Detail Permohonan Peraturan";
     }
 
@@ -283,14 +279,9 @@ export const AppLayout = ({ children, title }) => {
         ================================== */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-7 lg:p-8">
           {/* Page Header */}
-<<<<<<< Updated upstream
-          <div className="mb-7">
-            <h2 className="text-2xl font-extrabold tracking-tight text-[#20283D] sm:text-3xl">
-=======
           <div className="mb-6">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A5E] tracking-tight">
->>>>>>> Stashed changes
-              {getHeaderTitle(pathname)}
+              {getHeaderTitle(currentPath)}
             </h2>
 
             {/* Yellow Accent */}
