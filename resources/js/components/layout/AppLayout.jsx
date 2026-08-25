@@ -281,7 +281,7 @@ export const AppLayout = ({ children, title }) => {
           {/* Page Header */}
           <div className="mb-6">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A5E] tracking-tight">
-              {getHeaderTitle(currentPath)}
+              {getHeaderTitle(pathname)}
             </h2>
 
             {/* Yellow Accent */}
