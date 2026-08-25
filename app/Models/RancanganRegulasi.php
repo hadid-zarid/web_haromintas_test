@@ -71,6 +71,14 @@ class RancanganRegulasi extends Model
     }
 
     /**
+     * Alias Relasi ke Status Regulasi
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(StatusRegulasi::class, 'status_id', 'status_id');
+    }
+
+    /**
      * Relasi ke User Pengunggah / Pembuat
      */
     public function uploader(): BelongsTo

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '../../components/layout/AppLayout';
 import RoleBadge from '../../components/common/RoleBadge';
@@ -19,7 +19,13 @@ import {
   AlertTriangle,
   RotateCcw,
   Eye,
-  EyeOff
+  EyeOff,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal
 } from 'lucide-react';
 
 export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], filters = {} }) => {
@@ -28,38 +34,112 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
   // Normalisasi list unit tim kerja
   const unitList = (timKerjas && timKerjas.length > 0) ? timKerjas : pokjas;
+  const rawUsers = Array.isArray(users) ? users : (users?.data || []);
 
-  // Filter States
+  // Filter & Sorting States (Pure React In-Memory State untuk Instant Filter tanpa Reload)
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [selectedRole, setSelectedRole] = useState(filters.role || 'ALL');
   const [selectedStatus, setSelectedStatus] = useState(filters.status || 'ALL');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortDir, setSortDir] = useState('desc');
+  const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const isFirstRender = useRef(true);
+  // Instant In-Memory Filter & Sorting
+  const filteredUsers = useMemo(() => {
+    let result = [...rawUsers];
 
-  // Live search otomatis saat mengetik (debounced 300ms) atau mengubah filter dropdown
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    // Search Filter
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(u => {
+        const name = (u.nama || u.name || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const nip = (u.nip || '').toLowerCase();
+        const noHp = (u.no_hp || '').toLowerCase();
+        const timName = (u.tim_kerja?.nama_tim_kerja || u.timKerja?.nama_tim_kerja || '').toLowerCase();
+        const roleName = (u.role || u.role_relation?.nama_role || '').toLowerCase();
+        return name.includes(term) || email.includes(term) || nip.includes(term) || noHp.includes(term) || timName.includes(term) || roleName.includes(term);
+      });
     }
 
-    const timer = setTimeout(() => {
-      router.get(
-        '/admin/users',
-        {
-          search: searchTerm,
-          role: selectedRole,
-          status: selectedStatus,
-        },
-        {
-          preserveState: true,
-          replace: true,
-        }
-      );
-    }, 300);
+    // Role Filter
+    if (selectedRole !== 'ALL') {
+      result = result.filter(u => {
+        const roleId = String(u.role_id || '');
+        const roleCode = String(u.role || '');
+        if (selectedRole === '1' || selectedRole === 'ADMIN') return roleId === '1' || roleCode === 'ADMIN';
+        if (selectedRole === '2' || selectedRole === 'TIM_KERJA' || selectedRole === 'POKJA') return roleId === '2' || roleCode === 'TIM_KERJA' || roleCode === 'POKJA';
+        if (selectedRole === '3' || selectedRole === 'BIRO_HUKUM') return roleId === '3' || roleCode === 'BIRO_HUKUM';
+        if (selectedRole === '4' || selectedRole === 'PIMPINAN') return roleId === '4' || roleCode === 'PIMPINAN';
+        return roleId === String(selectedRole);
+      });
+    }
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, selectedRole, selectedStatus]);
+    // Status Filter
+    if (selectedStatus !== 'ALL') {
+      result = result.filter(u => u.status === selectedStatus);
+    }
+
+    // Sorting
+    result.sort((a, b) => {
+      let valA, valB;
+      if (sortBy === 'nama') {
+        valA = (a.nama || a.name || '').toLowerCase();
+        valB = (b.nama || b.name || '').toLowerCase();
+      } else if (sortBy === 'email') {
+        valA = (a.email || '').toLowerCase();
+        valB = (b.email || '').toLowerCase();
+      } else if (sortBy === 'role') {
+        valA = Number(a.role_id || 0);
+        valB = Number(b.role_id || 0);
+      } else if (sortBy === 'status') {
+        valA = a.status || '';
+        valB = b.status || '';
+      } else {
+        valA = new Date(a.created_at || 0).getTime();
+        valB = new Date(b.created_at || 0).getTime();
+      }
+
+      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [rawUsers, searchTerm, selectedRole, selectedStatus, sortBy, sortDir]);
+
+  // Pagination Calculations
+  const totalItems = filteredUsers.length;
+  const totalPages = perPage === 'ALL' ? 1 : Math.max(1, Math.ceil(totalItems / Number(perPage)));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = perPage === 'ALL' ? 0 : (safeCurrentPage - 1) * Number(perPage);
+  const endIndex = perPage === 'ALL' ? totalItems : Math.min(startIndex + Number(perPage), totalItems);
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(startIndex, endIndex);
+  }, [filteredUsers, startIndex, endIndex]);
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortDir('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const handleResetFilter = () => {
+    setSearchTerm('');
+    setSelectedRole('ALL');
+    setSelectedStatus('ALL');
+    setCurrentPage(1);
+  };
+
+  const handleFilterSubmit = (e) => {
+    e?.preventDefault();
+    setCurrentPage(1);
+  };
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -106,26 +186,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
   const addPasswordRules = getPasswordRules(addForm.data.password);
   const editPasswordRules = getPasswordRules(editForm.data.password);
-
-  // Filter submit handler
-  const handleFilterSubmit = (e) => {
-    e?.preventDefault();
-    router.get('/admin/users', {
-      search: searchTerm,
-      role: selectedRole,
-      status: selectedStatus,
-    }, {
-      preserveState: true,
-      replace: true,
-    });
-  };
-
-  const handleResetFilter = () => {
-    setSearchTerm('');
-    setSelectedRole('ALL');
-    setSelectedStatus('ALL');
-    router.get('/admin/users');
-  };
 
   // Open Edit Modal
   const openEditModal = (user) => {
@@ -299,18 +359,36 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Cari nama, email, atau NIP pegawai..."
-                className="w-full pl-10 pr-4 py-2 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                className="w-full pl-10 pr-9 py-2 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] transition"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setCurrentPage(1);
+                  }}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Role Filter */}
             <div className="sm:col-span-3">
               <select
                 value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                onChange={(e) => {
+                  setSelectedRole(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] transition"
               >
                 <option value="ALL">Semua Hak Akses (Role)</option>
                 <option value="1">ADMIN - Administrator Kanwil</option>
@@ -324,8 +402,11 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             <div className="sm:col-span-2">
               <select
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] transition"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="ACTIVE">ACTIVE (Aktif)</option>
@@ -337,7 +418,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             <div className="sm:col-span-2 flex items-center gap-2">
               <button
                 type="submit"
-                className="flex-1 py-2 px-3 bg-[#1A1A5E] text-white hover:bg-[#2C3154] rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-2 px-3 bg-[#1A1A5E] text-white hover:bg-[#2C3154] rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
               >
                 <Filter className="w-3.5 h-3.5" />
                 <span>Filter</span>
@@ -346,7 +427,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                 type="button"
                 onClick={handleResetFilter}
                 title="Reset Filter"
-                className="p-2 bg-[#F8F8F5] border border-[#E2E2DC] hover:bg-white text-slate-600 rounded-xl transition"
+                className="p-2 bg-[#F8F8F5] border border-[#E2E2DC] hover:bg-white text-slate-600 rounded-xl transition shadow-sm active:scale-95"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -356,31 +437,106 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
         {/* USERS TABLE */}
         <div className="bg-white rounded-3xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-[#E2E2DC] flex items-center justify-between">
+          <div className="p-4 sm:p-5 border-b border-[#E2E2DC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-black text-[#1A1A5E]">
-                Daftar Akun Pengguna ({users?.total || users?.data?.length || 0})
+                Daftar Akun Pengguna ({totalItems})
               </h2>
               <p className="text-[11px] text-slate-500 font-medium">
                 Daftar seluruh akun petugas yang terdaftar di database HARMONITAS.
               </p>
+            </div>
+
+            {/* Page Size Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500">Tampilkan:</span>
+              <select
+                value={perPage}
+                onChange={(e) => {
+                  setPerPage(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="py-1.5 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] transition"
+              >
+                <option value={5}>5 baris</option>
+                <option value={10}>10 baris</option>
+                <option value={25}>25 baris</option>
+                <option value="ALL">Semua</option>
+              </select>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F8F8F5] border-b border-[#E2E2DC] text-[10px] font-black uppercase tracking-wider text-slate-500">
-                  <th className="py-3.5 px-4">Nama & Identitas Pegawai</th>
-                  <th className="py-3.5 px-4">Kontak / Email</th>
-                  <th className="py-3.5 px-4">Hak Akses & Penugasan</th>
-                  <th className="py-3.5 px-4">Status Akun</th>
+                <tr className="bg-[#F8F8F5] border-b border-[#E2E2DC] text-[10px] font-black uppercase tracking-wider text-slate-500 select-none">
+                  {/* Nama Col */}
+                  <th 
+                    className="py-3.5 px-4 cursor-pointer hover:bg-slate-200/50 transition"
+                    onClick={() => handleSort('nama')}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Nama & Identitas Pegawai</span>
+                      {sortBy === 'nama' ? (
+                        sortDir === 'asc' ? <ArrowUp className="w-3 h-3 text-[#1A1A5E]" /> : <ArrowDown className="w-3 h-3 text-[#1A1A5E]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      )}
+                    </div>
+                  </th>
+
+                  {/* Email Col */}
+                  <th 
+                    className="py-3.5 px-4 cursor-pointer hover:bg-slate-200/50 transition"
+                    onClick={() => handleSort('email')}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Kontak / Email</span>
+                      {sortBy === 'email' ? (
+                        sortDir === 'asc' ? <ArrowUp className="w-3 h-3 text-[#1A1A5E]" /> : <ArrowDown className="w-3 h-3 text-[#1A1A5E]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      )}
+                    </div>
+                  </th>
+
+                  {/* Role Col */}
+                  <th 
+                    className="py-3.5 px-4 cursor-pointer hover:bg-slate-200/50 transition"
+                    onClick={() => handleSort('role')}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Hak Akses & Penugasan</span>
+                      {sortBy === 'role' ? (
+                        sortDir === 'asc' ? <ArrowUp className="w-3 h-3 text-[#1A1A5E]" /> : <ArrowDown className="w-3 h-3 text-[#1A1A5E]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      )}
+                    </div>
+                  </th>
+
+                  {/* Status Col */}
+                  <th 
+                    className="py-3.5 px-4 cursor-pointer hover:bg-slate-200/50 transition"
+                    onClick={() => handleSort('status')}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Status Akun</span>
+                      {sortBy === 'status' ? (
+                        sortDir === 'asc' ? <ArrowUp className="w-3 h-3 text-[#1A1A5E]" /> : <ArrowDown className="w-3 h-3 text-[#1A1A5E]" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                      )}
+                    </div>
+                  </th>
+
+                  {/* Action Col */}
                   <th className="py-3.5 px-4 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
-                {users?.data && users.data.length > 0 ? (
-                  users.data.map((u) => {
+                {paginatedUsers && paginatedUsers.length > 0 ? (
+                  paginatedUsers.map((u) => {
                     const userId = u.user_id || u.id;
                     const userName = u.nama || u.name;
                     const isSelf = userId === currentAdminId;
@@ -467,7 +623,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                               type="button"
                               disabled={isSelf}
                               onClick={() => setTogglingUser(u)}
-                              title={u.status === 'ACTIVE' ? 'Nonaktifkan Akun' : 'Aktifkan Akun'}
+                              title={isSelf ? 'Tidak dapat menonaktifkan akun sendiri' : u.status === 'ACTIVE' ? 'Nonaktifkan Akun' : 'Aktifkan Akun'}
                               className={`p-1.5 rounded-lg border transition ${
                                 isSelf
                                   ? 'opacity-30 cursor-not-allowed border-slate-200 text-slate-400'
@@ -514,8 +670,15 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                   })
                 ) : (
                   <tr>
-                    <td colSpan="5" className="py-8 text-center text-slate-400 font-bold">
-                      Tidak ditemukan akun pengguna dengan kriteria pencarian ini.
+                    <td colSpan="5" className="py-12 text-center text-slate-400 font-bold">
+                      <p className="text-xs text-slate-500">Tidak ditemukan akun pengguna dengan kriteria pencarian ini.</p>
+                      <button
+                        type="button"
+                        onClick={handleResetFilter}
+                        className="mt-2 text-xs font-black text-[#1A1A5E] hover:underline"
+                      >
+                        Reset Filter & Pencarian
+                      </button>
                     </td>
                   </tr>
                 )}
@@ -523,30 +686,54 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </table>
           </div>
 
-          {/* Pagination */}
-          {users?.links && users.links.length > 3 && (
-            <div className="p-4 border-t border-[#E2E2DC] flex items-center justify-between">
+          {/* Pagination Controls */}
+          {totalItems > 0 && (
+            <div className="p-4 border-t border-[#E2E2DC] flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-[11px] font-bold text-slate-500">
-                Menampilkan halaman {users.current_page} dari {users.last_page} ({users.total} total akun)
+                Menampilkan <span className="text-[#1A1A5E] font-black">{totalItems === 0 ? 0 : startIndex + 1} – {endIndex}</span> dari total <span className="text-[#1A1A5E] font-black">{totalItems}</span> akun pengguna
               </p>
-              <div className="flex items-center gap-1">
-                {users.links.map((link, idx) => (
+              
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  {/* Prev Button */}
                   <button
-                    key={idx}
                     type="button"
-                    disabled={!link.url || link.active}
-                    onClick={() => link.url && router.get(link.url)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                      link.active
-                        ? 'bg-[#1A1A5E] text-white'
-                        : link.url
-                        ? 'bg-[#F8F8F5] text-slate-700 hover:bg-white border border-[#E2E2DC]'
-                        : 'opacity-40 text-slate-400 cursor-not-allowed'
-                    }`}
-                    dangerouslySetInnerHTML={{ __html: link.label }}
-                  />
-                ))}
-              </div>
+                    disabled={safeCurrentPage <= 1}
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className="p-1.5 rounded-lg text-xs font-bold transition bg-[#F8F8F5] text-slate-700 hover:bg-white border border-[#E2E2DC] disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Halaman Sebelumnya"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      type="button"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`min-w-8 h-8 px-2 rounded-lg text-xs font-black transition ${
+                        safeCurrentPage === pageNum
+                          ? 'bg-[#1A1A5E] text-white shadow-sm'
+                          : 'bg-[#F8F8F5] text-slate-700 hover:bg-white border border-[#E2E2DC]'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    type="button"
+                    disabled={safeCurrentPage >= totalPages}
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className="p-1.5 rounded-lg text-xs font-bold transition bg-[#F8F8F5] text-slate-700 hover:bg-white border border-[#E2E2DC] disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Halaman Selanjutnya"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -615,30 +802,48 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
                 {/* NIP */}
                 <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    NIP Pegawai
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-extrabold text-[#1A1A5E]">
+                      NIP Pegawai
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {(addForm.data.nip || '').length}/18 digit
+                    </span>
+                  </div>
                   <input
                     type="text"
+                    maxLength={18}
                     value={addForm.data.nip}
-                    onChange={(e) => addForm.setData('nip', e.target.value)}
-                    placeholder="19880101 201501 1 001"
+                    onChange={(e) => addForm.setData('nip', e.target.value.replace(/\D/g, '').slice(0, 18))}
+                    placeholder="Contoh: 198801012015011001"
                     className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
+                  {addForm.errors.nip && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.nip}</p>
+                  )}
                 </div>
 
                 {/* No HP */}
                 <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Nomor WhatsApp / HP
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-extrabold text-[#1A1A5E]">
+                      Nomor WhatsApp / HP
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {(addForm.data.no_hp || '').length}/13 digit
+                    </span>
+                  </div>
                   <input
                     type="tel"
+                    maxLength={13}
                     value={addForm.data.no_hp}
-                    onChange={(e) => addForm.setData('no_hp', e.target.value)}
-                    placeholder="081234567890"
+                    onChange={(e) => addForm.setData('no_hp', e.target.value.replace(/\D/g, '').slice(0, 13))}
+                    placeholder="Contoh: 081234567890"
                     className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
+                  {addForm.errors.no_hp && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.no_hp}</p>
+                  )}
                 </div>
 
                 {/* Role / Hak Akses */}
@@ -837,28 +1042,48 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
                 {/* NIP */}
                 <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    NIP Pegawai
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-extrabold text-[#1A1A5E]">
+                      NIP Pegawai
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {(editForm.data.nip || '').length}/18 digit
+                    </span>
+                  </div>
                   <input
                     type="text"
+                    maxLength={18}
                     value={editForm.data.nip}
-                    onChange={(e) => editForm.setData('nip', e.target.value)}
+                    onChange={(e) => editForm.setData('nip', e.target.value.replace(/\D/g, '').slice(0, 18))}
+                    placeholder="Contoh: 198801012015011001"
                     className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
+                  {editForm.errors.nip && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{editForm.errors.nip}</p>
+                  )}
                 </div>
 
                 {/* No HP */}
                 <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Nomor WhatsApp / HP
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-extrabold text-[#1A1A5E]">
+                      Nomor WhatsApp / HP
+                    </label>
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {(editForm.data.no_hp || '').length}/13 digit
+                    </span>
+                  </div>
                   <input
                     type="tel"
+                    maxLength={13}
                     value={editForm.data.no_hp}
-                    onChange={(e) => editForm.setData('no_hp', e.target.value)}
+                    onChange={(e) => editForm.setData('no_hp', e.target.value.replace(/\D/g, '').slice(0, 13))}
+                    placeholder="Contoh: 081234567890"
                     className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
+                  {editForm.errors.no_hp && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{editForm.errors.no_hp}</p>
+                  )}
                 </div>
 
                 {/* Role */}

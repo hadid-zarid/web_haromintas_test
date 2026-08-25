@@ -6,11 +6,14 @@
 
 ## 📑 Daftar Isi
 1. [Latar Belakang & Tujuan Fitur](#1-latar-belakang--tujuan-fitur)
-2. [Matriks Peran (Role) & Aturan Notifikasi](#2-matriks-peran-role--aturan-notifikasi)
-3. [Arsitektur & Pemicu Otomatis (Triggers)](#3-arsitektur--pemicu-otomatis-triggers)
-4. [Antarmuka Pengguna (UI & UX)](#4-antarmuka-pengguna-ui--ux)
-5. [Struktur Database & Endpoint API](#5-struktur-database--endpoint-api)
-6. [Tabel Pengujian Manual Black Box Testing](#6-tabel-pengujian-manual-black-box-testing)
+2. [Sistem Notifikasi Ganda (Dual-Channel Notifications)](#2-sistem-notifikasi-ganda-dual-channel-notifications)
+3. [Matriks Peran (Role) & Aturan Notifikasi](#3-matriks-peran-role--aturan-notifikasi)
+4. [Arsitektur & Pemicu Otomatis (Triggers)](#4-arsitektur--pemicu-otomatis-triggers)
+5. [Desain Template Email & Logo Kedinasan](#5-desain-template-email--logo-kedinasan)
+6. [Panduan Konfigurasi Email (Gmail SMTP / Log) di .env](#6-panduan-konfigurasi-email-gmail-smtp--log-di-env)
+7. [Antarmuka Pengguna In-App (UI & UX)](#7-antarmuka-pengguna-in-app-ui--ux)
+8. [Struktur Database & Endpoint API](#8-struktur-database--endpoint-api)
+9. [Tabel Pengujian Manual Black Box Testing (14 Skenario)](#9-tabel-pengujian-manual-black-box-testing-14-skenario)
 
 ---
 
@@ -21,47 +24,61 @@ Dalam proses harmonisasi dan fasilitasi rancangan peraturan daerah (Ranperda/Ran
 Fitur **Notifikasi Terintegrasi** ini dibangun dengan tujuan:
 - **Menghilangkan Bottleneck Komunikasi**: Memberitahu Biro Hukum secara otomatis ketika berkas harmonisasi Kanwil (5 slot dokumen) telah lengkap dan siap difasilitasi.
 - **Transparansi Hasil Telaah**: Memberikan info seketika ke Tim Kerja ketika Biro Hukum menyetujui fasilitasi (disertai surat hasil fasilitasi) atau mengembalikan berkas (disertai surat dan catatan perbaikan).
+- **Pengiriman ke Gmail / Email Dinas**: Mengirimkan email resmi seketika ke kotak masuk (*inbox*) pegawai sehingga notifikasi tetap tersampaikan meskipun pengguna sedang tidak membuka aplikasi web.
 - **Executive Summary bagi Pimpinan**: Memberikan notifikasi pencapaian (*milestone*) saat produk hukum daerah tuntas disahkan.
 - **Bebas Spam untuk Administrator**: Akun Admin difokuskan pada pemeliharaan sistem tanpa dibebani notifikasi alur operasional permohonan.
 
 ---
 
-## 2. Matriks Peran (Role) & Aturan Notifikasi
+## 2. Sistem Notifikasi Ganda (Dual-Channel Notifications)
 
-| Peran (Role) | Role ID | Akun Default | Notifikasi yang Diterima | Notifikasi yang Dikecualikan |
-| :--- | :---: | :--- | :--- | :--- |
-| **Biro Hukum** | `3` | `birohukum.riau@harmonitas.go.id` | 1. Berkas 5 slot harmonisasi lengkap (Siap Fasilitasi)<br>2. Unggah pembaruan berkas revisi oleh Tim Kerja | - Pendaftaran draf awal<br>- Unggah slot perantara (slot 2-4) |
-| **Tim Kerja 1, 2, 3** | `2` | `timkerja1@harmonitas.go.id`<br>`timkerja2@harmonitas.go.id`<br>`timkerja3@harmonitas.go.id` | 1. Permohonan baru terdaftar di wilayah binaannya<br>2. Biro Hukum menyetujui fasilitasi (*Status: Selesai*)<br>3. Biro Hukum mengembalikan berkas (*Status: Perlu Perbaikan*) | - Berkas di luar wilayah binaan kerja masing-masing |
-| **Pimpinan**<br>*(Kakanwil & Kadiv)* | `4` | `kakanwil.riau@harmonitas.go.id`<br>`kadiv.kumham@harmonitas.go.id` | 1. **Milestone Selesai**: Produk hukum daerah selesai & sah difasilitasi (*Status: Selesai*) | - Notifikasi mikro teknis (unggah berkas slot 1-5, revisi draf, dll) |
-| **Administrator** | `1` | `admin@harmonitas.go.id` | **Tidak menerima notifikasi operasional** (Panel pasif sistem) | - Seluruh notifikasi alur kerja regulasi daerah |
+Sistem HARMONITAS menerapkan mekanisme **Dual-Channel Delivery**:
+1. **Channel 1: In-App Notification (Web Database)**
+   - Tersimpan di tabel database `notifikasi`.
+   - Ditampilkan langsung pada ikon lonceng header dengan *unread badge counter*.
+   - Navigasi instan 1-klik menuju halaman berkas terkait.
+2. **Channel 2: Email Dispatch (Gmail / SMTP Mailer)**
+   - Mengirimkan email berdesain resmi dengan **Logo HARMONITAS**, ringkasan data regulasi, dan tombol aksi langsung (*Direct CTA Link*).
+   - Dilengkapi proteksi **Fail-Safe (`try...catch`)** agar jika server mail offline, transaksi alur kerja web tetap berhasil 100%.
 
 ---
 
-## 3. Arsitektur & Pemicu Otomatis (Triggers)
+## 3. Matriks Peran (Role) & Aturan Notifikasi
+
+| Peran (Role) | Role ID | Akun Default | Notifikasi yang Diterima | Notifikasi yang Dikecualikan | Saluran Pengiriman |
+| :--- | :---: | :--- | :--- | :--- | :---: |
+| **Biro Hukum** | `3` | `birohukum.riau@harmonitas.go.id` | 1. Berkas 5 slot harmonisasi lengkap (Siap Fasilitasi)<br>2. Unggah pembaruan berkas revisi oleh Tim Kerja | - Pendaftaran draf awal<br>- Unggah slot perantara (slot 2-4) | In-App + Email |
+| **Tim Kerja 1, 2, 3** | `2` | `timkerja1@harmonitas.go.id`<br>`timkerja2@harmonitas.go.id`<br>`timkerja3@harmonitas.go.id` | 1. Permohonan baru terdaftar di wilayah binaannya<br>2. Biro Hukum menyetujui fasilitasi (*Status: Selesai*)<br>3. Biro Hukum mengembalikan berkas (*Status: Perlu Perbaikan*) | - Berkas di luar wilayah binaan kerja masing-masing | In-App + Email |
+| **Pimpinan**<br>*(Kakanwil & Kadiv)* | `4` | `kakanwil.riau@harmonitas.go.id`<br>`kadiv.kumham@harmonitas.go.id` | 1. **Milestone Selesai**: Produk hukum daerah selesai & sah difasilitasi (*Status: Selesai*) | - Notifikasi mikro teknis (unggah berkas slot 1-5, revisi draf, dll) | In-App + Email |
+| **Administrator** | `1` | `admin@harmonitas.go.id` | **Tidak menerima notifikasi operasional** (Panel pasif sistem) | - Seluruh notifikasi alur kerja regulasi daerah | Panel Pasif |
+
+---
+
+## 4. Arsitektur & Pemicu Otomatis (Triggers)
 
 ```
 [ Tim Kerja Mengunggah Dokumen Harmonisasi (Slot 1-5 Lengkap) ]
                                │
                                ▼
-               [ Status Berubah: 3 - Fasilitasi ]
+                [ Status Berubah: 3 - Fasilitasi ]
                                │
                                ▼
-        📢 Notifikasi Terkirim ke BIRO HUKUM PROVINSI RIAU
-       "Permohonan Siap Difasilitasi: Dokumen 5/5 Lengkap"
+         📢 Notifikasi In-App + ✉️ Email ke BIRO HUKUM PROVINSI RIAU
+        "Permohonan Siap Difasilitasi: Dokumen 5/5 Lengkap"
                                │
                                ▼
-               [ Biro Hukum Menelaah & Mengambil Keputusan ]
+                [ Biro Hukum Menelaah & Mengambil Keputusan ]
                                ├─── (SETUJU / TERIMA) ───► [ Status: 4 - Selesai ]
                                │                                 │
-                               │                                 ├─► 📢 Notifikasi ke TIM KERJA
+                               │                                 ├─► 📢 Notif + ✉️ Email ke TIM KERJA
                                │                                 │   "Fasilitasi Disetujui & Selesai"
                                │                                 │
-                               │                                 └─► 📢 Notifikasi ke PIMPINAN (Kakanwil & Kadiv)
+                               │                                 └─► 📢 Notif + ✉️ Email ke PIMPINAN
                                │                                     "Produk Hukum Daerah Selesai & Sah"
                                │
                                └─── (TOLAK / REVISI) ────► [ Status: 5 - Perlu Perbaikan ]
                                                                  │
-                                                                 └─► 📢 Notifikasi ke TIM KERJA
+                                                                 └─► 📢 Notif + ✉️ Email ke TIM KERJA
                                                                      "Permohonan Memerlukan Perbaikan (+ Catatan)"
 ```
 
@@ -76,7 +93,48 @@ Fitur **Notifikasi Terintegrasi** ini dibangun dengan tujuan:
 
 ---
 
-## 4. Antarmuka Pengguna (UI & UX)
+## 5. Desain Template Email & Logo Kedinasan
+
+Seluruh template email menggunakan format responsif berbasis tabel standar email client (didukung Gmail, Outlook, Thunderbird, Apple Mail):
+1. **Template Notifikasi Alur Kerja (`emails.notifikasi_alur_kerja`)**:
+   - Header Dark Navy (`#101B4F`) dengan **Logo Resmi HARMONITAS**.
+   - Sapaan nama pejabat/petugas dan penugasan unit kerja.
+   - Kartu pemberitahuan berbingkai kuning emas (`#FFC800`).
+   - Tabel ringkasan data berkas (Judul, Nomor Berkas, Pemda Pengaju, Jenis Regulasi, Status Terkini).
+   - Tombol CTA Emas: *"Buka & Tinjau Berkas di HARMONITAS &rarr;"*.
+   - Footer alamat resmi Kanwil Kemenkumham Riau.
+2. **Template Reset Kata Sandi (`emails.reset_password`)**:
+   - Memuat logo resmi HARMONITAS, instruksi reset password kedinasan, tombol CTA *"Reset Kata Sandi Anda &rarr;"*, dan catatan keamanan masa berlaku tautan 60 menit.
+
+---
+
+## 6. Panduan Konfigurasi Email (Gmail SMTP / Log) di .env
+
+### Mode Development (Default - Tanpa Kirim Email Asli):
+Secara default, Laravel menyimpan seluruh pesan email yang terkirim ke dalam file log:
+```env
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="notifikasi@harmonitas.go.id"
+MAIL_FROM_NAME="HARMONITAS Kanwil Kemenkumham Riau"
+```
+*Isi email dapat diperiksa langsung di file: `storage/logs/laravel.log`.*
+
+### Mode Produksi (Kirim Langsung ke Gmail Asli via SMTP):
+Untuk mengirimkan email langsung ke akun Gmail penerima, gunakan akun Google dengan fitur **App Password (Sandi Aplikasi 16 Digit)**:
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=email_dinas_anda@gmail.com
+MAIL_PASSWORD=xxxx-xxxx-xxxx-xxxx  # Masukkan 16 digit Sandi Aplikasi Google
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="notifikasi@harmonitas.go.id"
+MAIL_FROM_NAME="HARMONITAS Kanwil Kemenkumham Riau"
+```
+
+---
+
+## 7. Antarmuka Pengguna In-App (UI & UX)
 
 Komponen utama: `resources/js/components/layout/NotificationDropdown.jsx`
 - **Ikon Lonceng Header**: Menampilkan *badge counter* merah menyala dengan jumlah notifikasi yang belum dibaca (`unread_count`).
@@ -95,7 +153,7 @@ Komponen utama: `resources/js/components/layout/NotificationDropdown.jsx`
 
 ---
 
-## 5. Struktur Database & Endpoint API
+## 8. Struktur Database & Endpoint API
 
 ### Tabel Database (`notifikasi`)
 | Kolom | Tipe Data | Keterangan |
@@ -117,9 +175,9 @@ Komponen utama: `resources/js/components/layout/NotificationDropdown.jsx`
 
 ---
 
-## 6. Tabel Pengujian Manual Black Box Testing
+## 9. Tabel Pengujian Manual Black Box Testing (14 Skenario)
 
-Gunakan tabel berikut untuk memverifikasi fungsionalitas notifikasi secara menyeluruh:
+Gunakan tabel berikut untuk memverifikasi fungsionalitas notifikasi (In-App & Email) secara menyeluruh:
 
 ### Akun Uji Coba:
 - **Admin**: `admin@harmonitas.go.id` | Password: `password`
@@ -138,12 +196,15 @@ Gunakan tabel berikut untuk memverifikasi fungsionalitas notifikasi secara menye
 | **3** | **Filter Tab "Belum Dibaca"** | Klik tab "Belum Dibaca" pada dropdown notifikasi. | Biro Hukum / Tim Kerja | Hanya notifikasi yang berstatus `is_read = 0` yang ditampilkan dalam daftar. | [ ] Pass<br>[ ] Fail |
 | **4** | **Tandai Semua Dibaca** | Klik tombol *"Tandai dibaca"* di kanan atas dropdown. | Biro Hukum / Tim Kerja | Badge angka merah hilang seketika, dan seluruh item beralih ke status normal (terbaca). | [ ] Pass<br>[ ] Fail |
 | **5** | **Navigasi Langsung dari Notifikasi** | Klik pada salah satu baris notifikasi atau klik *"Buka Berkas"*. | Biro Hukum / Tim Kerja | Notifikasi otomatis ditandai terbaca dan browser langsung berpindah ke halaman detail regulasi terkait (`/peraturan/{id}`). | [ ] Pass<br>[ ] Fail |
-| **6** | **Trigger Notifikasi Biro Hukum (5 Dokumen Lengkap)** | 1. Login sebagai Tim Kerja.<br>2. Buka permohonan yang berstatus Draf Awal.<br>3. Unggah seluruh berkas hingga Slot 1 s.d. 5 terisi lengkap.<br>4. Login sebagai Biro Hukum. | Tim Kerja ➔ Biro Hukum | Biro Hukum menerima notifikasi baru: *"Permohonan Siap Difasilitasi: Dokumen harmonisasi Kanwil lengkap 5 slot"*. Badge angka bertambah. | [ ] Pass<br>[ ] Fail |
+| **6** | **Trigger Notifikasi Biro Hukum (5 Dokumen Lengkap)** | 1. Login sebagai Tim Kerja.<br>2. Buka permohonan yang berstatus Draf Awal.<br>3. Unggah seluruh berkas hingga Slot 1 s.d. 5 terisi lengkap.<br>4. Login sebagai Biro Hukum. | Tim Kerja ➔ Biro Hukum | Biro Hukum menerima notifikasi in-app baru: *"Permohonan Siap Difasilitasi: Dokumen harmonisasi Kanwil lengkap 5 slot"*. | [ ] Pass<br>[ ] Fail |
 | **7** | **Trigger Notifikasi Tim Kerja (Biro Hukum Menyetujui)** | 1. Login sebagai Biro Hukum.<br>2. Buka permohonan dengan status Fasilitasi.<br>3. Klik *"Terima & Terbitkan Surat Fasilitasi"*, unggah surat, lalu klik simpan.<br>4. Login sebagai Tim Kerja wilayah tersebut. | Biro Hukum ➔ Tim Kerja | Tim Kerja menerima notifikasi baru: *"Fasilitasi Disetujui & Selesai"*. | [ ] Pass<br>[ ] Fail |
 | **8** | **Trigger Notifikasi Tim Kerja (Biro Hukum Menolak / Revisi)** | 1. Login sebagai Biro Hukum.<br>2. Buka permohonan dengan status Fasilitasi.<br>3. Klik *"Tolak & Terbitkan Surat Pengembalian"*, isi catatan evaluasi, lalu simpan.<br>4. Login sebagai Tim Kerja wilayah tersebut. | Biro Hukum ➔ Tim Kerja | Tim Kerja menerima notifikasi baru: *"Permohonan Memerlukan Perbaikan"* lengkap dengan teks catatan dari Biro Hukum. | [ ] Pass<br>[ ] Fail |
 | **9** | **Trigger Notifikasi Milestone Pimpinan (Kakanwil & Kadiv)** | 1. Lakukan persetujuan regulasi hingga berstatus *4 - Selesai* oleh Biro Hukum.<br>2. Login sebagai Kakanwil atau Kadiv. | Biro Hukum ➔ Kakanwil / Kadiv | Kakanwil & Kadiv menerima notifikasi pencapaian: *"Produk Hukum Daerah Selesai & Sah"*. | [ ] Pass<br>[ ] Fail |
 | **10** | **Verifikasi Pengecualian Akun Admin** | 1. Jalankan proses unggah dan perubahan status.<br>2. Login sebagai Administrator (`admin@harmonitas.go.id`).<br>3. Buka dropdown notifikasi. | Admin | Tidak ada badge angka dan dropdown menampilkan informasi akun administrator sistem (bebas dari notifikasi operasional). | [ ] Pass<br>[ ] Fail |
 | **11** | **Proteksi Keamanan Akses (IDOR Defense)** | Coba lakukan request API `POST /notifikasi/{id_milik_user_lain}/read`. | User Lain via Postman / Fetch | Server mengembalikan respon `403 Forbidden` (Akses Ditolak). | [ ] Pass<br>[ ] Fail |
+| **12** | **Pengiriman Email Notifikasi Alur Kerja (Workflow Email)** | 1. Lakukan trigger notifikasi (misal: 5 slot lengkap atau persetujuan fasilitasi).<br>2. Buka `storage/logs/laravel.log` atau kotak masuk Gmail penerima. | Tim Kerja / Biro Hukum | Email resmi dengan subjek `[HARMONITAS] ...`, Logo HARMONITAS, ringkasan berkas, dan tombol CTA terkirim dengan rapi. | [ ] Pass<br>[ ] Fail |
+| **13** | **Pengiriman Email Reset Password Berlogo** | 1. Buka halaman `/forgot-password`.<br>2. Masukkan email kedinasan terdaftar dan klik kirim.<br>3. Periksa email yang masuk. | Semua Akun | Email pemulihan kata sandi memuat logo HARMONITAS, tombol reset emas, dan catatan keamanan 60 menit. | [ ] Pass<br>[ ] Fail |
+| **14** | **Ketahanan Kegagalan Pengiriman Email (Fail-Safe)** | Putuskan koneksi internet / simulasikan error SMTP, lalu lakukan submit alur kerja regulasi di web. | Tim Kerja / Biro Hukum | Transaksi web tetap sukses, notifikasi in-app tetap tersimpan, dan error email hanya dicatat di log tanpa merusak alur kerja user. | [ ] Pass<br>[ ] Fail |
 
 ---
 

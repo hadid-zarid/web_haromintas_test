@@ -28,36 +28,7 @@ class AdminUserController extends Controller
         $statusFilter = $request->query('status');
         $timKerjaFilter = $request->query('tim_kerja_id');
 
-        $query = User::with(['timKerja', 'roleRelation'])->latest('created_at');
-
-        if (! empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($roleFilter) && $roleFilter !== 'ALL') {
-            $roleId = match ($roleFilter) {
-                'ADMIN' => 1,
-                'TIM_KERJA', 'POKJA' => 2,
-                'BIRO_HUKUM' => 3,
-                'PIMPINAN' => 4,
-                default => (int) $roleFilter,
-            };
-            $query->where('role_id', $roleId);
-        }
-
-        if (! empty($statusFilter) && $statusFilter !== 'ALL') {
-            $query->where('status', $statusFilter);
-        }
-
-        if (! empty($timKerjaFilter) && $timKerjaFilter !== 'ALL') {
-            $query->where('tim_kerja_id', $timKerjaFilter);
-        }
-
-        $users = $query->paginate(15)->withQueryString();
+        $users = User::with(['timKerja', 'roleRelation'])->latest('created_at')->get();
 
         // Data Statistik Pengguna
         $stats = [
