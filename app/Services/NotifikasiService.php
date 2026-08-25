@@ -37,6 +37,19 @@ class NotifikasiService
     }
 
     /**
+     * Kirim notifikasi pencapaian tuntas (Milestone Selesai) ke Pimpinan (Kakanwil & Kadiv, role_id = 4)
+     * Admin (role_id = 1) TIDAK menerima notifikasi ini.
+     */
+    public static function notifyPimpinan(RancanganRegulasi $rancangan, string $judul, string $pesan): array
+    {
+        $users = User::where('role_id', 4)
+            ->where('status', 'ACTIVE')
+            ->get();
+
+        return self::createNotificationsForUsers($users, $rancangan->rancangan_id, $judul, $pesan);
+    }
+
+    /**
      * Kirim notifikasi ke user individual secara spesifik (selama bukan Admin)
      */
     public static function notifyUser(int $userId, RancanganRegulasi $rancangan, string $judul, string $pesan): ?Notifikasi

@@ -646,13 +646,23 @@ class PermohonanController extends Controller
             default => 'CHANGE_PERATURAN_STATUS',
         };
 
-        // Notifikasi ke Tim Kerja terkait saat Biro Hukum mengambil keputusan
-        if ($newStatusId === 4 && $rancangan->tim_kerja_id) {
-            NotifikasiService::notifyTimKerja(
-                (int) $rancangan->tim_kerja_id,
+        // Notifikasi ke Tim Kerja terkait & Pimpinan saat Biro Hukum mengambil keputusan
+        if ($newStatusId === 4) {
+            if ($rancangan->tim_kerja_id) {
+                NotifikasiService::notifyTimKerja(
+                    (int) $rancangan->tim_kerja_id,
+                    $rancangan,
+                    'Fasilitasi Disetujui & Selesai',
+                    "Biro Hukum Provinsi Riau telah menyetujui fasilitasi untuk '{$rancangan->judul_rancangan}'" . ($suratDocName ? " dengan lampiran surat: '{$suratDocName}'." : ".")
+                );
+            }
+
+            // Notifikasi Milestone Selesai ke Pimpinan (Kakanwil & Kadiv)
+            $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
+            NotifikasiService::notifyPimpinan(
                 $rancangan,
-                'Fasilitasi Disetujui & Selesai',
-                "Biro Hukum Provinsi Riau telah menyetujui fasilitasi untuk '{$rancangan->judul_rancangan}'" . ($suratDocName ? " dengan lampiran surat: '{$suratDocName}'." : ".")
+                'Produk Hukum Daerah Selesai & Sah',
+                "Harmonisasi & fasilitasi '{$rancangan->judul_rancangan}' ({$kabName}) telah disetujui tuntas oleh Biro Hukum Provinsi Riau."
             );
         } elseif ($newStatusId === 5 && $rancangan->tim_kerja_id) {
             NotifikasiService::notifyTimKerja(
