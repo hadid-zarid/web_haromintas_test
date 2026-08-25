@@ -16,6 +16,7 @@ use App\Models\RancanganRegulasi;
 use App\Models\StatusRegulasi;
 use App\Models\TimKerja;
 use App\Models\User;
+use App\Services\NotifikasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -232,6 +233,16 @@ class PermohonanController extends Controller
                 ],
                 'created_at' => now(),
             ]);
+
+            // Notifikasi ke Tim Kerja terkait
+            if ($timKerjaId) {
+                NotifikasiService::notifyTimKerja(
+                    (int) $timKerjaId,
+                    $rancangan,
+                    'Permohonan Regulasi Baru',
+                    "Permohonan baru '{$rancangan->judul_rancangan}' ({$kabupaten->nama_kabupaten}) berhasil didaftarkan ke wilayah kerja Anda."
+                );
+            }
 
             DB::commit();
 
@@ -503,6 +514,14 @@ class PermohonanController extends Controller
                     'status_id' => 3,
                     'keterangan' => 'Tahap Harmonisasi Kanwil selesai (5 dokumen lengkap). Berkas diteruskan ke Biro Hukum Pemprov Riau untuk Tahap Fasilitasi.',
                 ]);
+
+                // Notifikasi ke Biro Hukum bahwa berkas siap difasilitasi
+                $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
+                NotifikasiService::notifyBiroHukum(
+                    $rancangan,
+                    'Permohonan Siap Difasilitasi',
+                    "Dokumen harmonisasi Kanwil untuk '{$rancangan->judul_rancangan}' ({$kabName}) telah lengkap 5 slot. Berkas siap untuk ditelaah dan difasilitasi oleh Biro Hukum."
+                );
             }
         } else {
             // Jika Tim Kerja mengunggah kelanjutan pembahasan (Slot 2, 3, atau 4) saat status masih Draf Awal (1) -> Otomatis beralih ke PROSES HARMONISASI (2)
@@ -626,6 +645,23 @@ class PermohonanController extends Controller
             5 => 'REJECT_FASILITASI',
             default => 'CHANGE_PERATURAN_STATUS',
         };
+
+        // Notifikasi ke Tim Kerja terkait saat Biro Hukum mengambil keputusan
+        if ($newStatusId === 4 && $rancangan->tim_kerja_id) {
+            NotifikasiService::notifyTimKerja(
+                (int) $rancangan->tim_kerja_id,
+                $rancangan,
+                'Fasilitasi Disetujui & Selesai',
+                "Biro Hukum Provinsi Riau telah menyetujui fasilitasi untuk '{$rancangan->judul_rancangan}'" . ($suratDocName ? " dengan lampiran surat: '{$suratDocName}'." : ".")
+            );
+        } elseif ($newStatusId === 5 && $rancangan->tim_kerja_id) {
+            NotifikasiService::notifyTimKerja(
+                (int) $rancangan->tim_kerja_id,
+                $rancangan,
+                'Permohonan Memerlukan Perbaikan',
+                "Biro Hukum Provinsi Riau mengembalikan berkas '{$rancangan->judul_rancangan}'. Catatan: " . ($catatan ?: 'Harap periksa dan perbaiki draf regulasi.')
+            );
+        }
 
         AuditLog::create([
             'user_id' => $user->user_id,

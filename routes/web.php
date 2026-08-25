@@ -64,6 +64,11 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('DraftGeneratePage');
     })->name('draft.generate');
 
+    // Notifikasi Sistem
+    Route::get('/notifikasi', [\App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/{id}/read', [\App\Http\Controllers\NotifikasiController::class, 'markAsRead'])->name('notifikasi.read');
+    Route::post('/notifikasi/read-all', [\App\Http\Controllers\NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.read-all');
+
     // HARMONITAS AI
     Route::get('/ai', function () {
         return Inertia::render('AIAssistantPage');
