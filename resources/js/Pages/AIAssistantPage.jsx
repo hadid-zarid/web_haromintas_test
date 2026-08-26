@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '../components/layout/AppLayout';
+import HarmonitasLoader from '../components/common/HarmonitasLoader';
 
 import {
   Upload,
@@ -9,7 +10,6 @@ import {
   AlertCircle,
   CheckCircle2,
   X,
-  Loader2,
   Search,
   FileCheck2,
   Info,
@@ -22,25 +22,16 @@ const AIAssistantPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
 
-  /* =========================================
-     FILE UPLOAD
-  ========================================== */
-
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
-
     if (!file) return;
 
     const allowedExtensions = ['.pdf', '.doc', '.docx'];
-
     const fileName = file.name.toLowerCase();
-
-    const isValid = allowedExtensions.some((extension) =>
-      fileName.endsWith(extension)
-    );
+    const isValid = allowedExtensions.some((ext) => fileName.endsWith(ext));
 
     if (!isValid) {
-      alert('Format dokumen harus PDF, DOC, atau DOCX.');
+      alert('Format dokumen harus berupa PDF, DOC, atau DOCX.');
       return;
     }
 
@@ -48,18 +39,10 @@ const AIAssistantPage = () => {
     setAnalysisResult(null);
   };
 
-  /* =========================================
-     REMOVE FILE
-  ========================================== */
-
   const removeFile = () => {
     setSelectedFile(null);
     setAnalysisResult(null);
   };
-
-  /* =========================================
-     ANALYZE DOCUMENT
-  ========================================== */
 
   const handleAnalyze = () => {
     if (!selectedFile) return;
@@ -67,27 +50,8 @@ const AIAssistantPage = () => {
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
-    /*
-      SIMULASI ANALISIS AI
-
-      Nantinya bagian ini dapat diganti dengan API backend:
-
-      const formData = new FormData();
-
-      formData.append(
-        'document',
-        selectedFile
-      );
-
-      axios.post(
-        '/api/ai/analyze',
-        formData
-      );
-    */
-
     setTimeout(() => {
       setIsAnalyzing(false);
-
       setAnalysisResult({
         score: 87,
         totalErrors: 8,
@@ -95,139 +59,91 @@ const AIAssistantPage = () => {
         structureErrors: 2,
         formatErrors: 2,
         recommendations: 1,
-
         errors: [
           {
-            type: 'Kesalahan Penulisan',
+            type: 'Kaidah Penulisan',
             severity: 'Sedang',
             page: 'Halaman 2',
             description:
-              'Terdapat penggunaan kata atau kalimat yang berpotensi tidak sesuai dengan kaidah penulisan peraturan.',
+              'Ditemukan penggunaan istilah dan rujukan frasa yang berpotensi tidak konsisten dengan kaidah baku legal drafting.',
           },
           {
             type: 'Struktur Peraturan',
             severity: 'Tinggi',
             page: 'Halaman 4',
             description:
-              'Struktur pasal dan ayat perlu diperiksa kembali karena terdapat bagian yang berpotensi tidak mengikuti sistematika peraturan.',
+              'Struktur penomoran pasal dan ayat perlu diperiksa karena terdapat hierarki sub-pasal yang melompati urutan baku.',
           },
           {
             type: 'Kesesuaian Format',
             severity: 'Sedang',
             page: 'Halaman 6',
             description:
-              'Format penomoran pada beberapa bagian dokumen berpotensi tidak konsisten.',
+              'Format penomoran lampiran dan konsiderans menimbang memerlukan penyesuaian tata naskah dinas.',
           },
           {
             type: 'Rekomendasi',
             severity: 'Rendah',
             page: 'Halaman 8',
             description:
-              'Disarankan melakukan pemeriksaan ulang terhadap istilah yang digunakan agar konsisten di seluruh dokumen.',
+              'Direkomendasikan melakukan standardisasi definisi operasional pada Pasal 1 Ketentuan Umum.',
           },
         ],
       });
-    }, 2000);
+    }, 1800);
   };
 
   return (
     <AppLayout>
       <Head title="Asisten AI Pra-Harmonisasi - HARMONITAS" />
-      <div className="space-y-6">
-
-
-        {/* =====================================
-            MAIN GRID
-        ====================================== */}
-
+      <div className="space-y-6 font-sans">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-          {/* ===================================
-              LEFT CONTENT
-          ==================================== */}
-
+          {/* Left Column: Upload & Result */}
           <div className="xl:col-span-2 space-y-6">
-
-            {/* =================================
-                UPLOAD DOCUMENT
-            ================================== */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-
-              {/* Header */}
-
-              <div className="px-6 py-5 border-b border-[#E2E2DC]">
-
-                <div className="flex items-center gap-3">
-
-                  <div className="w-10 h-10 rounded-xl bg-[#2C3154] flex items-center justify-center">
-
-                    <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
-
-                  </div>
-
-                  <div>
-
-                    <h2 className="text-base font-black text-[#2C3154]">
-                      Pemeriksaan Dokumen
-                    </h2>
-
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Upload dokumen peraturan untuk dianalisis oleh AI.
-                    </p>
-
-                  </div>
-
+            {/* Upload Document Card */}
+            <section className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#2B3056] flex items-center justify-center text-white">
+                  <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
                 </div>
-
+                <div>
+                  <h2 className="text-sm font-bold text-[#2B3056]">
+                    Pemeriksaan & Telaah Dokumen
+                  </h2>
+                  <p className="text-xs text-slate-500 font-normal">
+                    Unggah naskah peraturan (PDF/DOCX) untuk pemindaian otomatis kesesuaian format
+                  </p>
+                </div>
               </div>
 
-
-              {/* Upload Area */}
-
               <div className="p-6">
-
                 {!selectedFile ? (
-
                   <label
                     htmlFor="document-upload"
-                    className="group relative block cursor-pointer"
+                    className="block cursor-pointer group"
                   >
-
-                    <div className="border-2 border-dashed border-[#D8DBE5] rounded-2xl p-10 text-center transition-all duration-200 hover:border-[#FFC800] hover:bg-[#FFFDF2]">
-
-                      <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F1F3F8] group-hover:bg-[#FFF3B8] flex items-center justify-center transition">
-
-                        <Upload className="w-7 h-7 text-[#2C3154]" />
-
+                    <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center transition-colors hover:border-[#2B3056] hover:bg-slate-50/50">
+                      <div className="mx-auto w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-[#2B3056] mb-3 group-hover:scale-105 transition-transform">
+                        <Upload className="w-6 h-6 text-[#2B3056]" />
                       </div>
-
-                      <h3 className="mt-5 text-sm font-black text-[#2C3154]">
-                        Upload Dokumen Peraturan
+                      <h3 className="text-sm font-bold text-[#2B3056]">
+                        Klik atau Tarik File ke Sini
                       </h3>
-
-                      <p className="mt-2 text-xs text-slate-500">
-                        Klik untuk memilih dokumen yang akan diperiksa.
+                      <p className="text-xs text-slate-500 mt-1">
+                        Mendukung format naskah regulasi standar daerah
                       </p>
-
                       <div className="flex justify-center gap-2 mt-4">
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
+                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-[11px] font-semibold text-[#2B3056] border border-slate-200">
                           PDF
                         </span>
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
+                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-[11px] font-semibold text-[#2B3056] border border-slate-200">
                           DOC
                         </span>
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
+                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-[11px] font-semibold text-[#2B3056] border border-slate-200">
                           DOCX
                         </span>
-
                       </div>
-
                     </div>
-
                     <input
                       id="document-upload"
                       type="file"
@@ -235,667 +151,300 @@ const AIAssistantPage = () => {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-
                   </label>
-
                 ) : (
-
-                  /* Selected File */
-
-                  <div className="rounded-2xl border border-[#D8DBE5] bg-[#F8F9FC] p-5">
-
-                    <div className="flex items-center gap-4">
-
-                      <div className="w-12 h-12 rounded-xl bg-[#2C3154] flex items-center justify-center shrink-0">
-
-                        <FileText className="w-6 h-6 text-[#FFC800]" />
-
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#2B3056] text-white flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5 text-[#FFC800]" />
                       </div>
-
                       <div className="flex-1 min-w-0">
-
-                        <p className="text-sm font-black text-[#2C3154] truncate">
+                        <p className="text-sm font-bold text-[#2B3056] truncate">
                           {selectedFile.name}
                         </p>
-
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-slate-500 mt-0.5">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
-
                       </div>
-
                       <button
                         type="button"
                         onClick={removeFile}
-                        className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition"
+                        className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                       >
-
                         <X className="w-4 h-4" />
-
                       </button>
-
                     </div>
 
-
-                    {/* Analyze Button */}
-
-                    <div className="mt-5 pt-5 border-t border-slate-200">
-
+                    <div className="mt-4 pt-4 border-t border-slate-200 flex justify-end">
                       <button
                         type="button"
                         onClick={handleAnalyze}
                         disabled={isAnalyzing}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#2C3154] hover:bg-[#383F6A] disabled:opacity-60 text-white text-sm font-black transition shadow-sm"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#2B3056] text-xs font-bold transition-all disabled:opacity-80 cursor-pointer shadow-sm active:scale-95"
                       >
-
                         {isAnalyzing ? (
-
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-
-                            Menganalisis Dokumen...
-                          </>
-
+                          <HarmonitasLoader variant="button" title="Menganalisis Naskah..." />
                         ) : (
-
                           <>
-                            <Sparkles className="w-4 h-4 text-[#FFC800]" />
-
-                            Mulai Analisis AI
+                            <Sparkles className="w-4 h-4 text-[#2B3056]" />
+                            <span>Mulai Telaah Dokumen</span>
                           </>
-
                         )}
-
                       </button>
-
                     </div>
-
                   </div>
-
                 )}
-
               </div>
-
             </section>
 
-
-            {/* =================================
-                RESULT
-            ================================== */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-
-              <div className="px-6 py-5 border-b border-[#E2E2DC]">
-
-                <div className="flex items-center justify-between gap-4">
-
-                  <div className="flex items-center gap-3">
-
-                    <div className="w-10 h-10 rounded-xl bg-[#F1F3F8] flex items-center justify-center">
-
-                      <Search className="w-5 h-5 text-[#2C3154]" />
-
-                    </div>
-
-                    <div>
-
-                      <h2 className="text-base font-black text-[#2C3154]">
-                        Hasil Pemeriksaan
-                      </h2>
-
-                      <p className="text-xs text-slate-500">
-                        Ringkasan hasil analisis dokumen.
-                      </p>
-
-                    </div>
-
+            {/* Analysis Result Section */}
+            <section className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#2B3056]">
+                    <Search className="w-5 h-5 text-[#2B3056]" />
                   </div>
-
-                  {analysisResult ? (
-
-                    <span className="px-3 py-1.5 rounded-lg bg-emerald-50 text-[10px] font-bold text-emerald-600">
-                      Analisis Selesai
-                    </span>
-
-                  ) : (
-
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
-                      Belum Dianalisis
-                    </span>
-
-                  )}
-
+                  <div>
+                    <h2 className="text-sm font-bold text-[#2B3056]">
+                      Hasil Telaah & Rekomendasi
+                    </h2>
+                    <p className="text-xs text-slate-500 font-normal">
+                      Ringkasan parameter kesesuaian naskah hukum
+                    </p>
+                  </div>
                 </div>
 
+                {isAnalyzing ? (
+                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-700 border border-amber-200 animate-pulse">
+                    Sedang Memindai AI
+                  </span>
+                ) : analysisResult ? (
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                    Selesai Dipindai
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-500 border border-slate-200">
+                    Menunggu Dokumen
+                  </span>
+                )}
               </div>
 
-
-              {!analysisResult ? (
-
-                <div className="p-8">
-
-                  <div className="flex flex-col items-center justify-center text-center py-8">
-
-                    <div className="w-16 h-16 rounded-2xl bg-[#F1F3F8] flex items-center justify-center">
-
-                      <FileText className="w-7 h-7 text-slate-400" />
-
-                    </div>
-
-                    <h3 className="mt-4 text-sm font-black text-[#2C3154]">
-                      Belum Ada Hasil Analisis
-                    </h3>
-
-                    <p className="mt-2 max-w-md text-xs text-slate-500 leading-relaxed">
-                      Upload dokumen Peraturan Daerah kemudian
-                      tekan tombol <b>Mulai Analisis AI</b> untuk
-                      melihat hasil pemeriksaan.
-                    </p>
-
-                  </div>
-
+              {isAnalyzing ? (
+                <div className="p-8 sm:p-12 flex items-center justify-center">
+                  <HarmonitasLoader
+                    variant="scanner"
+                    title="AI Sedang Menelaah Naskah Regulasi..."
+                    subtitle="Memproses parameter kesesuaian konsiderans, konsistensi istilah, dan hierarki perundang-undangan"
+                    steps={[
+                      "Membaca struktur naskah akademis & draf regulasi...",
+                      "Memverifikasi konsiderans 'Menimbang' & dasar hukum 'Mengingat'...",
+                      "Menganalisis keselarasan vertikal dengan UU No. 12/2011 & PP terkait...",
+                      "Memeriksa asas kepastian hukum & kerapian bahasa perancangan...",
+                      "Menyusun rekomendasi telaah hukum Kanwil Riau...",
+                    ]}
+                  />
                 </div>
-
+              ) : !analysisResult ? (
+                <div className="p-10 text-center">
+                  <div className="mx-auto w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-sm font-bold text-[#2B3056]">
+                    Belum Ada Hasil Telaah
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
+                    Unggah berkas rancangan peraturan dan tekan tombol <b>Mulai Telaah</b> untuk melihat catatan evaluasi.
+                  </p>
+                </div>
               ) : (
-
                 <div className="p-6 space-y-6">
-
-                  {/* Score */}
-
+                  {/* Score Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-                    <div className="sm:col-span-1 rounded-2xl bg-[#2C3154] p-5 text-white">
-
-                      <p className="text-xs text-slate-300 font-semibold">
-                        Tingkat Kesesuaian
+                    <div className="rounded-2xl bg-[#2B3056] p-5 text-white">
+                      <p className="text-xs text-slate-300 font-medium">
+                        Kesesuaian Format
                       </p>
-
-                      <div className="flex items-end gap-1 mt-2">
-
-                        <span className="text-4xl font-black text-[#FFC800]">
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="text-3xl font-bold text-[#FFD82B]">
                           {analysisResult.score}
                         </span>
-
-                        <span className="text-lg font-bold text-slate-300 mb-1">
-                          %
-                        </span>
-
+                        <span className="text-sm text-slate-300 font-medium">/ 100</span>
                       </div>
-
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        Berdasarkan pemeriksaan sementara AI.
+                      <p className="text-[11px] text-slate-300 mt-2">
+                        Skor keselarasan sistematika peraturan
                       </p>
-
                     </div>
 
-
-                    <div className="rounded-2xl border border-slate-200 p-5">
-
-                      <p className="text-xs text-slate-500 font-semibold">
-                        Potensi Kesalahan
+                    <div className="rounded-2xl border border-slate-200 p-5 bg-white">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Temuan Perbaikan
                       </p>
-
-                      <p className="text-3xl font-black text-red-500 mt-2">
+                      <p className="text-3xl font-bold text-[#2B3056] mt-1">
                         {analysisResult.totalErrors}
                       </p>
-
-                      <p className="text-[10px] text-slate-400 mt-1">
-                        Bagian perlu diperiksa
+                      <p className="text-[11px] text-slate-400 mt-2">
+                        Poin pasal yang perlu ditinjau
                       </p>
-
                     </div>
 
-
-                    <div className="rounded-2xl border border-slate-200 p-5">
-
-                      <p className="text-xs text-slate-500 font-semibold">
-                        Status Dokumen
+                    <div className="rounded-2xl border border-slate-200 p-5 bg-white">
+                      <p className="text-xs text-slate-500 font-medium">
+                        Status Validasi
                       </p>
-
-                      <div className="flex items-center gap-2 mt-3">
-
-                        <CheckCircle className="w-5 h-5 text-emerald-500" />
-
-                        <span className="text-sm font-black text-[#2C3154]">
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-bold text-[#2B3056]">
                           Perlu Review
                         </span>
-
                       </div>
-
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        Disarankan melakukan pemeriksaan lanjutan.
+                      <p className="text-[11px] text-slate-400 mt-2">
+                        Memerlukan konfirmasi Tim Kerja
                       </p>
-
                     </div>
-
                   </div>
 
-
-                  {/* Error Statistics */}
-
+                  {/* Summary Stats */}
                   <div>
-
-                    <h3 className="text-sm font-black text-[#2C3154] mb-3">
-                      Ringkasan Temuan
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                      Klasifikasi Temuan
                     </h3>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-
-                      <ResultStat
-                        title="Penulisan"
-                        value={analysisResult.writingErrors}
-                        icon={AlertCircle}
-                      />
-
-                      <ResultStat
-                        title="Struktur"
-                        value={analysisResult.structureErrors}
-                        icon={FileCheck2}
-                      />
-
-                      <ResultStat
-                        title="Format"
-                        value={analysisResult.formatErrors}
-                        icon={ShieldCheck}
-                      />
-
-                      <ResultStat
-                        title="Rekomendasi"
-                        value={analysisResult.recommendations}
-                        icon={CheckCircle2}
-                      />
-
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <ResultStat title="Penulisan" value={analysisResult.writingErrors} icon={AlertCircle} />
+                      <ResultStat title="Struktur" value={analysisResult.structureErrors} icon={FileCheck2} />
+                      <ResultStat title="Format" value={analysisResult.formatErrors} icon={ShieldCheck} />
+                      <ResultStat title="Rekomendasi" value={analysisResult.recommendations} icon={CheckCircle2} />
                     </div>
-
                   </div>
-
 
                   {/* Error List */}
-
                   <div>
-
-                    <div className="flex items-center justify-between mb-3">
-
-                      <h3 className="text-sm font-black text-[#2C3154]">
-                        Poin yang Perlu Diperiksa
-                      </h3>
-
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {analysisResult.errors.length} temuan
-                      </span>
-
-                    </div>
-
-                    <div className="space-y-3">
-
-                      {analysisResult.errors.map((error, index) => (
-
-                        <ErrorItem
-                          key={index}
-                          number={index + 1}
-                          {...error}
-                        />
-
-                      ))}
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              )}
-
-            </section>
-
-          </div>
-
-
-          {/* ===================================
-              RIGHT SIDEBAR
-          ==================================== */}
-
-          <div className="space-y-6">
-
-            {/* AI INFORMATION */}
-
-            <section className="bg-[#2C3154] rounded-2xl p-6 shadow-sm relative overflow-hidden">
-
-              <div className="absolute -right-10 -bottom-10 w-32 h-32 rounded-full bg-[#FFC800]/10 blur-2xl" />
-
-              <div className="relative">
-
-                <div className="flex items-center gap-3">
-
-                  <div className="w-11 h-11 rounded-xl bg-[#FFC800] flex items-center justify-center">
-
-                    <Sparkles className="w-5 h-5 text-[#2C3154]" />
-
-                  </div>
-
-                  <div>
-
-                    <h3 className="text-sm font-black text-white">
-                      HARMONITAS AI
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                      Rincian Catatan ({analysisResult.errors.length})
                     </h3>
-
-                    <p className="text-[10px] text-slate-300">
-                      Intelligent Regulation Analysis
-                    </p>
-
+                    <div className="space-y-3">
+                      {analysisResult.errors.map((error, index) => (
+                        <ErrorItem key={index} number={index + 1} {...error} />
+                      ))}
+                    </div>
                   </div>
-
                 </div>
-
-                <p className="mt-5 text-xs text-slate-300 leading-relaxed">
-                  Sistem AI membantu mengidentifikasi potensi
-                  kesalahan penulisan, struktur, format, serta
-                  memberikan rekomendasi perbaikan terhadap
-                  dokumen peraturan.
-                </p>
-
-                <div className="mt-5 flex items-center gap-2">
-
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-
-                  <span className="text-[10px] text-slate-300 font-bold">
-                    Secure Document Analysis
-                  </span>
-
-                </div>
-
-              </div>
-
+              )}
             </section>
-
-
-            {/* AI FEATURES */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm p-5">
-
-              <h3 className="text-sm font-black text-[#2C3154] mb-4">
-                Pemeriksaan AI
-              </h3>
-
-              <div className="space-y-3">
-
-                <FeatureItem
-                  icon={AlertCircle}
-                  title="Kesalahan Penulisan"
-                  description="Mendeteksi potensi kesalahan teks."
-                />
-
-                <FeatureItem
-                  icon={FileCheck2}
-                  title="Struktur Peraturan"
-                  description="Memeriksa struktur dokumen."
-                />
-
-                <FeatureItem
-                  icon={ShieldCheck}
-                  title="Kesesuaian Format"
-                  description="Menganalisis format peraturan."
-                />
-
-                <FeatureItem
-                  icon={CheckCircle2}
-                  title="Rekomendasi"
-                  description="Memberikan saran perbaikan."
-                />
-
-              </div>
-
-            </section>
-
-
-            {/* PROCESS */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm p-5">
-
-              <h3 className="text-sm font-black text-[#2C3154] mb-4">
-                Alur Pemeriksaan
-              </h3>
-
-              <div className="space-y-4">
-
-                <ProcessStep
-                  number="01"
-                  title="Upload Dokumen"
-                  description="Masukkan dokumen peraturan."
-                  active={!selectedFile}
-                />
-
-                <ProcessStep
-                  number="02"
-                  title="Analisis AI"
-                  description="AI memeriksa isi dokumen."
-                  active={isAnalyzing}
-                />
-
-                <ProcessStep
-                  number="03"
-                  title="Review Hasil"
-                  description="Tinjau temuan dan rekomendasi."
-                  active={!!analysisResult}
-                />
-
-              </div>
-
-            </section>
-
           </div>
 
+          {/* Right Column: Information & Guidelines */}
+          <div className="space-y-5">
+            {/* Information Card */}
+            <section className="bg-gradient-to-b from-[#2B3056] to-[#3A4070] text-white rounded-2xl p-6 border border-[#3A4070]">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#FFD82B]">
+                  <Sparkles className="w-5 h-5 text-[#FFD82B]" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Telaah Cerdas HARMONITAS</h3>
+                  <p className="text-[11px] text-slate-300 font-medium">Pemeriksaan Regulasi Berbantuan Sistem</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-200 leading-relaxed font-normal">
+                Sistem membantu mendeteksi potensi ketidaksesuaian penulisan, struktur pasal, dan format regulasi untuk mempercepat proses telaah oleh perancang peraturan perundang-undangan.
+              </p>
+
+              <div className="mt-4 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-slate-300 font-normal">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Pemrosesan internal terlindungi</span>
+              </div>
+            </section>
+
+            {/* Workflow steps */}
+            <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#2B3056] mb-3">
+                Alur Kerja Telaah
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-md bg-[#2B3056] text-[#FFD82B] flex items-center justify-center text-xs font-bold shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#2B3056]">Unggah Naskah</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Pilih dokumen permohonan regulasi.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-md bg-[#2B3056] text-[#FFD82B] flex items-center justify-center text-xs font-bold shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#2B3056]">Pemindaian Sistem</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Sistem memeriksa kesesuaian kaidah.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-md bg-[#2B3056] text-[#FFD82B] flex items-center justify-center text-xs font-bold shrink-0">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#2B3056]">Penyempurnaan Draft</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Tinjau temuan sebagai bahan rapat pleno.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Notice banner */}
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <p className="leading-relaxed font-normal">
+                <strong className="font-bold text-[#2B3056]">Catatan:</strong> Hasil pemeriksaan sistem bersifat rekomendasi teknis awal. Keputusan substansi hukum tetap berada pada kewenangan Tim Perancang Kanwil dan Biro Hukum.
+              </p>
+            </div>
+          </div>
         </div>
-
-
-        {/* =====================================
-            INFORMATION
-        ====================================== */}
-
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-[#FFF9DF] border border-[#F3DF82]">
-
-          <Info className="w-4 h-4 text-[#A47B00] mt-0.5 shrink-0" />
-
-          <p className="text-xs text-[#705B16] leading-relaxed">
-
-            <span className="font-black">
-              Catatan:
-            </span>{' '}
-
-            Fitur AI saat ini masih dalam tahap pengembangan.
-            Hasil pemeriksaan yang diberikan sistem merupakan
-            rekomendasi dan tetap perlu ditinjau oleh pengguna
-            sebelum digunakan sebagai dasar keputusan.
-
-          </p>
-
-        </div>
-
       </div>
     </AppLayout>
   );
 };
 
-
-/* =========================================
-   FEATURE ITEM
-========================================= */
-
-const FeatureItem = ({
-  icon: Icon,
-  title,
-  description,
-}) => {
-
-  return (
-
-    <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8F9FC] transition">
-
-      <div className="w-8 h-8 rounded-lg bg-[#F1F3F8] flex items-center justify-center shrink-0">
-
-        <Icon className="w-4 h-4 text-[#2C3154]" />
-
-      </div>
-
-      <div className="min-w-0">
-
-        <p className="text-xs font-black text-[#2C3154]">
-          {title}
-        </p>
-
-        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-          {description}
-        </p>
-
-      </div>
-
+const ResultStat = ({ title, value, icon: Icon }) => (
+  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl">
+    <div className="flex items-center justify-between">
+      <span className="text-[11px] text-slate-500 font-medium">{title}</span>
+      <Icon className="w-3.5 h-3.5 text-[#2B3056]" />
     </div>
+    <p className="text-lg font-bold text-[#2B3056] mt-1">{value}</p>
+  </div>
+);
 
-  );
-};
-
-
-/* =========================================
-   RESULT STAT
-========================================= */
-
-const ResultStat = ({
-  title,
-  value,
-  icon: Icon,
-}) => {
-
-  return (
-
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-
-      <div className="flex items-center justify-between">
-
-        <div className="w-8 h-8 rounded-lg bg-[#F1F3F8] flex items-center justify-center">
-
-          <Icon className="w-4 h-4 text-[#2C3154]" />
-
-        </div>
-
-        <span className="text-xl font-black text-[#2C3154]">
-          {value}
-        </span>
-
-      </div>
-
-      <p className="text-[10px] text-slate-500 font-bold mt-3">
-        {title}
-      </p>
-
-    </div>
-
-  );
-};
-
-
-/* =========================================
-   ERROR ITEM
-========================================= */
-
-const ErrorItem = ({
-  number,
-  type,
-  severity,
-  page,
-  description,
-}) => {
-
+const ErrorItem = ({ number, type, severity, page, description }) => {
   const severityClass = {
-    Tinggi: 'bg-red-50 text-red-600 border-red-100',
-    Sedang: 'bg-amber-50 text-amber-600 border-amber-100',
-    Rendah: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+    Tinggi: 'bg-red-50 text-red-700 border-red-200',
+    Sedang: 'bg-amber-50 text-amber-800 border-amber-200',
+    Rendah: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   };
 
   return (
-
-    <div className="rounded-xl border border-slate-200 p-4 hover:border-[#D0D5E2] hover:shadow-sm transition">
-
-      <div className="flex items-start gap-3">
-
-        <div className="w-8 h-8 rounded-lg bg-[#2C3154] text-[#FFC800] flex items-center justify-center text-xs font-black shrink-0">
-          {number}
+    <div className="p-4 border border-slate-200 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-2">
+          <span className="w-5 h-5 rounded bg-[#2B3056] text-[#FFD82B] text-[10px] font-bold flex items-center justify-center">
+            {number}
+          </span>
+          <span className="text-xs font-bold text-[#2B3056]">{type}</span>
         </div>
-
-        <div className="flex-1 min-w-0">
-
-          <div className="flex flex-wrap items-center gap-2">
-
-            <h4 className="text-xs font-black text-[#2C3154]">
-              {type}
-            </h4>
-
-            <span
-              className={`px-2 py-0.5 rounded-md border text-[9px] font-bold ${
-                severityClass[severity]
-              }`}
-            >
-              {severity}
-            </span>
-
-            <span className="text-[9px] text-slate-400 font-semibold">
-              {page}
-            </span>
-
-          </div>
-
-          <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
-            {description}
-          </p>
-
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${severityClass[severity]}`}>
+            {severity}
+          </span>
+          <span className="text-[11px] text-slate-400 font-medium">{page}</span>
         </div>
-
       </div>
-
+      <p className="text-xs text-slate-600 leading-relaxed font-normal pl-7">
+        {description}
+      </p>
     </div>
-
-  );
-};
-
-
-/* =========================================
-   PROCESS STEP
-========================================= */
-
-const ProcessStep = ({
-  number,
-  title,
-  description,
-  active,
-}) => {
-
-  return (
-
-    <div className="flex items-start gap-3">
-
-      <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${
-          active
-            ? 'bg-[#FFC800] text-[#2C3154]'
-            : 'bg-[#F1F3F8] text-[#2C3154]'
-        }`}
-      >
-        {number}
-      </div>
-
-      <div>
-
-        <p className="text-xs font-black text-[#2C3154]">
-          {title}
-        </p>
-
-        <p className="text-[10px] text-slate-500 mt-0.5">
-          {description}
-        </p>
-
-      </div>
-
-    </div>
-
   );
 };
 

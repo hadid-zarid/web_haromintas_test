@@ -702,7 +702,7 @@ class PermohonanController extends Controller
     /**
      * Tampilkan Dokumen Langsung di Web (Inline Secure Preview)
      */
-    public function viewDokumen($dokumenId): BinaryFileResponse|RedirectResponse
+    public function viewDokumen($dokumenId)
     {
         $dokumen = Dokumen::with('rancanganRegulasi')->findOrFail($dokumenId);
         $user = Auth::user();
@@ -711,7 +711,106 @@ class PermohonanController extends Controller
 
         $fullPath = $this->resolveSecureFilePath($dokumen);
         if (! $fullPath || ! file_exists($fullPath)) {
-            return back()->with('error', "Berkas fisik '{$dokumen->nama_file}' tidak ditemukan di server.");
+            $namaFile = htmlspecialchars($dokumen->nama_file ?? 'Dokumen', ENT_QUOTES, 'UTF-8');
+            $html = <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berkas Fisik Belum Tersedia - HARMONITAS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #F8FAFC;
+            color: #1E293B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        .card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 24px;
+            padding: 40px 32px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px -5px rgba(43, 48, 86, 0.07);
+        }
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: #EFF6FF;
+            color: #2B3056;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 18px;
+            border: 1px solid #DBEAFE;
+        }
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #2B3056;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        p {
+            font-size: 13px;
+            color: #64748B;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+        .file-box {
+            background: #F1F5F9;
+            border: 1px solid #CBD5E1;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            display: inline-block;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        .footer-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-box">📁</div>
+        <h2>Berkas Fisik Belum Tersedia</h2>
+        <p>File fisik untuk dokumen ini belum diunggah ke penyimpanan server atau telah dipindahkan.</p>
+        <div class="file-box">{$namaFile}</div>
+        <div>
+            <span class="footer-note">Silakan unggah dokumen fisik melalui menu Unggah Dokumen</span>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+            return response($html, 200, [
+                'Content-Type' => 'text/html; charset=UTF-8',
+                'X-Frame-Options' => 'SAMEORIGIN',
+            ]);
         }
 
         // Catat jejak audit akses berkas rahasia

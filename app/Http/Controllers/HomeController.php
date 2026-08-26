@@ -203,7 +203,7 @@ class HomeController extends Controller
         $currentMonth = (int) date('n');
 
         $trendData = [];
-        for ($m = max(1, $currentMonth - 5); $m <= $currentMonth; $m++) {
+        for ($m = 1; $m <= 12; $m++) {
             $monthData = $allData->filter(function ($item) use ($m, $currentYear) {
                 if (! $item->tanggal_dibuat && ! $item->created_at) return false;
                 $date = Carbon::parse($item->tanggal_dibuat ?? $item->created_at);
@@ -211,6 +211,7 @@ class HomeController extends Controller
             });
 
             $trendData[] = [
+                'month_num' => $m,
                 'bulan' => $months[$m],
                 'Total Masuk' => $monthData->count(),
                 'Selesai' => $monthData->where('status_id', 4)->count(),

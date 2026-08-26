@@ -1,26 +1,58 @@
 import React, { useEffect, useRef, useState } from "react";
-import { usePage } from "@inertiajs/react";
+import { usePage, Link, router } from "@inertiajs/react";
 
 import Sidebar from "./Sidebar";
 import Breadcrumb from "./Breadcrumb";
 import RoleBadge from "../common/RoleBadge";
+import HarmonitasLoader from "../common/HarmonitasLoader";
 
 import { useAuth } from "../../context/AuthContext";
 
 import SessionTimeoutModal from "../modals/SessionTimeoutModal";
 import NotificationDropdown from "./NotificationDropdown";
 
-import { Building2, ChevronDown, IdCard, Menu, User } from "lucide-react";
+import {
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  BookOpen,
+  IdCard,
+  LogOut,
+  Menu,
+  Sparkles,
+  User,
+} from "lucide-react";
 
-export const AppLayout = ({ children, title }) => {
+export const AppLayout = ({
+  children,
+  title,
+  subtitle,
+  headerAction,
+  hideHeader = false,
+}) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const profileMenuRef = useRef(null);
   const { user, role } = useAuth();
   const { url } = usePage();
   const pathname = url.split('?')[0];
+
+  /* =========================================
+     GLOBAL INERTIA NAVIGATION LOADER LISTENER
+  ========================================== */
+  useEffect(() => {
+    const unregisterStart = router.on("start", () => setIsNavigating(true));
+    const unregisterFinish = router.on("finish", () => setIsNavigating(false));
+
+    return () => {
+      unregisterStart();
+      unregisterFinish();
+    };
+  }, []);
 
   /* =========================================
      CLOSE PROFILE DROPDOWN
@@ -91,12 +123,13 @@ export const AppLayout = ({ children, title }) => {
     return "Dashboard";
   };
 
-  const displayName = user?.name || "Operator Kanwil Kemenkum";
-  const displayUnit = user?.unit || "Kementerian Hukum & HAM Riau";
+  const displayName = user?.name || user?.nama || "Operator Kanwil Kemenkum";
+  const displayEmail = user?.email || "operator@kemenkumham.go.id";
+  const displayUnit = user?.unit || user?.unit_kerja || "Kementerian Hukum & HAM Riau";
   const displayNip = user?.nip || "-";
 
   return (
-    <div className="flex min-h-screen bg-[#F7F8FC] text-[#20283D]">
+    <div className="flex min-h-screen bg-[#F7F8FC] text-[#20283D] font-sans">
       {/* =====================================
           SIDEBAR
       ====================================== */}
@@ -144,26 +177,22 @@ export const AppLayout = ({ children, title }) => {
           <div className="flex items-center gap-2.5 shrink-0">
             <NotificationDropdown />
 
-            {/* Account Dropdown */}
+            {/* Account Trigger & Dropdown */}
             <div ref={profileMenuRef} className="relative">
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((current) => !current)}
-                className={`flex h-10 items-center gap-2 rounded-xl border px-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#FFC800]/40 ${
+                className={`group flex h-10 items-center gap-2 rounded-xl px-2.5 transition-all duration-200 border cursor-pointer select-none ${
                   isProfileOpen
-                    ? "border-[#303661]/20 bg-[#303661] text-white shadow-md"
-                    : "border-[#E2E6EF] bg-[#F7F8FC] text-[#303661] hover:border-[#303661]/20 hover:bg-white"
+                    ? "border-[#2B3056] bg-[#2B3056] text-white shadow-sm"
+                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
                 }`}
-                title="Informasi akun"
+                title="Menu Akun"
                 aria-label="Buka informasi akun"
                 aria-haspopup="menu"
                 aria-expanded={isProfileOpen}
               >
-                <span
-                  className={`flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg ${
-                    isProfileOpen ? "bg-white/15" : "bg-[#EEF1F8]"
-                  }`}
-                >
+                <div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg border border-[#FFD82B]/60 bg-white/20 shrink-0">
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
@@ -173,100 +202,81 @@ export const AppLayout = ({ children, title }) => {
                   ) : (
                     <User className="h-4 w-4" />
                   )}
+                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-white" />
+                </div>
+                <span className="hidden sm:block text-xs font-bold truncate max-w-[120px]">
+                  {displayName.split(" ")[0]}
                 </span>
                 <ChevronDown
-                  className={`hidden h-3.5 w-3.5 transition-transform duration-200 sm:block ${
-                    isProfileOpen ? "rotate-180" : ""
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    isProfileOpen ? "rotate-180 text-[#FFD82B]" : "text-slate-400"
                   }`}
                 />
               </button>
 
+              {/* Account Dropdown Panel */}
               {isProfileOpen && (
                 <div
-                  className="absolute right-0 top-[calc(100%+0.75rem)] z-50 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-[#E2E6EF] bg-white shadow-[0_22px_58px_rgba(26,26,94,0.18)]"
+                  className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[265px] sm:w-[275px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-[0_16px_40px_rgba(43,48,86,0.12)] animate-in fade-in zoom-in-95 duration-150 origin-top-right space-y-3"
                   role="menu"
                   aria-label="Informasi akun pengguna"
                 >
-                  {/* Profile Header */}
-                  <div className="relative overflow-hidden bg-gradient-to-r from-[#303661] to-[#4B5286] p-5 text-white">
-                    <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#FFC800]/15 blur-2xl" />
-
-                    <div className="relative flex items-start gap-3.5">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-[#FFC800] bg-white/10">
-                        {user?.avatar ? (
-                          <img
-                            src={user.avatar}
-                            alt={displayName}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-6 w-6 text-white" />
-                        )}
+                  {/* User Identity Row */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-[#FFD82B] bg-[#2B3056] text-white shadow-2xs">
+                      {user?.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={displayName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-5 w-5" />
+                      )}
+                      <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-extrabold text-[#2B3056] truncate">
+                        {displayName}
+                      </p>
+                      <p className="text-[10.5px] text-slate-400 font-medium truncate mt-0.5">
+                        {displayEmail}
+                      </p>
+                      <div className="mt-1">
+                        <RoleBadge role={role} />
                       </div>
+                    </div>
+                  </div>
 
-                      <div className="min-w-0 flex-1 pt-0.5">
-                        <p className="truncate text-sm font-black">
-                          {displayName}
-                        </p>
-                        <p className="mt-1 truncate text-[11px] font-semibold text-slate-300">
-                          {displayUnit}
-                        </p>
-                      </div>
-
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-1 text-[9px] font-black text-emerald-300">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                        Online
+                  {/* Metadata Mini Chip */}
+                  <div className="space-y-1.5 py-0.5">
+                    <div className="flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                      <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+                        <IdCard className="w-3.5 h-3.5 text-[#2B3056]" />
+                        <span>NIP Pegawai</span>
+                      </span>
+                      <span className="font-mono font-bold text-[#2B3056] text-[10.5px]">
+                        {displayNip}
                       </span>
                     </div>
                   </div>
 
-                  {/* Profile Details */}
-                  <div className="space-y-3 p-4">
-                    <div className="rounded-xl border border-[#E2E6EF] bg-[#F7F8FC] p-3.5">
-                      <div className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#303661] shadow-sm">
-                          <IdCard className="h-4 w-4" />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-[9px] font-black uppercase tracking-[0.14em] text-[#3D3D3A]/55">
-                            Nomor Induk Pegawai
-                          </p>
-                          <p className="mt-1 break-words text-xs font-extrabold text-[#303661]">
-                            {displayNip}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-xl border border-[#E2E6EF] bg-[#F7F8FC] p-3.5">
-                      <div className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#303661] shadow-sm">
-                          <Building2 className="h-4 w-4" />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-[9px] font-black uppercase tracking-[0.14em] text-[#3D3D3A]/55">
-                            Unit Kerja
-                          </p>
-                          <p className="mt-1 text-xs font-bold leading-relaxed text-[#3D3D3A]">
-                            {displayUnit}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-[#E2E6EF] px-1 pt-3">
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.14em] text-[#3D3D3A]/55">
-                          Hak Akses
-                        </p>
-                        <div className="mt-1.5">
-                          <RoleBadge role={role} />
-                        </div>
-                      </div>
-                      <p className="max-w-[130px] text-right text-[9px] font-semibold leading-relaxed text-[#3D3D3A]/55">
-                        Gunakan tombol logout pada sidebar untuk keluar.
-                      </p>
-                    </div>
+                  {/* Logout Action */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setIsLogoutModalOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-bold text-xs transition cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                        <span>Keluar dari Akun</span>
+                      </span>
+                      <span className="text-[10px] text-rose-400">Logout</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -278,25 +288,61 @@ export const AppLayout = ({ children, title }) => {
             MAIN CONTENT
         ================================== */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-7 lg:p-8">
-          {/* Page Header */}
-          <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A5E] tracking-tight">
-              {getHeaderTitle(pathname)}
-            </h2>
+          {/* Unified Page Header */}
+          {!hideHeader && (
+            <div className="mb-6 space-y-2.5">
+              {/* Breadcrumb Navigation */}
+              <div>
+                <Breadcrumb />
+              </div>
 
-            {/* Yellow Accent */}
-            <div className="mt-2 h-1 w-14 rounded-full bg-[#FFC800]" />
+              {/* Title & Action Row */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2B3056] tracking-tight">
+                    {getHeaderTitle(pathname)}
+                  </h1>
+                  {subtitle && (
+                    <p className="text-xs text-slate-500 font-medium mt-1">
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
 
-            {/* Breadcrumb */}
-            <div className="mt-2.5">
-              <Breadcrumb />
+                {headerAction && (
+                  <div className="shrink-0">
+                    {headerAction}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* PAGE CONTENT */}
           {children}
         </main>
       </div>
+
+      {/* =====================================
+          GLOBAL TOP LASER LOADING BAR
+      ====================================== */}
+      {isNavigating && (
+        <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] overflow-hidden pointer-events-none">
+          <div className="h-full w-full bg-gradient-to-r from-transparent via-[#FFD82B] to-[#FFB943] shadow-[0_0_10px_#FFD82B] animate-laser-scan" />
+        </div>
+      )}
+
+      {/* =====================================
+          GLOBAL FLOATING QUANTUM SYNC PILL
+      ====================================== */}
+      {isNavigating && (
+        <div className="fixed bottom-5 right-5 z-[9999] pointer-events-none animate-fadeIn">
+          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-[#2B3056]/95 text-white backdrop-blur-md border border-[#FFD82B]/30 shadow-2xl">
+            <HarmonitasLoader variant="button" />
+            <span className="text-xs font-black tracking-wide text-[#FFD82B]">Sinkronisasi HARMONITAS...</span>
+          </div>
+        </div>
+      )}
 
       {/* =====================================
           LOGOUT MODAL
