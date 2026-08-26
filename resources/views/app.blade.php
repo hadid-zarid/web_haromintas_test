@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="{{ asset('LOGO HARMONITAS.png') }}" />
+    <link rel="shortcut icon" type="image/png" href="{{ asset('LOGO HARMONITAS.png') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('LOGO HARMONITAS.png') }}" />
     <meta name="description" content="HARMONITAS (Harmonisasi Ranperda dan Ranperkada Tuntas) - Solusi menyederhanakan proses harmonisasi rancangan peraturan daerah dan rancangan peraturan kepala daerah di Provinsi Riau." />
 
     <title inertia>{{ config('app.name', 'HARMONITAS') }}</title>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '../components/layout/AppLayout';
 
@@ -15,32 +15,149 @@ import {
   Info,
   Sparkles,
   CheckCircle,
+  Bot,
+  Zap,
+  ArrowRight,
+  RefreshCw,
+  SlidersHorizontal,
+  Download,
+  Copy,
+  Check,
+  FileCode,
+  BookOpen,
+  HelpCircle,
+  Filter,
 } from 'lucide-react';
 
-const AIAssistantPage = () => {
+const SAMPLE_ANALYSIS = {
+  fileName: 'Draf_Ranperda_Penyelenggaraan_Ketertiban_Umum_2026.docx',
+  fileSize: '1.84 MB',
+  score: 88,
+  grade: 'Layak dengan Perbaikan Ringan',
+  totalFindings: 6,
+  writingErrors: 2,
+  structureErrors: 2,
+  formatErrors: 1,
+  recommendations: 1,
+  categories: [
+    {
+      id: 'all',
+      label: 'Semua Temuan',
+      count: 6,
+    },
+    {
+      id: 'struktur',
+      label: 'Struktur & Sistematika',
+      count: 2,
+    },
+    {
+      id: 'penulisan',
+      label: 'Kaidah Bahasa',
+      count: 2,
+    },
+    {
+      id: 'format',
+      label: 'Format & Penomoran',
+      count: 1,
+    },
+    {
+      id: 'rekomendasi',
+      label: 'Rekomendasi Khusus',
+      count: 1,
+    },
+  ],
+  findings: [
+    {
+      id: 1,
+      category: 'struktur',
+      type: 'Sistematika Bab & Pasal',
+      severity: 'Tinggi',
+      location: 'BAB III - Ketentuan Sanksi (Hal. 6)',
+      problem:
+        'Penempatan Ketentuan Pidana mendahului Ketentuan Penyidikan. Berdasarkan Lampiran II UU 12/2011, Bab Penyidikan wajib diletakkan sebelum Bab Ketentuan Pidana.',
+      solution:
+        'Pindahkan BAB Penyidikan menjadi BAB IV dan sesuaikan penomoran pasal serta rujukannya pada batang tubuh.',
+    },
+    {
+      id: 2,
+      category: 'penulisan',
+      type: 'Kaidah Bahasa Hukum',
+      severity: 'Sedang',
+      location: 'Pasal 12 ayat (2) (Hal. 3)',
+      problem:
+        'Ditemukan penggunaan frasa ambigu "dan/atau" pada perumusan norma kewajiban yang dapat menimbulkan multitafsir penegakan hukum.',
+      solution:
+        'Gunakan kata "dan" jika bersifat kumulatif atau kata "atau" jika bersifat alternatif secara tegas.',
+    },
+    {
+      id: 3,
+      category: 'format',
+      type: 'Format Konsistensi Penomoran',
+      severity: 'Sedang',
+      location: 'Pasal 18 ayat (1) huruf c (Hal. 5)',
+      problem:
+        'Penulisan rincian huruf menggunakan tanda kurung tutup "(c)" bukan titik "c." yang tidak sesuai standar drafting regulasi.',
+      solution:
+        'Ubah format rincian huruf menjadi "a.", "b.", "c." diakhiri tanda titik koma (;).',
+    },
+    {
+      id: 4,
+      category: 'struktur',
+      type: 'Konsiderans Menimbang',
+      severity: 'Rendah',
+      location: 'Konsiderans Menimbang huruf b (Hal. 1)',
+      problem:
+        'Uraian pokok pikiran pada butir (b) menggabungkan landasan filosofis dan sosiologis dalam satu kalimat panjang.',
+      solution:
+        'Pisahkan pokok pikiran sosiologis menjadi butir tersendiri untuk menjaga kejelasan alur penalaran konsiderans.',
+    },
+    {
+      id: 5,
+      category: 'penulisan',
+      type: 'Istilah dan Definisi',
+      severity: 'Sedang',
+      location: 'Ketentuan Umum Pasal 1 angka 4 (Hal. 2)',
+      problem:
+        'Istilah "Satuan Tugas" didefinisikan dalam Ketentuan Umum namun tidak pernah digunakan dalam pasal-pasal batang tubuh.',
+      solution:
+        'Hapus definisi angka 4 dari Ketentuan Umum jika tidak memiliki keterkaitan operasional dengan norma pasal.',
+    },
+    {
+      id: 6,
+      category: 'rekomendasi',
+      type: 'Sinkronisasi Vertikal',
+      severity: 'Rendah',
+      location: 'Dasar Hukum Mengingat angka 7 (Hal. 1)',
+      problem:
+        'Peraturan Pemerintah rujukan telah mengalami perubahan terakhir melalui PP Nomor 16 Tahun 2023.',
+      solution:
+        'Perbarui nomor dan nomenklatur dasar hukum ke regulasi pengganti terbaru.',
+    },
+  ],
+};
+
+export const AIAssistantPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [progressStage, setProgressStage] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [copiedId, setCopiedId] = useState(null);
 
   /* =========================================
-     FILE UPLOAD
+     HANDLE FILE SELECTION
   ========================================== */
-
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0];
-
+  const processFile = (file) => {
     if (!file) return;
 
     const allowedExtensions = ['.pdf', '.doc', '.docx'];
-
     const fileName = file.name.toLowerCase();
-
-    const isValid = allowedExtensions.some((extension) =>
-      fileName.endsWith(extension)
-    );
+    const isValid = allowedExtensions.some((ext) => fileName.endsWith(ext));
 
     if (!isValid) {
-      alert('Format dokumen harus PDF, DOC, atau DOCX.');
+      alert('Format dokumen harus berupa PDF, DOC, atau DOCX.');
       return;
     }
 
@@ -48,186 +165,193 @@ const AIAssistantPage = () => {
     setAnalysisResult(null);
   };
 
-  /* =========================================
-     REMOVE FILE
-  ========================================== */
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    processFile(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    processFile(file);
+  };
 
   const removeFile = () => {
     setSelectedFile(null);
     setAnalysisResult(null);
   };
 
-  /* =========================================
-     ANALYZE DOCUMENT
-  ========================================== */
+  const loadSampleDocument = () => {
+    const dummyFile = {
+      name: SAMPLE_ANALYSIS.fileName,
+      size: 1929380, // ~1.84 MB
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    };
+    setSelectedFile(dummyFile);
+    setAnalysisResult(null);
+  };
 
+  /* =========================================
+     SIMULATE AI ANALYSIS WITH REALISTIC STAGES
+  ========================================== */
   const handleAnalyze = () => {
     if (!selectedFile) return;
 
     setIsAnalyzing(true);
+    setAnalysisProgress(10);
+    setProgressStage('Mengekstraksi teks dokumen dan struktur draf...');
     setAnalysisResult(null);
 
-    /*
-      SIMULASI ANALISIS AI
+    const stages = [
+      { progress: 30, text: 'Memeriksa format konsiderans dan dasar hukum...' },
+      { progress: 55, text: 'Menganalisis sistematika BAB, Bagian, dan Pasal...' },
+      { progress: 80, text: 'Memverifikasi kaidah bahasa hukum & UU 12/2011...' },
+      { progress: 100, text: 'Menyusun laporan skor kesesuaian dan rekomendasi...' },
+    ];
 
-      Nantinya bagian ini dapat diganti dengan API backend:
+    stages.forEach((stage, idx) => {
+      setTimeout(() => {
+        setAnalysisProgress(stage.progress);
+        setProgressStage(stage.text);
 
-      const formData = new FormData();
-
-      formData.append(
-        'document',
-        selectedFile
-      );
-
-      axios.post(
-        '/api/ai/analyze',
-        formData
-      );
-    */
-
-    setTimeout(() => {
-      setIsAnalyzing(false);
-
-      setAnalysisResult({
-        score: 87,
-        totalErrors: 8,
-        writingErrors: 3,
-        structureErrors: 2,
-        formatErrors: 2,
-        recommendations: 1,
-
-        errors: [
-          {
-            type: 'Kesalahan Penulisan',
-            severity: 'Sedang',
-            page: 'Halaman 2',
-            description:
-              'Terdapat penggunaan kata atau kalimat yang berpotensi tidak sesuai dengan kaidah penulisan peraturan.',
-          },
-          {
-            type: 'Struktur Peraturan',
-            severity: 'Tinggi',
-            page: 'Halaman 4',
-            description:
-              'Struktur pasal dan ayat perlu diperiksa kembali karena terdapat bagian yang berpotensi tidak mengikuti sistematika peraturan.',
-          },
-          {
-            type: 'Kesesuaian Format',
-            severity: 'Sedang',
-            page: 'Halaman 6',
-            description:
-              'Format penomoran pada beberapa bagian dokumen berpotensi tidak konsisten.',
-          },
-          {
-            type: 'Rekomendasi',
-            severity: 'Rendah',
-            page: 'Halaman 8',
-            description:
-              'Disarankan melakukan pemeriksaan ulang terhadap istilah yang digunakan agar konsisten di seluruh dokumen.',
-          },
-        ],
-      });
-    }, 2000);
+        if (idx === stages.length - 1) {
+          setTimeout(() => {
+            setIsAnalyzing(false);
+            setAnalysisResult(SAMPLE_ANALYSIS);
+            setActiveCategory('all');
+          }, 400);
+        }
+      }, (idx + 1) * 500);
+    });
   };
+
+  const handleCopyFinding = (finding) => {
+    const textToCopy = `[${finding.type}] - ${finding.location}\nMasalah: ${finding.problem}\nRekomendasi: ${finding.solution}`;
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedId(finding.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const filteredFindings = analysisResult
+    ? analysisResult.findings.filter((item) => {
+        if (activeCategory === 'all') return true;
+        return item.category === activeCategory;
+      })
+    : [];
 
   return (
     <AppLayout>
-      <Head title="Asisten AI Pra-Harmonisasi - HARMONITAS" />
-      <div className="space-y-6">
+      <Head title="HARMONITAS AI - Asisten Regulasi Cerdas" />
 
+      <div className="space-y-6 pb-12">
+        {/* =========================================
+            HERO HEADER BANNER
+        ========================================= */}
+        <section className="relative overflow-hidden rounded-3xl border border-[#263E75] bg-gradient-to-r from-[#142A5E] via-[#1E3773] to-[#2B478B] p-6 text-white shadow-[0_16px_40px_rgba(20,42,94,0.18)] sm:p-8">
+          {/* Ambient Glows */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#FFC800]/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
 
-        {/* =====================================
-            MAIN GRID
-        ====================================== */}
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-          {/* ===================================
-              LEFT CONTENT
-          ==================================== */}
-
-          <div className="xl:col-span-2 space-y-6">
-
-            {/* =================================
-                UPLOAD DOCUMENT
-            ================================== */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-
-              {/* Header */}
-
-              <div className="px-6 py-5 border-b border-[#E2E2DC]">
-
-                <div className="flex items-center gap-3">
-
-                  <div className="w-10 h-10 rounded-xl bg-[#2C3154] flex items-center justify-center">
-
-                    <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
-
-                  </div>
-
-                  <div>
-
-                    <h2 className="text-base font-black text-[#2C3154]">
-                      Pemeriksaan Dokumen
-                    </h2>
-
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Upload dokumen peraturan untuk dianalisis oleh AI.
-                    </p>
-
-                  </div>
-
-                </div>
-
+          <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+            <div className="max-w-2xl space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#FFE380] backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5 text-[#FFC800]" />
+                Asisten Analisis Regulasi Cerdas
               </div>
 
+              <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                HARMONITAS AI
+              </h1>
 
-              {/* Upload Area */}
+              <p className="text-xs font-medium leading-relaxed text-white/75 sm:text-sm">
+                Periksa kepatuhan format, sistematika Bab & Pasal, serta kaidah perancangan peraturan perundang-undangan (UU No. 12/2011) secara otomatis sebelum masuk ke rapat pleno.
+              </p>
+            </div>
 
-              <div className="p-6">
+            {/* Quick Status Pill */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2.5 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-xs font-bold text-white shadow-inner backdrop-blur-md">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                </span>
+                <div>
+                  <p className="text-[10px] font-medium text-white/60">Engine AI Regulasi</p>
+                  <p className="text-xs font-bold text-white">Online & Siap Analisis</p>
+                </div>
+              </div>
 
-                {!selectedFile ? (
+              {!selectedFile && (
+                <button
+                  type="button"
+                  onClick={loadSampleDocument}
+                  className="group inline-flex h-11 items-center gap-2 rounded-2xl border border-[#FFE380]/40 bg-[#FFC800] px-4 text-xs font-black text-[#101B4F] shadow-[0_4px_14px_rgba(255,200,0,0.30)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#FFD633] active:translate-y-0"
+                >
+                  <Zap className="h-3.5 w-3.5 fill-current text-[#101B4F]" />
+                  <span>Coba Contoh Dokumen</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
 
-                  <label
-                    htmlFor="document-upload"
-                    className="group relative block cursor-pointer"
+        {/* =========================================
+            MAIN 2-COLUMN LAYOUT
+        ========================================= */}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+          {/* LEFT CONTENT AREA (8 Cols) */}
+          <div className="space-y-6 xl:col-span-8">
+            {/* 1. UPLOAD BOX */}
+            <section className="rounded-2xl border border-[#DCE2EC] bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#EAEFF6] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#142A5E] text-[#FFC800] shadow-sm">
+                    <FileCheck2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black text-[#142A5E]">
+                      Unggah Dokumen Peraturan
+                    </h2>
+                    <p className="text-[11px] font-medium text-slate-500">
+                      Pilih berkas draf Ranperda / Ranperkada (PDF, DOCX, atau DOC).
+                    </p>
+                  </div>
+                </div>
+
+                {selectedFile && (
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold text-rose-600 transition hover:bg-rose-50"
                   >
+                    <X className="h-3.5 w-3.5" />
+                    <span>Ganti File</span>
+                  </button>
+                )}
+              </div>
 
-                    <div className="border-2 border-dashed border-[#D8DBE5] rounded-2xl p-10 text-center transition-all duration-200 hover:border-[#FFC800] hover:bg-[#FFFDF2]">
-
-                      <div className="mx-auto w-16 h-16 rounded-2xl bg-[#F1F3F8] group-hover:bg-[#FFF3B8] flex items-center justify-center transition">
-
-                        <Upload className="w-7 h-7 text-[#2C3154]" />
-
-                      </div>
-
-                      <h3 className="mt-5 text-sm font-black text-[#2C3154]">
-                        Upload Dokumen Peraturan
-                      </h3>
-
-                      <p className="mt-2 text-xs text-slate-500">
-                        Klik untuk memilih dokumen yang akan diperiksa.
-                      </p>
-
-                      <div className="flex justify-center gap-2 mt-4">
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
-                          PDF
-                        </span>
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
-                          DOC
-                        </span>
-
-                        <span className="px-3 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
-                          DOCX
-                        </span>
-
-                      </div>
-
-                    </div>
-
+              <div className="mt-5">
+                {!selectedFile ? (
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 ${
+                      isDragging
+                        ? 'border-[#FFC800] bg-[#FFFDF0] scale-[0.99]'
+                        : 'border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#142A5E]/40 hover:bg-[#F1F5F9]'
+                    }`}
+                  >
                     <input
                       id="document-upload"
                       type="file"
@@ -236,666 +360,432 @@ const AIAssistantPage = () => {
                       className="hidden"
                     />
 
-                  </label>
-
-                ) : (
-
-                  /* Selected File */
-
-                  <div className="rounded-2xl border border-[#D8DBE5] bg-[#F8F9FC] p-5">
-
-                    <div className="flex items-center gap-4">
-
-                      <div className="w-12 h-12 rounded-xl bg-[#2C3154] flex items-center justify-center shrink-0">
-
-                        <FileText className="w-6 h-6 text-[#FFC800]" />
-
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-
-                        <p className="text-sm font-black text-[#2C3154] truncate">
-                          {selectedFile.name}
-                        </p>
-
-                        <p className="text-xs text-slate-500 mt-1">
-                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={removeFile}
-                        className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition"
-                      >
-
-                        <X className="w-4 h-4" />
-
-                      </button>
-
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#142A5E] shadow-sm border border-[#E2E8F0] transition-transform duration-200 group-hover:scale-105">
+                      <Upload className="h-6 w-6 text-[#142A5E]" />
                     </div>
 
+                    <h3 className="mt-4 text-sm font-black text-[#142A5E]">
+                      Tarik & Lepas Dokumen di Sini
+                    </h3>
 
-                    {/* Analyze Button */}
+                    <p className="mt-1 text-xs text-slate-500">
+                      atau klik tombol di bawah untuk memilih file dari komputer Anda.
+                    </p>
 
-                    <div className="mt-5 pt-5 border-t border-slate-200">
+                    <label
+                      htmlFor="document-upload"
+                      className="mt-4 inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#142A5E] px-5 text-xs font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#102454] hover:shadow-md"
+                    >
+                      <Upload className="h-3.5 w-3.5 text-[#FFC800]" />
+                      <span>Pilih File Dokumen</span>
+                    </label>
+
+                    <div className="mt-5 flex items-center justify-center gap-2">
+                      <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600">
+                        PDF
+                      </span>
+                      <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600">
+                        DOCX
+                      </span>
+                      <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600">
+                        Maks. 25 MB
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  /* FILE ACTIVE CARD */
+                  <div className="rounded-2xl border border-[#D0DBE9] bg-gradient-to-r from-[#F8FAFD] to-[#F1F5FB] p-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#142A5E] text-[#FFC800] shadow-sm">
+                          <FileText className="h-6 w-6" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-black text-[#142A5E]">
+                            {selectedFile.name}
+                          </p>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] font-medium text-slate-500">
+                            <span>{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</span>
+                            <span>•</span>
+                            <span className="text-emerald-600 font-bold">Siap Dianalisis</span>
+                          </div>
+                        </div>
+                      </div>
 
                       <button
                         type="button"
                         onClick={handleAnalyze}
                         disabled={isAnalyzing}
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#2C3154] hover:bg-[#383F6A] disabled:opacity-60 text-white text-sm font-black transition shadow-sm"
+                        className="group inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#142A5E] px-6 text-xs font-bold text-white shadow-[0_4px_14px_rgba(20,42,94,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#102454] hover:shadow-lg disabled:opacity-60"
                       >
-
                         {isAnalyzing ? (
-
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-
-                            Menganalisis Dokumen...
+                            <Loader2 className="h-4 w-4 animate-spin text-[#FFC800]" />
+                            <span>Menganalisis Draf...</span>
                           </>
-
                         ) : (
-
                           <>
-                            <Sparkles className="w-4 h-4 text-[#FFC800]" />
-
-                            Mulai Analisis AI
+                            <Sparkles className="h-4 w-4 text-[#FFC800]" />
+                            <span>Mulai Analisis AI</span>
+                            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                           </>
-
                         )}
-
                       </button>
-
                     </div>
 
+                    {/* Progress Bar when Analyzing */}
+                    {isAnalyzing && (
+                      <div className="mt-5 space-y-2 border-t border-[#DDE4EE] pt-4">
+                        <div className="flex items-center justify-between text-xs font-bold text-[#142A5E]">
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#142A5E]" />
+                            {progressStage}
+                          </span>
+                          <span>{analysisProgress}%</span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[#142A5E] via-[#2A4D9B] to-[#FFC800] transition-all duration-500"
+                            style={{ width: `${analysisProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-
                 )}
-
               </div>
-
             </section>
 
-
-            {/* =================================
-                RESULT
-            ================================== */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-
-              <div className="px-6 py-5 border-b border-[#E2E2DC]">
-
-                <div className="flex items-center justify-between gap-4">
-
-                  <div className="flex items-center gap-3">
-
-                    <div className="w-10 h-10 rounded-xl bg-[#F1F3F8] flex items-center justify-center">
-
-                      <Search className="w-5 h-5 text-[#2C3154]" />
-
-                    </div>
-
-                    <div>
-
-                      <h2 className="text-base font-black text-[#2C3154]">
-                        Hasil Pemeriksaan
-                      </h2>
-
-                      <p className="text-xs text-slate-500">
-                        Ringkasan hasil analisis dokumen.
-                      </p>
-
-                    </div>
-
+            {/* 2. RESULTS CONTAINER */}
+            <section className="rounded-2xl border border-[#DCE2EC] bg-white shadow-sm overflow-hidden">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EAEFF6] px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F4FA] text-[#142A5E]">
+                    <Search className="h-5 w-5" />
                   </div>
-
-                  {analysisResult ? (
-
-                    <span className="px-3 py-1.5 rounded-lg bg-emerald-50 text-[10px] font-bold text-emerald-600">
-                      Analisis Selesai
-                    </span>
-
-                  ) : (
-
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-500">
-                      Belum Dianalisis
-                    </span>
-
-                  )}
-
+                  <div>
+                    <h2 className="text-sm font-black text-[#142A5E]">
+                      Hasil Telaah & Rekomendasi
+                    </h2>
+                    <p className="text-[11px] font-medium text-slate-500">
+                      Rangkuman poin koreksi sesuai standar penyusunan perundang-undangan.
+                    </p>
+                  </div>
                 </div>
 
+                {analysisResult ? (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Analisis Tuntas
+                    </span>
+                  </div>
+                ) : (
+                  <span className="rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500">
+                    Menunggu Dokumen
+                  </span>
+                )}
               </div>
-
 
               {!analysisResult ? (
-
-                <div className="p-8">
-
-                  <div className="flex flex-col items-center justify-center text-center py-8">
-
-                    <div className="w-16 h-16 rounded-2xl bg-[#F1F3F8] flex items-center justify-center">
-
-                      <FileText className="w-7 h-7 text-slate-400" />
-
-                    </div>
-
-                    <h3 className="mt-4 text-sm font-black text-[#2C3154]">
-                      Belum Ada Hasil Analisis
-                    </h3>
-
-                    <p className="mt-2 max-w-md text-xs text-slate-500 leading-relaxed">
-                      Upload dokumen Peraturan Daerah kemudian
-                      tekan tombol <b>Mulai Analisis AI</b> untuk
-                      melihat hasil pemeriksaan.
-                    </p>
-
+                /* EMPTY STATE */
+                <div className="p-12 text-center">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0F4FA] text-slate-400">
+                    <Bot className="h-8 w-8 text-[#142A5E]/40" />
                   </div>
-
+                  <h3 className="mt-4 text-sm font-black text-[#142A5E]">
+                    Belum Ada Dokumen yang Dianalisis
+                  </h3>
+                  <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500 leading-relaxed">
+                    Unggah draf regulasi Anda di atas atau klik tombol <b>"Coba Contoh Dokumen"</b> untuk melihat simulasi analisis sistematis dari HARMONITAS AI.
+                  </p>
                 </div>
-
               ) : (
-
+                /* POPULATED RESULTS */
                 <div className="p-6 space-y-6">
-
-                  {/* Score */}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-                    <div className="sm:col-span-1 rounded-2xl bg-[#2C3154] p-5 text-white">
-
-                      <p className="text-xs text-slate-300 font-semibold">
-                        Tingkat Kesesuaian
+                  {/* METRIC SCORE CARDS */}
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {/* Compliance Score */}
+                    <div className="relative overflow-hidden rounded-2xl border border-[#243E77] bg-[#142A5E] p-5 text-white shadow-sm">
+                      <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#FFC800]/10 blur-xl" />
+                      <p className="text-[11px] font-bold text-white/70">
+                        Skor Kesesuaian Draf
                       </p>
-
-                      <div className="flex items-end gap-1 mt-2">
-
-                        <span className="text-4xl font-black text-[#FFC800]">
+                      <div className="mt-2 flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black tracking-tight text-[#FFC800]">
                           {analysisResult.score}
                         </span>
-
-                        <span className="text-lg font-bold text-slate-300 mb-1">
-                          %
-                        </span>
-
+                        <span className="text-base font-bold text-white/60">/ 100</span>
                       </div>
-
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        Berdasarkan pemeriksaan sementara AI.
+                      <p className="mt-2 text-[10px] font-bold text-emerald-300">
+                        {analysisResult.grade}
                       </p>
-
                     </div>
 
-
-                    <div className="rounded-2xl border border-slate-200 p-5">
-
-                      <p className="text-xs text-slate-500 font-semibold">
-                        Potensi Kesalahan
+                    {/* Total Findings */}
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-5">
+                      <p className="text-[11px] font-bold text-rose-800">
+                        Catatan & Koreksi
                       </p>
-
-                      <p className="text-3xl font-black text-red-500 mt-2">
-                        {analysisResult.totalErrors}
+                      <p className="mt-2 text-3xl font-black text-rose-600">
+                        {analysisResult.totalFindings} Poin
                       </p>
-
-                      <p className="text-[10px] text-slate-400 mt-1">
-                        Bagian perlu diperiksa
+                      <p className="mt-2 text-[10px] font-medium text-rose-700/80">
+                        Memerlukan revisi sebelum pleno
                       </p>
-
                     </div>
 
-
-                    <div className="rounded-2xl border border-slate-200 p-5">
-
-                      <p className="text-xs text-slate-500 font-semibold">
-                        Status Dokumen
+                    {/* Status Advice */}
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                      <p className="text-[11px] font-bold text-slate-600">
+                        Status Rekomendasi
                       </p>
-
-                      <div className="flex items-center gap-2 mt-3">
-
-                        <CheckCircle className="w-5 h-5 text-emerald-500" />
-
-                        <span className="text-sm font-black text-[#2C3154]">
-                          Perlu Review
+                      <div className="mt-2 flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
+                        <span className="text-sm font-black text-[#142A5E]">
+                          Revisi Terarah
                         </span>
-
                       </div>
-
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        Disarankan melakukan pemeriksaan lanjutan.
+                      <p className="mt-2 text-[10px] font-medium text-slate-500">
+                        Perbaiki sesuai saran di bawah
                       </p>
-
                     </div>
-
                   </div>
 
-
-                  {/* Error Statistics */}
-
-                  <div>
-
-                    <h3 className="text-sm font-black text-[#2C3154] mb-3">
-                      Ringkasan Temuan
-                    </h3>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-
-                      <ResultStat
-                        title="Penulisan"
-                        value={analysisResult.writingErrors}
-                        icon={AlertCircle}
-                      />
-
-                      <ResultStat
-                        title="Struktur"
-                        value={analysisResult.structureErrors}
-                        icon={FileCheck2}
-                      />
-
-                      <ResultStat
-                        title="Format"
-                        value={analysisResult.formatErrors}
-                        icon={ShieldCheck}
-                      />
-
-                      <ResultStat
-                        title="Rekomendasi"
-                        value={analysisResult.recommendations}
-                        icon={CheckCircle2}
-                      />
-
-                    </div>
-
+                  {/* FILTER TABS */}
+                  <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
+                    <span className="mr-1 text-[11px] font-bold text-slate-400">
+                      Filter Kategori:
+                    </span>
+                    {analysisResult.categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setActiveCategory(cat.id)}
+                        className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-150 ${
+                          activeCategory === cat.id
+                            ? 'bg-[#142A5E] text-white shadow-sm'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {cat.label} ({cat.count})
+                      </button>
+                    ))}
                   </div>
 
+                  {/* FINDINGS LIST */}
+                  <div className="space-y-3">
+                    {filteredFindings.map((finding, idx) => (
+                      <article
+                        key={finding.id}
+                        className="rounded-2xl border border-[#DCE2EC] bg-[#FAFBFD] p-5 transition-all duration-200 hover:border-[#BAC7D8] hover:bg-white hover:shadow-sm"
+                      >
+                        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                          <div className="flex items-center gap-2.5">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#142A5E] text-xs font-black text-[#FFC800]">
+                              {idx + 1}
+                            </span>
+                            <div>
+                              <h3 className="text-xs font-black text-[#142A5E]">
+                                {finding.type}
+                              </h3>
+                              <p className="text-[10px] font-semibold text-slate-500">
+                                {finding.location}
+                              </p>
+                            </div>
+                          </div>
 
-                  {/* Error List */}
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`rounded-full border px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${
+                                finding.severity === 'Tinggi'
+                                  ? 'border-rose-200 bg-rose-50 text-rose-700'
+                                  : finding.severity === 'Sedang'
+                                    ? 'border-amber-200 bg-amber-50 text-amber-800'
+                                    : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                              }`}
+                            >
+                              Prioritas: {finding.severity}
+                            </span>
 
-                  <div>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyFinding(finding)}
+                              title="Salin Poin Koreksi"
+                              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-[#142A5E]"
+                            >
+                              {copiedId === finding.id ? (
+                                <Check className="h-4 w-4 text-emerald-600" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
 
-                    <div className="flex items-center justify-between mb-3">
+                        {/* Finding Details */}
+                        <div className="mt-3.5 space-y-2.5 text-xs">
+                          <div className="rounded-xl border border-rose-100 bg-rose-50/60 p-3 text-rose-900">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-700 mb-0.5">
+                              Temuan Masalah:
+                            </p>
+                            <p className="leading-relaxed font-medium">{finding.problem}</p>
+                          </div>
 
-                      <h3 className="text-sm font-black text-[#2C3154]">
-                        Poin yang Perlu Diperiksa
-                      </h3>
-
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {analysisResult.errors.length} temuan
-                      </span>
-
-                    </div>
-
-                    <div className="space-y-3">
-
-                      {analysisResult.errors.map((error, index) => (
-
-                        <ErrorItem
-                          key={index}
-                          number={index + 1}
-                          {...error}
-                        />
-
-                      ))}
-
-                    </div>
-
+                          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-emerald-950">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 mb-0.5">
+                              Rekomendasi Perbaikan:
+                            </p>
+                            <p className="leading-relaxed font-medium">{finding.solution}</p>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-
                 </div>
-
               )}
-
             </section>
-
           </div>
 
+          {/* RIGHT SIDEBAR (4 Cols) */}
+          <div className="space-y-6 xl:col-span-4">
+            {/* 1. KANWIL AI IDENTITY CARD */}
+            <div className="relative overflow-hidden rounded-2xl border border-[#243E77] bg-[#142A5E] p-6 text-white shadow-sm">
+              <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-[#FFC800]/10 blur-2xl" />
 
-          {/* ===================================
-              RIGHT SIDEBAR
-          ==================================== */}
-
-          <div className="space-y-6">
-
-            {/* AI INFORMATION */}
-
-            <section className="bg-[#2C3154] rounded-2xl p-6 shadow-sm relative overflow-hidden">
-
-              <div className="absolute -right-10 -bottom-10 w-32 h-32 rounded-full bg-[#FFC800]/10 blur-2xl" />
-
-              <div className="relative">
-
+              <div className="relative z-10 space-y-4">
                 <div className="flex items-center gap-3">
-
-                  <div className="w-11 h-11 rounded-xl bg-[#FFC800] flex items-center justify-center">
-
-                    <Sparkles className="w-5 h-5 text-[#2C3154]" />
-
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFC800] text-[#101B4F] shadow-sm">
+                    <Bot className="h-6 w-6" />
                   </div>
-
                   <div>
-
                     <h3 className="text-sm font-black text-white">
                       HARMONITAS AI
                     </h3>
-
-                    <p className="text-[10px] text-slate-300">
-                      Intelligent Regulation Analysis
+                    <p className="text-[10px] font-medium text-[#FFE380]">
+                      Legal Drafting Rule Engine
                     </p>
-
                   </div>
-
                 </div>
 
-                <p className="mt-5 text-xs text-slate-300 leading-relaxed">
-                  Sistem AI membantu mengidentifikasi potensi
-                  kesalahan penulisan, struktur, format, serta
-                  memberikan rekomendasi perbaikan terhadap
-                  dokumen peraturan.
+                <p className="text-xs font-medium leading-relaxed text-white/75">
+                  Sistem dirancang khusus untuk memverifikasi draf Ranperda/Ranperkada berdasarkan kaidah pembentukan peraturan perundang-undangan nasional dan SOP Kanwil Kemenkum Riau.
                 </p>
 
-                <div className="mt-5 flex items-center gap-2">
-
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-
-                  <span className="text-[10px] text-slate-300 font-bold">
-                    Secure Document Analysis
-                  </span>
-
+                <div className="flex items-center gap-2 border-t border-white/10 pt-3 text-[10px] font-bold text-emerald-300">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Kerahasiaan Dokumen Terjamin</span>
                 </div>
-
               </div>
+            </div>
 
-            </section>
-
-
-            {/* AI FEATURES */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm p-5">
-
-              <h3 className="text-sm font-black text-[#2C3154] mb-4">
-                Pemeriksaan AI
+            {/* 2. PILAR PENGUJIAN OTOMATIS */}
+            <div className="rounded-2xl border border-[#DCE2EC] bg-white p-5 shadow-sm space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#142A5E]">
+                Pilar Pengujian AI
               </h3>
 
-              <div className="space-y-3">
-
-                <FeatureItem
-                  icon={AlertCircle}
-                  title="Kesalahan Penulisan"
-                  description="Mendeteksi potensi kesalahan teks."
-                />
-
-                <FeatureItem
-                  icon={FileCheck2}
-                  title="Struktur Peraturan"
-                  description="Memeriksa struktur dokumen."
-                />
-
-                <FeatureItem
-                  icon={ShieldCheck}
-                  title="Kesesuaian Format"
-                  description="Menganalisis format peraturan."
-                />
-
-                <FeatureItem
-                  icon={CheckCircle2}
-                  title="Rekomendasi"
-                  description="Memberikan saran perbaikan."
-                />
-
+              <div className="space-y-2.5">
+                {[
+                  {
+                    title: 'Sistematika UU No. 12/2011',
+                    desc: 'Struktur Judul, Pembukaan, Batang Tubuh, Penutup & Lampiran',
+                    icon: BookOpen,
+                  },
+                  {
+                    title: 'Kaidah Bahasa Peraturan',
+                    desc: 'Ketepatan subjek norma, penghindaran frasa ambigu & multitafsir',
+                    icon: AlertCircle,
+                  },
+                  {
+                    title: 'Konsistensi Format & Hierarki',
+                    desc: 'Penomoran pasal, ayat, huruf, serta rujukan pasal internal',
+                    icon: FileCheck2,
+                  },
+                  {
+                    title: 'Sinkronisasi Dasar Hukum',
+                    desc: 'Pemeriksaan keberlakuan peraturan yang dijadikan rujukan',
+                    icon: ShieldCheck,
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.title}
+                      className="flex items-start gap-3 rounded-xl border border-slate-100 bg-[#F9FAFC] p-3 transition hover:bg-slate-50"
+                    >
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#142A5E] text-[#FFC800]">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-[#142A5E]">{item.title}</p>
+                        <p className="mt-0.5 text-[10px] text-slate-500 leading-tight">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
 
-            </section>
-
-
-            {/* PROCESS */}
-
-            <section className="bg-white rounded-2xl border border-[#E2E2DC] shadow-sm p-5">
-
-              <h3 className="text-sm font-black text-[#2C3154] mb-4">
+            {/* 3. ALUR TAHAPAN ANALISIS */}
+            <div className="rounded-2xl border border-[#DCE2EC] bg-white p-5 shadow-sm space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#142A5E]">
                 Alur Pemeriksaan
               </h3>
 
-              <div className="space-y-4">
-
-                <ProcessStep
-                  number="01"
-                  title="Upload Dokumen"
-                  description="Masukkan dokumen peraturan."
-                  active={!selectedFile}
-                />
-
-                <ProcessStep
-                  number="02"
-                  title="Analisis AI"
-                  description="AI memeriksa isi dokumen."
-                  active={isAnalyzing}
-                />
-
-                <ProcessStep
-                  number="03"
-                  title="Review Hasil"
-                  description="Tinjau temuan dan rekomendasi."
-                  active={!!analysisResult}
-                />
-
+              <div className="space-y-3 text-xs">
+                {[
+                  {
+                    step: '01',
+                    title: 'Unggah Berkas',
+                    desc: 'Sistem membaca berkas naskah',
+                    done: !!selectedFile,
+                  },
+                  {
+                    step: '02',
+                    title: 'Pengolahan AI',
+                    desc: 'Pemeriksaan kaidah drafting',
+                    done: !!analysisResult,
+                  },
+                  {
+                    step: '03',
+                    title: 'Tinjau & Rekomendasi',
+                    desc: 'Daftar perbaikan siap dipedomani',
+                    done: !!analysisResult,
+                  },
+                ].map((st) => (
+                  <div key={st.step} className="flex items-center gap-3">
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-black ${
+                        st.done
+                          ? 'bg-[#142A5E] text-[#FFC800]'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {st.step}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-[#142A5E]">{st.title}</p>
+                      <p className="text-[10px] text-slate-400">{st.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-            </section>
-
+            {/* 4. PANDUAN PENTING */}
+            <div className="flex items-start gap-3 rounded-2xl border border-[#F0DF97] bg-[#FFFBF0] p-4 text-xs">
+              <Info className="h-4 w-4 shrink-0 text-[#96740B] mt-0.5" />
+              <p className="leading-relaxed text-[#785E09] text-[11px]">
+                <strong className="font-bold">Disclaimer:</strong> Hasil analisis HARMONITAS AI merupakan telaah awal pendukung dan tidak menggantikan keputusan resmi rapat pleno Pokja Kanwil Kemenkum Riau.
+              </p>
+            </div>
           </div>
-
         </div>
-
-
-        {/* =====================================
-            INFORMATION
-        ====================================== */}
-
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-[#FFF9DF] border border-[#F3DF82]">
-
-          <Info className="w-4 h-4 text-[#A47B00] mt-0.5 shrink-0" />
-
-          <p className="text-xs text-[#705B16] leading-relaxed">
-
-            <span className="font-black">
-              Catatan:
-            </span>{' '}
-
-            Fitur AI saat ini masih dalam tahap pengembangan.
-            Hasil pemeriksaan yang diberikan sistem merupakan
-            rekomendasi dan tetap perlu ditinjau oleh pengguna
-            sebelum digunakan sebagai dasar keputusan.
-
-          </p>
-
-        </div>
-
       </div>
     </AppLayout>
-  );
-};
-
-
-/* =========================================
-   FEATURE ITEM
-========================================= */
-
-const FeatureItem = ({
-  icon: Icon,
-  title,
-  description,
-}) => {
-
-  return (
-
-    <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8F9FC] transition">
-
-      <div className="w-8 h-8 rounded-lg bg-[#F1F3F8] flex items-center justify-center shrink-0">
-
-        <Icon className="w-4 h-4 text-[#2C3154]" />
-
-      </div>
-
-      <div className="min-w-0">
-
-        <p className="text-xs font-black text-[#2C3154]">
-          {title}
-        </p>
-
-        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-          {description}
-        </p>
-
-      </div>
-
-    </div>
-
-  );
-};
-
-
-/* =========================================
-   RESULT STAT
-========================================= */
-
-const ResultStat = ({
-  title,
-  value,
-  icon: Icon,
-}) => {
-
-  return (
-
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-
-      <div className="flex items-center justify-between">
-
-        <div className="w-8 h-8 rounded-lg bg-[#F1F3F8] flex items-center justify-center">
-
-          <Icon className="w-4 h-4 text-[#2C3154]" />
-
-        </div>
-
-        <span className="text-xl font-black text-[#2C3154]">
-          {value}
-        </span>
-
-      </div>
-
-      <p className="text-[10px] text-slate-500 font-bold mt-3">
-        {title}
-      </p>
-
-    </div>
-
-  );
-};
-
-
-/* =========================================
-   ERROR ITEM
-========================================= */
-
-const ErrorItem = ({
-  number,
-  type,
-  severity,
-  page,
-  description,
-}) => {
-
-  const severityClass = {
-    Tinggi: 'bg-red-50 text-red-600 border-red-100',
-    Sedang: 'bg-amber-50 text-amber-600 border-amber-100',
-    Rendah: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-  };
-
-  return (
-
-    <div className="rounded-xl border border-slate-200 p-4 hover:border-[#D0D5E2] hover:shadow-sm transition">
-
-      <div className="flex items-start gap-3">
-
-        <div className="w-8 h-8 rounded-lg bg-[#2C3154] text-[#FFC800] flex items-center justify-center text-xs font-black shrink-0">
-          {number}
-        </div>
-
-        <div className="flex-1 min-w-0">
-
-          <div className="flex flex-wrap items-center gap-2">
-
-            <h4 className="text-xs font-black text-[#2C3154]">
-              {type}
-            </h4>
-
-            <span
-              className={`px-2 py-0.5 rounded-md border text-[9px] font-bold ${
-                severityClass[severity]
-              }`}
-            >
-              {severity}
-            </span>
-
-            <span className="text-[9px] text-slate-400 font-semibold">
-              {page}
-            </span>
-
-          </div>
-
-          <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
-            {description}
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  );
-};
-
-
-/* =========================================
-   PROCESS STEP
-========================================= */
-
-const ProcessStep = ({
-  number,
-  title,
-  description,
-  active,
-}) => {
-
-  return (
-
-    <div className="flex items-start gap-3">
-
-      <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${
-          active
-            ? 'bg-[#FFC800] text-[#2C3154]'
-            : 'bg-[#F1F3F8] text-[#2C3154]'
-        }`}
-      >
-        {number}
-      </div>
-
-      <div>
-
-        <p className="text-xs font-black text-[#2C3154]">
-          {title}
-        </p>
-
-        <p className="text-[10px] text-slate-500 mt-0.5">
-          {description}
-        </p>
-
-      </div>
-
-    </div>
-
   );
 };
 

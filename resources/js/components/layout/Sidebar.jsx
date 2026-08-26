@@ -158,8 +158,8 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
           ========================================= */}
           {isAdmin && (
             <div className="px-3.5 mt-4">
-              <p className="px-3 text-[10px] font-bold text-purple-300 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                <ShieldCheck className="w-3 h-3 text-purple-400" />
+              <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 flex items-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-[#FFC800]" />
                 <span>Manajemen Sistem</span>
               </p>
 
@@ -168,15 +168,25 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                 onClick={() => setIsMobileOpen(false)}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                   isManageAccountsActive
-                    ? "bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-black shadow-md"
-                    : "text-purple-200 hover:bg-[#383F6A] hover:text-white"
+                    ? "bg-[#FFC800] text-[#101B4F] font-extrabold shadow-[0_8px_18px_rgba(8,14,49,0.2)]"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Users className="w-4 h-4 shrink-0" />
+                  <Users
+                    className={`w-4 h-4 shrink-0 ${
+                      isManageAccountsActive ? "text-[#101B4F]" : "text-white/65"
+                    }`}
+                  />
                   <span className="tracking-wide">Kelola Akun (Users)</span>
                 </div>
-                <span className="px-1.5 py-0.5 rounded bg-purple-400/20 text-purple-200 text-[9px] font-black uppercase">
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${
+                    isManageAccountsActive
+                      ? "bg-[#101B4F]/15 text-[#101B4F]"
+                      : "bg-white/10 text-white/75"
+                  }`}
+                >
                   Admin
                 </span>
               </Link>
