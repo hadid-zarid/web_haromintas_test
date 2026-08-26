@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { 
   Lock, 
   Mail, 
@@ -43,6 +43,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
 
   return (
     <div className="min-h-screen bg-[#F4F5F9] flex flex-col justify-center items-center p-4 sm:p-6">
+      <Head title="Masuk ke Sistem - HARMONITAS" />
       {/* Top Header Controls */}
       <div className="w-full max-w-xl mb-4 flex items-center justify-between">
         <Link
@@ -166,11 +167,9 @@ export const LoginPage = ({ demoUsers = [] }) => {
 
             {/* Password Input */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-extrabold text-[#1A1A5E]">
-                  Kata Sandi / Password
-                </label>
-              </div>
+              <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1.5">
+                Kata Sandi / Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
@@ -201,7 +200,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
               )}
             </div>
 
-            {/* Remember Me Checkbox */}
+            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -210,8 +209,15 @@ export const LoginPage = ({ demoUsers = [] }) => {
                   onChange={(e) => setData('remember', e.target.checked)}
                   className="w-4 h-4 rounded border-slate-300 text-[#1A1A5E] focus:ring-[#FFC800] accent-[#1A1A5E] cursor-pointer"
                 />
-                <span className="text-xs font-bold text-[#3D3D3A]">Ingat Sesi Saya (Remember Me)</span>
+                <span className="text-xs font-bold text-[#3D3D3A]">Ingat Sesi Saya</span>
               </label>
+
+              <Link
+                href="/forgot-password"
+                className="text-xs font-bold text-[#303661] hover:text-[#101b4f] hover:underline transition-colors"
+              >
+                Lupa Kata Sandi?
+              </Link>
             </div>
 
             {/* Submit Button */}
@@ -243,8 +249,8 @@ export const LoginPage = ({ demoUsers = [] }) => {
                       type="button"
                       onClick={() => handleSelectDemo(demo)}
                       className={`p-2.5 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between ${
-                        data.email === demo.email 
-                          ? 'border-[#1A1A5E] bg-[#1A1A5E]/5 ring-2 ring-[#FFC800]/50' 
+                        data.email === demo.email
+                          ? 'border-[#1A1A5E] bg-[#1A1A5E]/5 ring-2 ring-[#FFC800]/50'
                           : 'border-[#E2E2DC] bg-[#F8F8F5] hover:bg-white hover:border-[#1A1A5E]/30'
                       }`}
                     >

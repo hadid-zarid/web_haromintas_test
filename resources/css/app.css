@@ -1,205 +1,523 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700&display=swap');
 @import "tailwindcss";
 
+/* =========================================================
+   HARMONITAS DESIGN FOUNDATION
+   Visual language adapted from the SIBAPAK design system.
+   ========================================================= */
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #eef3ff;
+  --color-brand-75: #dbe6ff;
+  --color-brand-100: #b8cbfb;
+  --color-brand-200: #6473b5;
+  --color-brand-300: #3f477e;
+  --color-brand-400: #303661;
+  --color-brand-500: #101b4f;
+
+  --color-accent-50: #fff9df;
+  --color-accent-100: #ffe76d;
+  --color-accent-200: #ffd629;
+  --color-accent-300: #ffc800;
+  --color-accent-400: #c69b00;
+
+  --color-success-50: #edfbea;
+  --color-success-100: #b9e8a8;
+  --color-success-200: #77cf58;
+  --color-success-300: #42bd28;
+  --color-success-400: #2f8f1c;
+
+  --color-warning-50: #fff3e2;
+  --color-warning-100: #ffd49a;
+  --color-warning-200: #ffa52f;
+  --color-warning-300: #ff8f00;
+  --color-warning-400: #b86900;
+
+  --color-info-50: #e9f6ff;
+  --color-info-100: #9fd8fa;
+  --color-info-200: #47b7f1;
+  --color-info-300: #21a4ec;
+  --color-info-400: #1b79ae;
+
+  --color-error-50: #ffecec;
+  --color-error-100: #ffaaaa;
+  --color-error-200: #ff5959;
+  --color-error-300: #f33535;
+  --color-error-400: #ba2929;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f7f8fc;
+  --color-ink: #20283d;
+  --color-muted: #6f778b;
+  --color-line: #e2e6ef;
+}
+
+:root {
+  --harmonitas-navy: #303661;
+  --harmonitas-navy-deep: #101b4f;
+  --harmonitas-navy-soft: #454c7d;
+  --harmonitas-yellow: #ffc800;
+  --harmonitas-yellow-soft: #fff3b8;
+  --harmonitas-canvas: #f7f8fc;
+  --harmonitas-surface: #ffffff;
+  --harmonitas-ink: #20283d;
+  --harmonitas-muted: #6f778b;
+  --harmonitas-line: #e2e6ef;
+  --harmonitas-shadow: 0 10px 30px rgba(30, 39, 89, 0.08);
+  --harmonitas-shadow-lg: 0 22px 60px rgba(20, 28, 77, 0.16);
+}
+
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    background-color: #F5F5F0;
-    color: #3D3D3A;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    margin: 0;
+    background: var(--harmonitas-canvas);
+    color: var(--harmonitas-ink);
+    font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(255, 200, 0, 0.4);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--harmonitas-yellow);
+    color: var(--harmonitas-navy-deep);
   }
 }
 
-/* Custom Clean Scrollbars */
+/* Clean, compact scrollbars used throughout SIBAPAK. */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #EAEAE2;
+  background: #eef0f5;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #2E3A87;
-  border-radius: 4px;
+  background: #7078a6;
+  border: 2px solid #eef0f5;
+  border-radius: 999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #1A1A5E;
+  background: var(--harmonitas-navy);
 }
 
 /* =========================================================
-   EXPLICIT COLOR SYSTEM DEFINITION:
-   - Navy Blue: #1A1A5E (Primary Header, Footer, Sidebar, Primary Buttons)
-   - Golden Yellow: #FFC800 (Accent: Active indicators, underlines, highlights)
-   - Royal Indigo: #2E3A87 (Hover states, links, secondary accents)
-   - Off-White: #F5F5F0 (Page background)
-   - Charcoal: #3D3D3A (Primary text color)
+   SURFACES / CARDS
+   Legacy class aliases are retained so all existing screens
+   receive the same design system without changing their logic.
    ========================================================= */
+.flat-card,
+.flat-panel,
+.bento-card,
+.bento-panel,
+.clay-panel,
+.glass-panel {
+  background: var(--harmonitas-surface);
+  border: 1px solid var(--harmonitas-line);
+  border-radius: 18px;
+  box-shadow: var(--harmonitas-shadow);
+}
 
-/* Flat Card & Panel Base */
-.flat-card, .flat-panel, .bento-card, .bento-panel, .clay-panel, .glass-panel {
-  background: #ffffff;
+.flat-card-hover,
+.bento-card-hover,
+.clay-panel-hover,
+.glass-panel-hover {
+  background: var(--harmonitas-surface);
+  border: 1px solid var(--harmonitas-line);
   border-radius: 16px;
-  border: 1px solid #E2E2DC;
-  box-shadow: 0 1px 3px rgba(26, 26, 94, 0.03);
+  box-shadow: 0 4px 14px rgba(30, 39, 89, 0.04);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-/* Flat Card Hoverable */
-.flat-card-hover, .bento-card-hover, .clay-panel-hover, .glass-panel-hover {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #E2E2DC;
-  transition: all 0.15s ease-in-out;
-}
-.flat-card-hover:hover, .bento-card-hover:hover, .clay-panel-hover:hover, .glass-panel-hover:hover {
-  border-color: #2E3A87;
-  background-color: #ffffff;
+.flat-card-hover:hover,
+.bento-card-hover:hover,
+.clay-panel-hover:hover,
+.glass-panel-hover:hover {
+  border-color: rgba(63, 71, 126, 0.32);
+  box-shadow: 0 12px 28px rgba(30, 39, 89, 0.1);
+  transform: translateY(-2px);
 }
 
-/* Flat Inputs & Selects */
-.flat-input, .bento-input, .clay-input, .glass-input {
+/* =========================================================
+   FORM CONTROLS
+   ========================================================= */
+.flat-input,
+.bento-input,
+.clay-input,
+.glass-input {
+  min-height: 44px;
+  width: 100%;
   background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid #D5D5CE;
-  transition: all 0.15s ease-in-out;
-  color: #3D3D3A;
+  color: var(--harmonitas-ink);
+  border: 1px solid #d8dde8;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(30, 39, 89, 0.03);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
-.flat-input:focus, .bento-input:focus, .clay-input:focus, .glass-input:focus {
+
+.flat-input::placeholder,
+.bento-input::placeholder,
+.clay-input::placeholder,
+.glass-input::placeholder {
+  color: #a2a9b8;
+}
+
+.flat-input:hover,
+.bento-input:hover,
+.clay-input:hover,
+.glass-input:hover {
+  border-color: #b9c0d0;
+}
+
+.flat-input:focus,
+.bento-input:focus,
+.clay-input:focus,
+.glass-input:focus {
   background: #ffffff;
-  border-color: #1A1A5E;
+  border-color: var(--harmonitas-navy-soft);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(26, 26, 94, 0.15);
+  box-shadow: 0 0 0 4px rgba(63, 71, 126, 0.12);
 }
 
-/* Flat Buttons */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 .flat-btn {
-  border-radius: 10px;
+  min-height: 42px;
+  border-radius: 12px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: all 0.15s ease-in-out;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
   cursor: pointer;
   user-select: none;
 }
 
-/* Primary Button: Navy Blue #1A1A5E -> Royal Indigo #2E3A87 hover */
-.flat-btn-primary, .flat-btn-navy, .flat-btn-amber, .bento-btn-amber, .clay-btn-amber {
-  background: #1A1A5E;
-  color: #ffffff;
-  border: 1px solid #1A1A5E;
-}
-.flat-btn-primary:hover, .flat-btn-navy:hover, .flat-btn-amber:hover, .bento-btn-amber:hover, .clay-btn-amber:hover {
-  background: #2E3A87;
-  border-color: #2E3A87;
+.flat-btn:active {
+  transform: translateY(1px);
 }
 
-/* Secondary Button */
-.flat-btn-secondary, .flat-btn-slate, .bento-btn-secondary, .bento-btn-slate, .clay-btn-slate {
-  background: #EAEAE2;
-  color: #1A1A5E;
-  border: 1px solid #D5D5CE;
-}
-.flat-btn-secondary:hover, .flat-btn-slate:hover, .bento-btn-secondary:hover, .bento-btn-slate:hover, .clay-btn-slate:hover {
-  background: #2E3A87;
+.flat-btn-primary,
+.flat-btn-navy,
+.flat-btn-amber,
+.bento-btn-amber,
+.clay-btn-amber {
+  background: linear-gradient(135deg, var(--harmonitas-navy) 0%, var(--harmonitas-navy-soft) 100%);
   color: #ffffff;
-  border-color: #2E3A87;
+  border: 1px solid rgba(16, 27, 79, 0.2);
+  box-shadow: 0 8px 18px rgba(30, 39, 89, 0.18);
 }
 
-/* Danger / Status Red */
-.flat-btn-danger, .bento-btn-danger, .clay-btn-danger {
-  background: #DC2626;
-  color: #ffffff;
-  border: 1px solid #DC2626;
-}
-.flat-btn-danger:hover, .bento-btn-danger:hover, .clay-btn-danger:hover {
-  background: #B91C1C;
-  border-color: #B91C1C;
-}
-
-/* Cards with Navy Header or Dark Variant (#1A1A5E) */
-.flat-card-dark, .bento-card-dark, .clay-card-navy, .glass-card-navy {
-  background: #1A1A5E;
-  border-radius: 16px;
-  border: 1px solid #2E3A87;
-  color: #ffffff;
+.flat-btn-primary:hover,
+.flat-btn-navy:hover,
+.flat-btn-amber:hover,
+.bento-btn-amber:hover,
+.clay-btn-amber:hover {
+  background: linear-gradient(135deg, #252b56 0%, #3b4376 100%);
+  box-shadow: 0 11px 24px rgba(30, 39, 89, 0.25);
+  transform: translateY(-1px);
 }
 
-.flat-card-dark.flat-card-hover:hover, 
+.flat-btn-secondary,
+.flat-btn-slate,
+.bento-btn-secondary,
+.bento-btn-slate,
+.clay-btn-slate {
+  background: #ffffff;
+  color: var(--harmonitas-navy);
+  border: 1px solid #d8dde8;
+  box-shadow: 0 3px 10px rgba(30, 39, 89, 0.05);
+}
+
+.flat-btn-secondary:hover,
+.flat-btn-slate:hover,
+.bento-btn-secondary:hover,
+.bento-btn-slate:hover,
+.clay-btn-slate:hover {
+  background: #f3f5fa;
+  border-color: #b9c0d0;
+  color: var(--harmonitas-navy-deep);
+}
+
+.flat-btn-danger,
+.bento-btn-danger,
+.clay-btn-danger {
+  background: #f33535;
+  color: #ffffff;
+  border: 1px solid #f33535;
+  box-shadow: 0 7px 16px rgba(243, 53, 53, 0.18);
+}
+
+.flat-btn-danger:hover,
+.bento-btn-danger:hover,
+.clay-btn-danger:hover {
+  background: #c92d2d;
+  border-color: #c92d2d;
+}
+
+/* =========================================================
+   CARD COLOR VARIANTS
+   ========================================================= */
+.flat-card-dark,
+.bento-card-dark,
+.clay-card-navy,
+.glass-card-navy {
+  background: linear-gradient(135deg, var(--harmonitas-navy) 0%, #4b5286 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(30, 39, 89, 0.2);
+  color: #ffffff;
+}
+
+.flat-card-dark.flat-card-hover:hover,
 .bento-card-dark.bento-card-hover:hover {
-  background-color: #1A1A5E;
-  border-color: #FFC800;
+  border-color: rgba(255, 200, 0, 0.72);
 }
 
-.flat-card-amber, .bento-card-amber, .clay-card-amber, .glass-card-amber {
-  background: #FFFDF0;
-  border-radius: 16px;
-  border: 1px solid #FFE885;
-  color: #3D3D3A;
+.flat-card-amber,
+.bento-card-amber,
+.clay-card-amber,
+.glass-card-amber {
+  background: #fff9df;
+  border: 1px solid #ffe27b;
+  border-radius: 18px;
+  color: var(--harmonitas-ink);
 }
 
-.flat-card-slate, .bento-card-slate, .clay-card-slate, .glass-card-slate {
-  background: #F5F5F0;
-  border-radius: 16px;
-  border: 1px solid #D5D5CE;
-  color: #3D3D3A;
+.flat-card-slate,
+.bento-card-slate,
+.clay-card-slate,
+.glass-card-slate {
+  background: #f6f7fa;
+  border: 1px solid var(--harmonitas-line);
+  border-radius: 18px;
+  color: var(--harmonitas-ink);
 }
 
-.flat-card-emerald, .bento-card-emerald, .clay-card-emerald, .glass-card-emerald {
-  background: #ECFDF5;
-  border-radius: 16px;
-  border: 1px solid #A7F3D0;
-  color: #065F46;
+.flat-card-emerald,
+.bento-card-emerald,
+.clay-card-emerald,
+.glass-card-emerald {
+  background: #effbef;
+  border: 1px solid #bdebb0;
+  border-radius: 18px;
+  color: #2d6e21;
 }
 
-/* Badges */
-.flat-badge, .bento-badge, .clay-badge {
-  border-radius: 9999px;
+/* =========================================================
+   BADGES / STATUS PILLS
+   ========================================================= */
+.flat-badge,
+.bento-badge,
+.clay-badge {
+  min-height: 24px;
+  border-radius: 999px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  line-height: 1;
 }
 
-.flat-badge-navy, .flat-badge-amber, .bento-badge-amber, .clay-badge-amber {
-  background: #EAEAE2;
-  color: #1A1A5E;
-  border: 1px solid #D5D5CE;
+.flat-badge-navy,
+.flat-badge-amber,
+.bento-badge-amber,
+.clay-badge-amber {
+  background: #eef1f8;
+  color: var(--harmonitas-navy);
+  border: 1px solid #dce1ec;
 }
 
 .flat-badge-gold {
-  background: #FFFDF0;
-  color: #1A1A5E;
-  border: 1px solid #FFC800;
+  background: #fff9df;
+  color: #7b6100;
+  border: 1px solid #ffd629;
 }
 
-.flat-badge-emerald, .bento-badge-emerald, .clay-badge-emerald {
-  background: #D1FAE5;
-  color: #047857;
-  border: 1px solid #A7F3D0;
+.flat-badge-emerald,
+.bento-badge-emerald,
+.clay-badge-emerald {
+  background: #eaf9e5;
+  color: #2f851f;
+  border: 1px solid #b9e8a8;
 }
 
-.flat-badge-blue, .bento-badge-blue, .clay-badge-blue {
-  background: #E0E7FF;
-  color: #1A1A5E;
-  border: 1px solid #C7D2FE;
+.flat-badge-blue,
+.bento-badge-blue,
+.clay-badge-blue {
+  background: #e9f4ff;
+  color: #245bb8;
+  border: 1px solid #bfdbfe;
 }
 
-.flat-badge-purple, .bento-badge-purple, .clay-badge-purple {
-  background: #F3E8FF;
-  color: #7E22CE;
-  border: 1px solid #E9D5FF;
+.flat-badge-purple,
+.bento-badge-purple,
+.clay-badge-purple {
+  background: #f7edff;
+  color: #7c32b8;
+  border: 1px solid #e9d5ff;
 }
 
-.flat-badge-rose, .bento-badge-rose, .clay-badge-rose {
-  background: #FFE4E6;
-  color: #BE123C;
-  border: 1px solid #FECDD3;
+.flat-badge-rose,
+.bento-badge-rose,
+.clay-badge-rose {
+  background: #ffecec;
+  color: #ba2929;
+  border: 1px solid #ffc4c4;
 }
 
-.flat-badge-slate, .bento-badge-slate, .clay-badge-slate {
-  background: #EAEAE2;
-  color: #3D3D3A;
-  border: 1px solid #D5D5CE;
+.flat-badge-slate,
+.bento-badge-slate,
+.clay-badge-slate {
+  background: #f0f2f6;
+  color: #596174;
+  border: 1px solid #dde1e9;
 }
+
+/* Decorative legal background used on the login screen. */
+.login-legal-bg {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(83, 96, 165, 0.42) 0, rgba(48, 54, 97, 0.08) 34%, transparent 58%),
+    linear-gradient(135deg, #101b4f 0%, #28356f 54%, #303661 100%);
+}
+
+.login-legal-bg::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 8% 20% 6%;
+  border: 2px solid rgba(255, 255, 255, 0.055);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px rgba(255, 255, 255, 0.025),
+    0 0 0 78px rgba(255, 255, 255, 0.018);
+  pointer-events: none;
+}
+
+.login-legal-bg::after {
+  content: "§   ⚖   ◫   §   ⚖   ◫   §";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: -0.06em;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.09);
+  font-size: clamp(5rem, 12vw, 11rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: 0.08em;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .login-legal-bg::before {
+    inset: 16% -22% 8%;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(45deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+

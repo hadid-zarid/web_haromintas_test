@@ -125,9 +125,10 @@ export const RegisterPage = ({ pokjas = [], wilayahs = [] }) => {
                   </div>
                   <input
                     type="text"
+                    maxLength={18}
                     value={data.nip}
-                    onChange={(e) => setData('nip', e.target.value)}
-                    placeholder="19850312 201012 1 002"
+                    onChange={(e) => setData('nip', e.target.value.replace(/\D/g, '').slice(0, 18))}
+                    placeholder="Contoh: 198503122010121002 (18 digit)"
                     className="w-full pl-10 pr-4 py-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
                 </div>
@@ -169,9 +170,10 @@ export const RegisterPage = ({ pokjas = [], wilayahs = [] }) => {
                   </div>
                   <input
                     type="tel"
+                    maxLength={13}
                     value={data.no_hp}
-                    onChange={(e) => setData('no_hp', e.target.value)}
-                    placeholder="0812-3456-7890"
+                    onChange={(e) => setData('no_hp', e.target.value.replace(/\D/g, '').slice(0, 13))}
+                    placeholder="Contoh: 081234567890 (Maks. 13 digit)"
                     className="w-full pl-10 pr-4 py-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
                   />
                 </div>

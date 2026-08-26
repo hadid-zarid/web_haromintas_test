@@ -12,7 +12,7 @@ import NotificationDropdown from "./NotificationDropdown";
 
 import { Building2, ChevronDown, IdCard, Menu, User } from "lucide-react";
 
-export const AppLayout = ({ children }) => {
+export const AppLayout = ({ children, title }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -55,28 +55,36 @@ export const AppLayout = ({ children }) => {
   /* =========================================
      PAGE TITLE
   ========================================== */
-  const getHeaderTitle = (pathname) => {
-    if (pathname === "/home") {
+  const getHeaderTitle = (currentPath) => {
+    if (title) {
+      return title;
+    }
+
+    if (currentPath === "/home") {
       return "Dashboard";
     }
 
-    if (pathname.startsWith("/admin/users")) {
+    if (currentPath.startsWith("/admin/users")) {
       return "Manajemen Akun & Hak Akses (RBAC)";
     }
 
-    if (pathname.includes("/peraturan/")) {
+    if (currentPath.includes("/peraturan/")) {
       return "Detail Permohonan Peraturan";
     }
 
-    if (pathname === "/peraturan") {
+    if (currentPath === "/peraturan") {
       return "Permohonan Peraturan";
     }
 
-    if (pathname === "/panduan") {
+    if (currentPath === "/draft-generate") {
+      return "Draft Generate Surat";
+    }
+
+    if (currentPath === "/panduan") {
       return "Buku Panduan";
     }
 
-    if (pathname === "/ai") {
+    if (currentPath === "/ai") {
       return "HARMONITAS AI";
     }
 
@@ -88,7 +96,7 @@ export const AppLayout = ({ children }) => {
   const displayNip = user?.nip || "-";
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] text-[#3D3D3A] flex">
+    <div className="flex min-h-screen bg-[#F7F8FC] text-[#20283D]">
       {/* =====================================
           SIDEBAR
       ====================================== */}
@@ -105,7 +113,7 @@ export const AppLayout = ({ children }) => {
         {/* =================================
             HEADER
         ================================== */}
-        <header className="sticky top-0 z-30 h-16 bg-white border-b border-[#E2E2DC] flex items-center justify-between px-4 sm:px-8">
+        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-[#E2E6EF] bg-white/95 px-4 shadow-[0_5px_18px_rgba(30,39,89,0.04)] backdrop-blur-xl sm:px-8">
           {/* Left */}
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Menu */}
@@ -115,7 +123,7 @@ export const AppLayout = ({ children }) => {
                 setIsProfileOpen(false);
                 setIsMobileOpen(true);
               }}
-              className="lg:hidden p-2 rounded-lg text-[#1A1A5E] flat-btn-secondary focus:outline-none"
+              className="flat-btn-secondary rounded-xl p-2 text-[#303661] focus:outline-none lg:hidden"
               aria-label="Buka menu navigasi"
             >
               <Menu className="w-5 h-5" />
@@ -123,10 +131,10 @@ export const AppLayout = ({ children }) => {
 
             {/* User Greeting */}
             <div className="min-w-0">
-              <h1 className="text-sm font-black text-[#1A1A5E] truncate">
+              <h1 className="truncate text-sm font-extrabold text-[#20283D]">
                 {displayName}
               </h1>
-              <p className="text-[11px] text-[#3D3D3A]/70 font-semibold truncate">
+              <p className="truncate text-[10px] font-semibold text-[#7A8294]">
                 {displayUnit}
               </p>
             </div>
@@ -143,8 +151,8 @@ export const AppLayout = ({ children }) => {
                 onClick={() => setIsProfileOpen((current) => !current)}
                 className={`flex h-10 items-center gap-2 rounded-xl border px-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#FFC800]/40 ${
                   isProfileOpen
-                    ? "border-[#1A1A5E]/20 bg-[#1A1A5E] text-white shadow-md"
-                    : "border-[#E2E2DC] bg-[#F8F8F5] text-[#1A1A5E] hover:border-[#1A1A5E]/20 hover:bg-white"
+                    ? "border-[#303661]/20 bg-[#303661] text-white shadow-md"
+                    : "border-[#E2E6EF] bg-[#F7F8FC] text-[#303661] hover:border-[#303661]/20 hover:bg-white"
                 }`}
                 title="Informasi akun"
                 aria-label="Buka informasi akun"
@@ -153,7 +161,7 @@ export const AppLayout = ({ children }) => {
               >
                 <span
                   className={`flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg ${
-                    isProfileOpen ? "bg-white/15" : "bg-[#EAEAE2]"
+                    isProfileOpen ? "bg-white/15" : "bg-[#EEF1F8]"
                   }`}
                 >
                   {user?.avatar ? (
@@ -175,12 +183,12 @@ export const AppLayout = ({ children }) => {
 
               {isProfileOpen && (
                 <div
-                  className="absolute right-0 top-[calc(100%+0.75rem)] z-50 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#E2E2DC] bg-white shadow-[0_20px_55px_rgba(26,26,94,0.18)]"
+                  className="absolute right-0 top-[calc(100%+0.75rem)] z-50 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[20px] border border-[#E2E6EF] bg-white shadow-[0_22px_58px_rgba(26,26,94,0.18)]"
                   role="menu"
                   aria-label="Informasi akun pengguna"
                 >
                   {/* Profile Header */}
-                  <div className="relative overflow-hidden bg-[#1A1A5E] p-5 text-white">
+                  <div className="relative overflow-hidden bg-gradient-to-r from-[#303661] to-[#4B5286] p-5 text-white">
                     <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#FFC800]/15 blur-2xl" />
 
                     <div className="relative flex items-start gap-3.5">
@@ -214,25 +222,25 @@ export const AppLayout = ({ children }) => {
 
                   {/* Profile Details */}
                   <div className="space-y-3 p-4">
-                    <div className="rounded-xl border border-[#E2E2DC] bg-[#F8F8F5] p-3.5">
+                    <div className="rounded-xl border border-[#E2E6EF] bg-[#F7F8FC] p-3.5">
                       <div className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#1A1A5E] shadow-sm">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#303661] shadow-sm">
                           <IdCard className="h-4 w-4" />
                         </span>
                         <div className="min-w-0">
                           <p className="text-[9px] font-black uppercase tracking-[0.14em] text-[#3D3D3A]/55">
                             Nomor Induk Pegawai
                           </p>
-                          <p className="mt-1 break-words text-xs font-black text-[#1A1A5E]">
+                          <p className="mt-1 break-words text-xs font-extrabold text-[#303661]">
                             {displayNip}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-[#E2E2DC] bg-[#F8F8F5] p-3.5">
+                    <div className="rounded-xl border border-[#E2E6EF] bg-[#F7F8FC] p-3.5">
                       <div className="flex items-start gap-3">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#1A1A5E] shadow-sm">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#303661] shadow-sm">
                           <Building2 className="h-4 w-4" />
                         </span>
                         <div className="min-w-0">
@@ -246,7 +254,7 @@ export const AppLayout = ({ children }) => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-[#E2E2DC] px-1 pt-3">
+                    <div className="flex items-center justify-between border-t border-[#E2E6EF] px-1 pt-3">
                       <div>
                         <p className="text-[9px] font-black uppercase tracking-[0.14em] text-[#3D3D3A]/55">
                           Hak Akses
@@ -269,15 +277,15 @@ export const AppLayout = ({ children }) => {
         {/* =================================
             MAIN CONTENT
         ================================== */}
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-7 lg:p-8">
           {/* Page Header */}
           <div className="mb-6">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A5E] tracking-tight">
-              {getHeaderTitle(location.pathname)}
+              {getHeaderTitle(pathname)}
             </h2>
 
             {/* Yellow Accent */}
-            <div className="h-1.5 w-16 bg-[#FFC800] rounded-full mt-2" />
+            <div className="mt-2 h-1 w-14 rounded-full bg-[#FFC800]" />
 
             {/* Breadcrumb */}
             <div className="mt-2.5">

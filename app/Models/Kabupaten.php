@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kabupaten extends Model
 {
@@ -14,7 +16,18 @@ class Kabupaten extends Model
     protected $fillable = [
         'nama_kabupaten',
         'kode_kabupaten',
+        'tim_kerja_id',
     ];
+
+    public function timKerja(): BelongsTo
+    {
+        return $this->belongsTo(TimKerja::class, 'tim_kerja_id', 'tim_kerja_id');
+    }
+
+    public function rancangans(): HasMany
+    {
+        return $this->hasMany(RancanganRegulasi::class, 'kabupaten_id', 'kabupaten_id');
+    }
 
     public function users(): BelongsToMany
     {

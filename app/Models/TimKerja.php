@@ -20,4 +20,14 @@ class TimKerja extends Model
     {
         return $this->hasMany(User::class, 'tim_kerja_id', 'tim_kerja_id');
     }
+
+    public function kabupatens(): HasMany
+    {
+        return $this->hasMany(Kabupaten::class, 'tim_kerja_id', 'tim_kerja_id');
+    }
+
+    public function rancangans(): HasMany
+    {
+        return $this->hasMany(RancanganRegulasi::class, 'tim_kerja_id', 'tim_kerja_id');
+    }
 }
