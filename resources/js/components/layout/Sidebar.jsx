@@ -172,8 +172,11 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               >
                 <div className="flex items-center gap-3">
                   <Users className="w-4 h-4 shrink-0" />
-                  <span className="tracking-wide">Kelola Akun</span>
+                  <span className="tracking-wide">Kelola Akun (Users)</span>
                 </div>
+                <span className="px-1.5 py-0.5 rounded bg-white/20 text-white text-[9px] font-black uppercase">
+                  Admin
+                </span>
               </Link>
             </div>
           )}

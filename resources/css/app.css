@@ -332,3 +332,387 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
+
+.flat-card,
+.flat-panel,
+.bento-card,
+.bento-panel,
+.clay-panel,
+.glass-panel {
+  background: var(--harmonitas-surface);
+  border: 1px solid var(--harmonitas-line);
+  border-radius: 18px;
+  box-shadow: var(--harmonitas-shadow);
+}
+
+.flat-card-hover,
+.bento-card-hover,
+.clay-panel-hover,
+.glass-panel-hover {
+  background: var(--harmonitas-surface);
+  border: 1px solid var(--harmonitas-line);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(30, 39, 89, 0.04);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.flat-card-hover:hover,
+.bento-card-hover:hover,
+.clay-panel-hover:hover,
+.glass-panel-hover:hover {
+  border-color: rgba(63, 71, 126, 0.32);
+  box-shadow: 0 12px 28px rgba(30, 39, 89, 0.1);
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   FORM CONTROLS
+   ========================================================= */
+.flat-input,
+.bento-input,
+.clay-input,
+.glass-input {
+  min-height: 44px;
+  width: 100%;
+  background: #ffffff;
+  color: var(--harmonitas-ink);
+  border: 1px solid #d8dde8;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(30, 39, 89, 0.03);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.flat-input::placeholder,
+.bento-input::placeholder,
+.clay-input::placeholder,
+.glass-input::placeholder {
+  color: #a2a9b8;
+}
+
+.flat-input:hover,
+.bento-input:hover,
+.clay-input:hover,
+.glass-input:hover {
+  border-color: #b9c0d0;
+}
+
+.flat-input:focus,
+.bento-input:focus,
+.clay-input:focus,
+.glass-input:focus {
+  background: #ffffff;
+  border-color: var(--harmonitas-navy-soft);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(63, 71, 126, 0.12);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.flat-btn {
+  min-height: 42px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.flat-btn:active {
+  transform: translateY(1px);
+}
+
+.flat-btn-primary,
+.flat-btn-navy,
+.flat-btn-amber,
+.bento-btn-amber,
+.clay-btn-amber {
+  background: linear-gradient(135deg, var(--harmonitas-navy) 0%, var(--harmonitas-navy-soft) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(16, 27, 79, 0.2);
+  box-shadow: 0 8px 18px rgba(30, 39, 89, 0.18);
+}
+
+.flat-btn-primary:hover,
+.flat-btn-navy:hover,
+.flat-btn-amber:hover,
+.bento-btn-amber:hover,
+.clay-btn-amber:hover {
+  background: linear-gradient(135deg, #252b56 0%, #3b4376 100%);
+  box-shadow: 0 11px 24px rgba(30, 39, 89, 0.25);
+  transform: translateY(-1px);
+}
+
+.flat-btn-secondary,
+.flat-btn-slate,
+.bento-btn-secondary,
+.bento-btn-slate,
+.clay-btn-slate {
+  background: #ffffff;
+  color: var(--harmonitas-navy);
+  border: 1px solid #d8dde8;
+  box-shadow: 0 3px 10px rgba(30, 39, 89, 0.05);
+}
+
+.flat-btn-secondary:hover,
+.flat-btn-slate:hover,
+.bento-btn-secondary:hover,
+.bento-btn-slate:hover,
+.clay-btn-slate:hover {
+  background: #f3f5fa;
+  border-color: #b9c0d0;
+  color: var(--harmonitas-navy-deep);
+}
+
+.flat-btn-danger,
+.bento-btn-danger,
+.clay-btn-danger {
+  background: #f33535;
+  color: #ffffff;
+  border: 1px solid #f33535;
+  box-shadow: 0 7px 16px rgba(243, 53, 53, 0.18);
+}
+
+.flat-btn-danger:hover,
+.bento-btn-danger:hover,
+.clay-btn-danger:hover {
+  background: #c92d2d;
+  border-color: #c92d2d;
+}
+
+/* =========================================================
+   CARD COLOR VARIANTS
+   ========================================================= */
+.flat-card-dark,
+.bento-card-dark,
+.clay-card-navy,
+.glass-card-navy {
+  background: linear-gradient(135deg, var(--harmonitas-navy) 0%, #4b5286 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(30, 39, 89, 0.2);
+  color: #ffffff;
+}
+
+.flat-card-dark.flat-card-hover:hover,
+.bento-card-dark.bento-card-hover:hover {
+  border-color: rgba(255, 200, 0, 0.72);
+}
+
+.flat-card-amber,
+.bento-card-amber,
+.clay-card-amber,
+.glass-card-amber {
+  background: #fff9df;
+  border: 1px solid #ffe27b;
+  border-radius: 18px;
+  color: var(--harmonitas-ink);
+}
+
+.flat-card-slate,
+.bento-card-slate,
+.clay-card-slate,
+.glass-card-slate {
+  background: #f6f7fa;
+  border: 1px solid var(--harmonitas-line);
+  border-radius: 18px;
+  color: var(--harmonitas-ink);
+}
+
+.flat-card-emerald,
+.bento-card-emerald,
+.clay-card-emerald,
+.glass-card-emerald {
+  background: #effbef;
+  border: 1px solid #bdebb0;
+  border-radius: 18px;
+  color: #2d6e21;
+}
+
+/* =========================================================
+   BADGES / STATUS PILLS
+   ========================================================= */
+.flat-badge,
+.bento-badge,
+.clay-badge {
+  min-height: 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  line-height: 1;
+}
+
+.flat-badge-navy,
+.flat-badge-amber,
+.bento-badge-amber,
+.clay-badge-amber {
+  background: #eef1f8;
+  color: var(--harmonitas-navy);
+  border: 1px solid #dce1ec;
+}
+
+.flat-badge-gold {
+  background: #fff9df;
+  color: #7b6100;
+  border: 1px solid #ffd629;
+}
+
+.flat-badge-emerald,
+.bento-badge-emerald,
+.clay-badge-emerald {
+  background: #eaf9e5;
+  color: #2f851f;
+  border: 1px solid #b9e8a8;
+}
+
+.flat-badge-blue,
+.bento-badge-blue,
+.clay-badge-blue {
+  background: #e9f4ff;
+  color: #245bb8;
+  border: 1px solid #bfdbfe;
+}
+
+.flat-badge-purple,
+.bento-badge-purple,
+.clay-badge-purple {
+  background: #f7edff;
+  color: #7c32b8;
+  border: 1px solid #e9d5ff;
+}
+
+.flat-badge-rose,
+.bento-badge-rose,
+.clay-badge-rose {
+  background: #ffecec;
+  color: #ba2929;
+  border: 1px solid #ffc4c4;
+}
+
+.flat-badge-slate,
+.bento-badge-slate,
+.clay-badge-slate {
+  background: #f0f2f6;
+  color: #596174;
+  border: 1px solid #dde1e9;
+}
+
+/* Decorative legal background used on the login screen. */
+.login-legal-bg {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(83, 96, 165, 0.42) 0, rgba(48, 54, 97, 0.08) 34%, transparent 58%),
+    linear-gradient(135deg, #101b4f 0%, #28356f 54%, #303661 100%);
+}
+
+.login-legal-bg::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 8% 20% 6%;
+  border: 2px solid rgba(255, 255, 255, 0.055);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px rgba(255, 255, 255, 0.025),
+    0 0 0 78px rgba(255, 255, 255, 0.018);
+  pointer-events: none;
+}
+
+.login-legal-bg::after {
+  content: "§   ⚖   ◫   §   ⚖   ◫   §";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  bottom: -0.06em;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.09);
+  font-size: clamp(5rem, 12vw, 11rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: 0.08em;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .login-legal-bg::before {
+    inset: 16% -22% 8%;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(45deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
