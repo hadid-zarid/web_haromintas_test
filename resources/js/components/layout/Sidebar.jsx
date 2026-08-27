@@ -33,6 +33,11 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
       icon: FileText,
     },
     {
+      label: "Draft Generate Surat",
+      path: "/draft-generate",
+      icon: FileOutput,
+    },
+    {
       label: "Buku Panduan",
       path: "/panduan",
       icon: BookOpen,
