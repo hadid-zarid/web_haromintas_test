@@ -1,143 +1,338 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /* =========================================================
-   HARMONITAS DESIGN FOUNDATION
-   Visual language adapted from the SIBAPAK design system.
+   HARMONITAS DESIGN FOUNDATION (KEMENKUMHAM RIAU BRAND IDENTITY)
    ========================================================= */
 @theme {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand-50: #eef3ff;
-  --color-brand-75: #dbe6ff;
-  --color-brand-100: #b8cbfb;
-  --color-brand-200: #6473b5;
-  --color-brand-300: #3f477e;
-  --color-brand-400: #303661;
-  --color-brand-500: #101b4f;
+  /* Official Kemenkumham Navy Gradient: 180deg from #2B3056 -> #3A4070 -> #2B3056 */
+  --color-kemenkum-navy: #2B3056;
+  --color-kemenkum-navy-light: #3A4070;
+  --color-kemenkum-navy-dark: #1E2342;
 
-  --color-accent-50: #fff9df;
-  --color-accent-100: #ffe76d;
-  --color-accent-200: #ffd629;
-  --color-accent-300: #ffc800;
-  --color-accent-400: #c69b00;
-
-  --color-success-50: #edfbea;
-  --color-success-100: #b9e8a8;
-  --color-success-200: #77cf58;
-  --color-success-300: #42bd28;
-  --color-success-400: #2f8f1c;
-
-  --color-warning-50: #fff3e2;
-  --color-warning-100: #ffd49a;
-  --color-warning-200: #ffa52f;
-  --color-warning-300: #ff8f00;
-  --color-warning-400: #b86900;
-
-  --color-info-50: #e9f6ff;
-  --color-info-100: #9fd8fa;
-  --color-info-200: #47b7f1;
-  --color-info-300: #21a4ec;
-  --color-info-400: #1b79ae;
-
-  --color-error-50: #ffecec;
-  --color-error-100: #ffaaaa;
-  --color-error-200: #ff5959;
-  --color-error-300: #f33535;
-  --color-error-400: #ba2929;
+  /* Official Kemenkumham Gold Gradient: 90deg from #FFD82B -> #FFB943 */
+  --color-kemenkum-gold-start: #FFD82B;
+  --color-kemenkum-gold-end: #FFB943;
+  --color-kemenkum-gold: #FFC800;
 
   --color-surface: #ffffff;
-  --color-canvas: #f7f8fc;
-  --color-ink: #20283d;
-  --color-muted: #6f778b;
-  --color-line: #e2e6ef;
+  --color-canvas: #f8fafc;
 }
 
 :root {
-  --harmonitas-navy: #303661;
-  --harmonitas-navy-deep: #101b4f;
-  --harmonitas-navy-soft: #454c7d;
-  --harmonitas-yellow: #ffc800;
-  --harmonitas-yellow-soft: #fff3b8;
-  --harmonitas-canvas: #f7f8fc;
-  --harmonitas-surface: #ffffff;
-  --harmonitas-ink: #20283d;
-  --harmonitas-muted: #6f778b;
-  --harmonitas-line: #e2e6ef;
-  --harmonitas-shadow: 0 10px 30px rgba(30, 39, 89, 0.08);
-  --harmonitas-shadow-lg: 0 22px 60px rgba(20, 28, 77, 0.16);
+  --kemenkum-navy: #2B3056;
+  --kemenkum-navy-light: #3A4070;
+  --kemenkum-gold-start: #FFD82B;
+  --kemenkum-gold-end: #FFB943;
+  --kemenkum-gold: #FFC800;
 }
 
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
+  *, ::before, ::after {
+    font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    min-height: 100vh;
-    margin: 0;
-    background: var(--harmonitas-canvas);
-    color: var(--harmonitas-ink);
-    font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-weight: 400;
+  html, body {
+    font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  button,
-  input,
-  select,
-  textarea {
-    font: inherit;
-  }
-
-  button,
-  a {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  :focus-visible {
-    outline: 3px solid rgba(255, 200, 0, 0.4);
-    outline-offset: 2px;
-  }
-
-  ::selection {
-    background: var(--harmonitas-yellow);
-    color: var(--harmonitas-navy-deep);
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #F8FAFC;
+    color: #1E293B;
   }
 }
 
-/* Clean, compact scrollbars used throughout SIBAPAK. */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+/* Kemenkumham Navy Vertical Gradient */
+.kemenkum-navy-gradient {
+  background: linear-gradient(180deg, #2B3056 0%, #3A4070 50%, #2B3056 100%);
 }
 
-::-webkit-scrollbar-track {
-  background: #eef0f5;
+/* Kemenkumham Gold Horizontal Gradient */
+.kemenkum-gold-gradient {
+  background: linear-gradient(90deg, #FFD82B 0%, #FFB943 100%);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #7078a6;
-  border: 2px solid #eef0f5;
-  border-radius: 999px;
+/* Kemenkumham Gold CTA Button */
+.kemenkum-gold-btn {
+  background: linear-gradient(90deg, #FFD82B 0%, #FFB943 100%);
+  color: #2B3056;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+.kemenkum-gold-btn:hover {
+  filter: brightness(1.05);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--harmonitas-navy);
+/* Smooth Floating Micro-Animations for 3D Elements */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.5deg);
+  }
+}
+
+@keyframes floatBadge1 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatBadge2 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+.animate-float-badge1 {
+  animation: floatBadge1 3.5s ease-in-out infinite;
+}
+
+.animate-float-badge2 {
+  animation: floatBadge2 4.2s ease-in-out infinite;
+}
+
+/* Serindit Mascot Interactive Animations */
+@keyframes mascotWave {
+  0%, 100% {
+    transform: rotate(0deg) scale(1.02);
+  }
+  25% {
+    transform: rotate(1.5deg) translateY(-4px) scale(1.03);
+  }
+  75% {
+    transform: rotate(-1.5deg) translateY(-2px) scale(1.03);
+  }
+}
+
+@keyframes typingRhythm {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.005);
+  }
+}
+
+.animate-mascot-wave {
+  animation: mascotWave 1.6s ease-in-out infinite;
+}
+
+.animate-typing-rhythm {
+  animation: typingRhythm 2.8s ease-in-out infinite;
+}
+
+/* Subtle Slow Hero Background Pattern Drifting Animation (Seamless 32px Grid Loop) */
+@keyframes heroGridDrift {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 64px 64px;
+  }
+}
+
+@keyframes heroGlowPulse1 {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1) translate(0px, 0px);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.08) translate(12px, -8px);
+  }
+}
+
+@keyframes heroGlowPulse2 {
+  0%, 100% {
+    opacity: 0.20;
+    transform: scale(1) translate(0px, 0px);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.05) translate(-10px, 10px);
+  }
+}
+
+.animate-hero-grid {
+  animation: heroGridDrift 26s linear infinite;
+  will-change: background-position;
+}
+
+.animate-hero-glow-1 {
+  animation: heroGlowPulse1 14s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-hero-glow-2 {
+  animation: heroGlowPulse2 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Map Dokumen (Physical Document Folder) & Paper Peeking Micro-Animations */
+.folder-paper-layer-1 {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform;
+}
+.folder-paper-layer-2 {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform;
+}
+.folder-paper-layer-3 {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform;
+}
+
+.group:hover .folder-paper-layer-1 {
+  transform: translateY(-6px) rotate(-0.8deg);
+}
+.group:hover .folder-paper-layer-2 {
+  transform: translateY(-10px) rotate(1deg);
+}
+.group:hover .folder-paper-layer-3 {
+  transform: translateY(-14px) rotate(-0.5deg);
 }
 
 /* =========================================================
-   SURFACES / CARDS
-   Legacy class aliases are retained so all existing screens
-   receive the same design system without changing their logic.
+   ANTI-MAINSTREAM BESPOKE LOADERS (HARMONITAS LEGAL TECH)
    ========================================================= */
+
+@keyframes laserScan {
+  0% {
+    top: 0%;
+    opacity: 0.2;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.2;
+  }
+}
+
+@keyframes orbitClockwise {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitCounter {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulseGlowRing {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes kineticBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.18);
+  }
+}
+
+@keyframes shimmerGlow {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-laser-scan {
+  animation: laserScan 2.4s ease-in-out infinite alternate;
+  will-change: top, opacity;
+}
+
+.animate-orbit-clockwise {
+  animation: orbitClockwise 8s linear infinite;
+  will-change: transform;
+}
+
+.animate-orbit-counter {
+  animation: orbitCounter 6s linear infinite;
+  will-change: transform;
+}
+
+.animate-orbit-fast {
+  animation: orbitClockwise 2.5s linear infinite;
+  will-change: transform;
+}
+
+.animate-pulse-glow-ring {
+  animation: pulseGlowRing 2.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-kinetic-dot-1 {
+  animation: kineticBounce 1.2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+.animate-kinetic-dot-2 {
+  animation: kineticBounce 1.2s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+.animate-kinetic-dot-3 {
+  animation: kineticBounce 1.2s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.animate-shimmer-glow {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,216,43,0.35) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmerGlow 2.5s infinite;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
 .flat-card,
 .flat-panel,
 .bento-card,

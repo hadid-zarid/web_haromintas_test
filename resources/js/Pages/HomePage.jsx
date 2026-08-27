@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/layout/AppLayout';
 import MetricCard from '../components/common/MetricCard';
@@ -12,7 +12,7 @@ import {
   YAxis, 
   Tooltip, 
   CartesianGrid, 
-  Legend
+  Legend 
 } from 'recharts';
 import { 
   FileText, 
@@ -22,7 +22,8 @@ import {
   TrendingUp, 
   Activity, 
   BellRing,
-  Building,
+  Building2,
+  Landmark,
   ArrowRight,
   ShieldCheck,
   AlertCircle,
@@ -36,8 +37,50 @@ import {
   Download,
   XCircle,
   History,
-  MapPin
+  MapPin,
+  Sparkles,
+  ChevronRight,
+  ChevronLeft,
+  Calendar,
+  BookOpen,
+  HelpCircle,
+  Check
 } from 'lucide-react';
+
+/* Custom Compact & Clean Tooltip for Horizontal Recharts */
+const CustomChartTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-lg text-xs font-sans min-w-[170px] z-50">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2">
+          <span className="font-bold text-[#2B3056] text-[11px]">
+            Bulan {label}
+          </span>
+          <span className="text-[10px] text-slate-400 font-medium">
+            Rekap Bulanan
+          </span>
+        </div>
+        <div className="space-y-1.5">
+          {payload.map((entry, index) => (
+            <div key={index} className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: entry.color }}
+                />
+                <span className="text-slate-600 font-medium">{entry.name}</span>
+              </div>
+              <span className="font-bold text-[#2B3056]">
+                {entry.value} <span className="font-normal text-slate-400 text-[10px]">berkas</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 export const HomePage = ({
   metrics = {
@@ -58,19 +101,38 @@ export const HomePage = ({
 }) => {
   const { user, isTimKerja, isBiroHukum, isAdmin, isPimpinan } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [wilayahSearch, setWilayahSearch] = useState('');
+  
+  // Semester Switcher for Trend Chart (1: Jan-Jun, 2: Jul-Des)
+  const currentMonthIndex = new Date().getMonth(); // 0-based
+  const [semester, setSemester] = useState(currentMonthIndex >= 6 ? 2 : 1);
 
-  // Helper Formatter Riwayat Aktivitas yang Ramah Pengguna
+  // Filter 6 bulan untuk bar chart horizontal
+  const displayedTrendData = semester === 1 
+    ? trendData.slice(0, 6) 
+    : trendData.slice(6, 12);
+
+  // Role display name helper
+  const getRoleDisplayName = () => {
+    if (userScope.isTimKerja) return userScope.timKerjaNama || 'Tim Kerja Kanwil';
+    if (isBiroHukum) return 'Biro Hukum Provinsi Riau';
+    if (isAdmin) return 'Administrator Sistem';
+    if (isPimpinan) return 'Pimpinan Kanwil Kemenkum';
+    return user?.role?.name || user?.unit || 'Operator Resmi';
+  };
+
+  // Helper Formatter Riwayat Aktivitas
   const formatAuditItem = (act) => {
     const action = act.action;
     const p = act.payload || {};
-    const userName = act.user?.nama || 'Sistem';
+    const userName = act.user?.nama || act.user?.name || 'Sistem';
 
     switch (action) {
       case 'CREATE_PERMOHONAN':
         return {
           icon: PlusCircle,
           badge: 'Daftar',
-          badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+          badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200/70',
           title: `${userName} mendaftarkan permohonan`,
           desc: p.judul_rancangan || 'Rancangan regulasi baru.',
         };
@@ -78,15 +140,15 @@ export const HomePage = ({
         return {
           icon: Upload,
           badge: 'Unggah',
-          badgeClass: 'bg-blue-100 text-blue-800 border-blue-200',
-          title: `${userName} mengunggah berkas`,
+          badgeClass: 'bg-blue-50 text-blue-800 border-blue-200/70',
+          title: `${userName} mengunggah naskah`,
           desc: `${p.nama_dokumen || 'Dokumen'} (Versi ${p.versi || 1})`,
         };
       case 'APPROVE_FASILITASI':
         return {
           icon: CheckCircle2,
           badge: 'Disetujui',
-          badgeClass: 'bg-emerald-200 text-emerald-900 border-emerald-300 font-black',
+          badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-extrabold',
           title: `Biro Hukum menyetujui fasilitasi`,
           desc: p.surat_terlampir ? `Surat: ${p.surat_terlampir}` : (p.catatan || 'Fasilitasi selesai tuntas.'),
         };
@@ -94,7 +156,7 @@ export const HomePage = ({
         return {
           icon: XCircle,
           badge: 'Revisi',
-          badgeClass: 'bg-rose-100 text-rose-800 border-rose-200 font-black',
+          badgeClass: 'bg-rose-50 text-rose-800 border-rose-200/70 font-bold',
           title: `Biro Hukum mengembalikan berkas`,
           desc: p.catatan || 'Perlu perbaikan draf pasal.',
         };
@@ -102,7 +164,7 @@ export const HomePage = ({
         return {
           icon: RefreshCw,
           badge: 'Status',
-          badgeClass: 'bg-purple-100 text-purple-800 border-purple-200',
+          badgeClass: 'bg-slate-100 text-slate-700 border-slate-200/70',
           title: `Status: ${p.to_status_name || 'Diperbarui'}`,
           desc: p.catatan ? `Catatan: ${p.catatan}` : 'Pembaruan tahapan berkas.',
         };
@@ -110,237 +172,366 @@ export const HomePage = ({
         return {
           icon: Edit3,
           badge: 'Ubah Data',
-          badgeClass: 'bg-amber-100 text-amber-800 border-amber-200',
-          title: `${userName} mengubah data regulasi`,
-          desc: `Pembaruan data permohonan.`,
+          badgeClass: 'bg-amber-50 text-amber-800 border-amber-200/70',
+          title: `${userName} memperbarui data`,
+          desc: p.judul_rancangan || 'Pembaruan data permohonan.',
         };
       case 'PREVIEW_CONFIDENTIAL_DOKUMEN':
         return {
           icon: Eye,
           badge: 'Lihat',
-          badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60',
           title: `${userName} melihat dokumen`,
-          desc: p.nama_file || 'Pratinjau naskah di web.',
+          desc: p.nama_file || 'Pratinjau naskah hukum.',
         };
       case 'DOWNLOAD_CONFIDENTIAL_DOKUMEN':
         return {
           icon: Download,
           badge: 'Unduh',
-          badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60',
           title: `${userName} mengunduh berkas`,
-          desc: p.nama_file || 'Unduh file fisik ke komputer.',
+          desc: p.nama_file || 'Unduh file fisik berkas.',
         };
       default:
         return {
           icon: History,
           badge: 'Aktivitas',
-          badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60',
           title: `${userName} melakukan pembaruan`,
-          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || 'Aktivitas tercatat.'),
+          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || 'Aktivitas sistem tercatat.'),
         };
     }
   };
+
+  const handleOpenActivityModal = (act) => {
+    setSelectedActivity({
+      id: act.id,
+      action: act.action,
+      user: act.user?.nama || act.user?.name || 'Sistem',
+      role: act.user?.role?.name || 'Operator',
+      timestamp: act.created_at ? new Date(act.created_at).toLocaleString('id-ID') : '-',
+      regulationTitle: act.payload?.judul_rancangan || act.payload?.nama_dokumen || null,
+      description: typeof act.payload === 'string' ? act.payload : JSON.stringify(act.payload, null, 2),
+    });
+  };
+
+  // Filtered district list
+  const filteredWilayah = wilayahStats.filter((w) => 
+    w.nama_kabupaten.toLowerCase().includes(wilayahSearch.toLowerCase())
+  );
 
   return (
     <AppLayout>
       <Head title="Dashboard - HARMONITAS" />
 
-      <div className="space-y-5">
+      <div className="space-y-6">
+        
         {/* =========================================================================
-            TOP METRIC CARDS GRID (RESTORED BELOVED STYLE WITH SKY BLUE & GREEN)
+            1. EXECUTIVE CONTEXT HEADER
             ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Total Permohonan (Navy) */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs">
+          {/* Subtle Top Gold Accent Line */}
+          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#2B3056] via-[#FFD82B] to-[#2B3056]" />
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-[#2B3056]/10 px-2.5 py-1 text-[11px] font-bold text-[#2B3056]">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#B3912D]" />
+                  {getRoleDisplayName()}
+                </span>
+                <span className="text-xs text-slate-400 font-medium hidden sm:inline">•</span>
+                <span className="text-[11px] font-medium text-slate-500">
+                  Kanwil Kementerian Hukum Riau
+                </span>
+              </div>
+
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2B3056]">
+                Selamat Datang, {user?.nama || user?.name || 'Operator'}
+              </h1>
+
+              <p className="text-xs text-slate-500 font-normal max-w-2xl leading-relaxed">
+                {userScope.isTimKerja 
+                  ? `Ruang kendali harmonisasi regulasi untuk cakupan ${userScope.timKerjaNama || 'Tim Kerja'}.`
+                  : 'Pusat pemantauan dan kendali terpadu seluruh tahapan harmonisasi regulasi daerah di Provinsi Riau.'}
+              </p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 sm:pt-0">
+              <Link
+                href="/panduan"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 transition-colors shadow-2xs cursor-pointer"
+              >
+                <BookOpen className="h-3.5 w-3.5 text-slate-500" />
+                <span>Panduan SOP</span>
+              </Link>
+
+              <Link
+                href="/ai"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 text-xs font-bold text-[#2B3056] transition-colors shadow-2xs cursor-pointer"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-[#B3912D]" />
+                <span>Asisten AI</span>
+              </Link>
+
+              <Link
+                href="/peraturan"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] px-4 py-2 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer"
+              >
+                <FileText className="h-3.5 w-3.5 text-[#FFD82B]" />
+                <span>Lihat Semua Berkas</span>
+                <ChevronRight className="h-3.5 w-3.5 text-white/70" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            2. REFINED 4 METRIC CARDS
+            ========================================================================= */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
             title="Total Permohonan"
             value={metrics.total || 0}
             icon={FileText}
             variant="total"
-            subtext="Permohonan terdaftar"
+            subtext="Seluruh permohonan terdaftar"
             onClick={() => router.visit('/peraturan')}
           />
 
-          {/* Card 2: Proses Harmonisasi (Oranye / Kuning Emas) */}
           <MetricCard
-            title="Proses Harmonisasi"
+            title="Dalam Harmonisasi"
             value={metrics.harmonisasi || 0}
             icon={Clock}
             variant="harmonisasi"
-            subtext="Tahap harmonisasi Kanwil"
+            subtext="Tahap telaah & rapat pleno Kanwil"
             onClick={() => router.visit('/peraturan?status_id=2')}
           />
 
-          {/* Card 3: Proses Fasilitasi (Biru Muda / Sky Blue) */}
           <MetricCard
-            title="Proses Fasilitasi"
+            title="Dalam Fasilitasi"
             value={metrics.fasilitasi || 0}
             icon={Search}
             variant="fasilitasi"
-            subtext="Tahap fasilitasi Biro Hukum"
+            subtext="Tahap telaah Biro Hukum"
             onClick={() => router.visit('/peraturan?status_id=3')}
           />
 
-          {/* Card 4: Selesai / Tuntas (Hijau / Emerald Green) */}
           <MetricCard
-            title="Selesai / Tuntas"
+            title="Selesai & Sah"
             value={metrics.selesai || 0}
             icon={CheckCircle2}
             variant="selesai"
-            subtext="Fasilitasi tuntas & terbit"
+            subtext="Harmonisasi & fasilitasi tuntas"
             onClick={() => router.visit('/peraturan?status_id=4')}
           />
         </div>
 
         {/* =========================================================================
-            MAIN SECTION: PROGRES ALUR (COMPACT) + TUGAS & AKTIVITAS (COMPACT)
+            3. MIDDLE WORKSPACE: 2-COLUMN BALANCED GRID
             ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* LEFT COLUMN (7 COLS): PROGRES ALUR STATUS (COMPACT & SLEEK) */}
-          <div className="lg:col-span-7 bg-[#FCFCF9] rounded-2xl border border-[#E2E2DC] p-4 sm:p-5 space-y-4 shadow-xs">
-            <div className="flex items-center justify-between border-b pb-3 border-[#E2E2DC]">
-              <div>
-                <h3 className="text-sm sm:text-base font-black text-[#1A1A5E] flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-[#FFC800]" />
-                  <span>Progres Alur Regulasi Daerah</span>
-                </h3>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                  {userScope.isTimKerja 
-                    ? `Cakupan wilayah binaan: ${userScope.timKerjaNama || 'Tim Kerja'}`
-                    : 'Distribusi permohonan aktif pada setiap tahapan alur kerja'}
-                </p>
-              </div>
-              <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold">
-                ● Live Data
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              {statusProgressItems.map((item) => {
-                const percentage = totalBerkas > 0 ? Math.round((item.count / totalBerkas) * 100) : 0;
-
-                return (
-                  <div
-                    key={item.label}
-                    onClick={() => router.visit(`/peraturan?status_id=${item.status_id}`)}
-                    className="p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200/80 hover:border-[#1A1A5E]/40 hover:shadow-xs transition-all cursor-pointer space-y-1.5 group"
-                    title={`Klik untuk menyaring berkas ${item.label}`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase border ${item.badge}`}>
-                          {item.label}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-medium hidden sm:inline truncate">
-                          • {item.desc}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        <span className="text-[10px] text-slate-400 font-bold">{percentage}%</span>
-                        <span className="font-mono font-black text-[#1A1A5E] px-2 py-0.5 bg-slate-50 border border-slate-200 rounded-md text-[11px]">
-                          {item.count} Berkas
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Mini Progress Bar */}
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r ${item.color}`}
-                        style={{ width: `${Math.max(percentage, item.count > 0 ? 5 : 0)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* SEBARAN WILAYAH BINAAN (SCOPED TO TIM KERJA) */}
-            <div className="pt-3 border-t border-[#E2E2DC] space-y-2.5">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-black text-[#1A1A5E] flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#FFC800]" />
-                  <span>{userScope.isTimKerja ? `Wilayah Binaan (${userScope.timKerjaNama})` : 'Sebaran Wilayah Kabupaten / Kota'}</span>
-                </h4>
-                <span className="text-[10px] font-bold text-slate-400">
-                  {wilayahStats.length} Wilayah
+          {/* =======================================================================
+              LEFT COLUMN (7 COLS): PROGRES ALUR & SEBARAN WILAYAH
+              ======================================================================= */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Card 1: Distribusi Tahapan Alur Harmonisasi */}
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-[#B3912D]" />
+                    <span>Distribusi Tahapan Alur Regulasi</span>
+                  </h2>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    {userScope.isTimKerja 
+                      ? `Cakupan wilayah: ${userScope.timKerjaNama || 'Tim Kerja'}`
+                      : 'Distribusi permohonan aktif pada setiap tahapan SOP harmonisasi'}
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70 text-[10px] font-bold">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Data
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {wilayahStats.map((w) => (
-                  <div
-                    key={w.kabupaten_id}
-                    onClick={() => router.visit(`/peraturan?kabupaten_id=${w.kabupaten_id}`)}
-                    className="p-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-[#1A1A5E]/40 transition cursor-pointer flex items-center justify-between gap-2 shadow-xs group"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-xs font-black text-[#1A1A5E] truncate group-hover:text-blue-900">
-                        {w.nama_kabupaten}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-semibold">
-                        <span className="text-emerald-700 font-bold">{w.selesai} Selesai</span> • {w.berjalan} Berjalan
-                      </p>
+              {/* Progress Stage Items */}
+              <div className="space-y-2.5">
+                {statusProgressItems.map((item) => {
+                  const percentage = totalBerkas > 0 ? Math.round((item.count / totalBerkas) * 100) : 0;
+
+                  return (
+                    <div
+                      key={item.label}
+                      onClick={() => router.visit(`/peraturan?status_id=${item.status_id}`)}
+                      className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer space-y-2 group"
+                      title={`Klik untuk melihat berkas ${item.label}`}
+                    >
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`px-2 py-0.5 rounded-md text-[9.5px] font-extrabold uppercase border ${item.badge}`}>
+                            {item.label}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-medium hidden sm:inline truncate">
+                            • {item.desc}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="text-[11px] text-slate-400 font-bold">{percentage}%</span>
+                          <span className="font-mono font-extrabold text-[#2B3056] px-2 py-0.5 bg-white border border-slate-200 rounded-md text-xs shadow-2xs">
+                            {item.count} Berkas
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Smooth Progress Bar */}
+                      <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r ${item.color}`}
+                          style={{ width: `${Math.max(percentage, item.count > 0 ? 6 : 0)}%` }}
+                        />
+                      </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 border border-slate-200 text-[#1A1A5E] font-mono font-black text-[11px] shrink-0">
-                      {w.total}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
+
+            {/* Card 2: Sebaran Wilayah Binaan (13 Kab/Kota & Pemprov) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3.5">
+                <div>
+                  <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-[#B3912D]" />
+                    <span>Sebaran Wilayah Administrasi ({wilayahStats.length})</span>
+                  </h2>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    {userScope.isTimKerja 
+                      ? `Wilayah binaan ${userScope.timKerjaNama}`
+                      : 'Distribusi permohonan regulasi di seluruh Kabupaten / Kota se-Riau'}
+                  </p>
+                </div>
+
+                {/* Quick Search */}
+                <div className="relative w-full sm:w-48">
+                  <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari daerah..."
+                    value={wilayahSearch}
+                    onChange={(e) => setWilayahSearch(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1.5 text-xs font-semibold text-[#2B3056] bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* District Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {filteredWilayah.length > 0 ? (
+                  filteredWilayah.map((w) => (
+                    <div
+                      key={w.kabupaten_id}
+                      onClick={() => router.visit(`/peraturan?kabupaten_id=${w.kabupaten_id}`)}
+                      className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer flex items-center justify-between gap-2.5 group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B] transition-colors">
+                          {w.nama_kabupaten.toLowerCase().includes('provinsi') ? (
+                            <Landmark className="h-3.5 w-3.5" />
+                          ) : w.nama_kabupaten.toLowerCase().includes('kota') ? (
+                            <Building2 className="h-3.5 w-3.5" />
+                          ) : (
+                            <MapPin className="h-3.5 w-3.5" />
+                          )}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-[#2B3056] truncate group-hover:text-[#3A4070]">
+                            {w.nama_kabupaten}
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            <span className="text-emerald-700 font-bold">{w.selesai} Selesai</span> • <span className="text-slate-600">{w.berjalan} Berjalan</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[#2B3056] font-mono font-extrabold text-xs shrink-0 shadow-2xs">
+                        {w.total}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-2 py-8 text-center text-xs text-slate-400 font-medium">
+                    Tidak ada wilayah yang cocok dengan pencarian "{wilayahSearch}".
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
 
-          {/* RIGHT COLUMN (5 COLS): TUGAS & AKTIVITAS TERBARU (COMPACT & NEAT) */}
-          <div className="lg:col-span-5 space-y-4">
+          {/* =======================================================================
+              RIGHT COLUMN (5 COLS): PRIORITY ACTIONS, AUDIT FEED & SOP CARD
+              ======================================================================= */}
+          <div className="lg:col-span-5 space-y-6">
             
-            {/* TUGAS PERLU TINDAKAN (COMPACT) */}
-            <div className="bg-[#FCFCF9] rounded-2xl border border-[#E2E2DC] p-4 space-y-3 shadow-xs">
-              <div className="flex items-center justify-between border-b pb-2.5 border-[#E2E2DC]">
-                <h3 className="text-xs font-black text-[#1A1A5E] flex items-center gap-1.5">
-                  <BellRing className="w-3.5 h-3.5 text-[#FFC800]" />
+            {/* Card 1: Tugas Perlu Tindakan (Action Hub) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-3.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#2B3056] flex items-center gap-2">
+                  <BellRing className="h-4 w-4 text-[#B3912D]" />
                   <span>Tugas Perlu Tindakan</span>
                 </h3>
-                <span className="text-[10px] font-bold text-slate-400">Sesuai Peran</span>
+                <span className="rounded-md bg-amber-50 border border-amber-200/70 px-2 py-0.5 text-[9.5px] font-bold text-amber-800">
+                  Prioritas Peran
+                </span>
               </div>
 
-              <div className="space-y-2">
-                {taskNotifications.map((task) => (
-                  <div
-                    key={task.id}
-                    onClick={() => router.visit(task.link)}
-                    className="p-3 rounded-xl bg-white border border-slate-200 hover:border-[#1A1A5E]/40 transition cursor-pointer flex items-center justify-between gap-3 shadow-xs group"
-                  >
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-black text-[#1A1A5E] group-hover:text-blue-900 flex items-center gap-1">
-                        <span className="truncate">{task.title}</span>
-                        <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                      </h4>
-                      <p className="text-[10px] text-slate-500 font-medium line-clamp-1 mt-0.5">
-                        {task.desc}
-                      </p>
+              <div className="space-y-2.5">
+                {taskNotifications.length > 0 ? (
+                  taskNotifications.map((task) => (
+                    <div
+                      key={task.id}
+                      onClick={() => router.visit(task.link)}
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                    >
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-[#2B3056] group-hover:text-[#3A4070] flex items-center gap-1.5">
+                          <span className="truncate">{task.title}</span>
+                          <ArrowRight className="h-3 w-3 text-[#B3912D] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        </h4>
+                        <p className="text-[10.5px] text-slate-500 font-medium line-clamp-2 mt-0.5 leading-relaxed">
+                          {task.desc}
+                        </p>
+                      </div>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] font-extrabold text-xs shrink-0 shadow-xs">
+                        {task.count}
+                      </span>
                     </div>
-                    <span className={`w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center shrink-0 shadow-xs ${task.color}`}>
-                      {task.count}
-                    </span>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-xs text-slate-400 font-medium">
+                    Semua permohonan terkini telah tertangani.
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
-            {/* AKTIVITAS BERKAS TERBARU (COMPACT TIMELINE FEED) */}
-            <div className="bg-[#FCFCF9] rounded-2xl border border-[#E2E2DC] p-4 space-y-3 shadow-xs">
-              <div className="flex items-center justify-between border-b pb-2.5 border-[#E2E2DC]">
-                <h3 className="text-xs font-black text-[#1A1A5E] flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-[#FFC800]" />
+            {/* Card 2: Aktivitas Berkas Terbaru (Live Audit Timeline Feed) */}
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-3.5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#2B3056] flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#B3912D]" />
                   <span>Aktivitas Berkas Terbaru</span>
                 </h3>
-                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[9.5px] font-bold text-slate-600">
                   Live Feed
                 </span>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {recentActivities.length > 0 ? (
                   recentActivities.map((act) => {
                     const formatted = formatAuditItem(act);
@@ -348,70 +539,180 @@ export const HomePage = ({
                     return (
                       <div
                         key={act.id}
-                        onClick={() => act.target_id && router.visit(`/peraturan/${act.target_id}`)}
-                        className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-[#1A1A5E]/40 transition cursor-pointer text-xs space-y-1 group shadow-xs"
+                        onClick={() => handleOpenActivityModal(act)}
+                        className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer text-xs space-y-1.5 group"
                       >
-                        <div className="flex items-center justify-between gap-1.5">
-                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border ${formatted.badgeClass}`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`px-1.5 py-0.2 rounded text-[8.5px] font-bold uppercase border ${formatted.badgeClass}`}>
                             {formatted.badge}
                           </span>
-                          <span className="text-[9px] text-slate-400 font-mono font-medium">
+                          <span className="text-[9.5px] text-slate-400 font-mono font-medium">
                             {act.created_at ? new Date(act.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}
                           </span>
                         </div>
-                        <p className="font-extrabold text-[#1A1A5E] text-[11px] truncate">
+
+                        <p className="font-bold text-[#2B3056] text-[11.5px] truncate group-hover:text-[#3A4070]">
                           {formatted.title}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-medium truncate">
+
+                        <p className="text-[10.5px] text-slate-500 font-medium truncate">
                           {formatted.desc}
                         </p>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-[11px] text-slate-400 font-semibold py-3 text-center">
+                  <p className="text-xs text-slate-400 font-medium py-6 text-center">
                     Belum ada riwayat aktivitas terbaru.
                   </p>
                 )}
               </div>
             </div>
 
+            {/* Card 3: Quick SOP & Technical Assistance Card */}
+            <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-br from-slate-50 to-white p-5 shadow-2xs space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                  <BookOpen className="h-4.5 w-4.5" />
+                </span>
+                <div>
+                  <h4 className="text-xs font-bold text-[#2B3056]">Panduan & SOP Harmonisasi</h4>
+                  <p className="text-[10.5px] text-slate-500">Standar operasional resmi Kanwil Kemenkum Riau</p>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-600 font-normal leading-relaxed">
+                Pelajari alur pendaftaran naskah rancangan, telaah dokumen 1-5, rapat pleno harmonisasi, hingga fasilitasi Biro Hukum.
+              </p>
+
+              <div className="pt-1 flex items-center justify-between border-t border-slate-200/60 text-xs">
+                <Link
+                  href="/panduan"
+                  className="font-bold text-[#2B3056] hover:text-[#3A4070] inline-flex items-center gap-1 hover:underline text-[11.5px]"
+                >
+                  <span>Buka Buku Panduan</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-[#B3912D]" />
+                </Link>
+
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Versi 2.4 Digital
+                </span>
+              </div>
+            </div>
+
           </div>
+
         </div>
 
         {/* =========================================================================
-            BOTTOM SECTION: GRAFIK TREN BULANAN RIIL
+            4. BOTTOM SECTION: FULL-WIDTH HORIZONTAL CARD FOR BAR CHART TREND
             ========================================================================= */}
-        <div className="bg-[#FCFCF9] rounded-2xl border border-[#E2E2DC] p-4 sm:p-5 space-y-3 shadow-xs">
-          <div className="flex items-center justify-between border-b pb-3 border-[#E2E2DC]">
+        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+          
+          {/* Header with 6-Month Period Toggle and Total */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3.5">
             <div>
-              <h3 className="text-sm font-black text-[#1A1A5E] flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-[#FFC800]" />
-                <span>Grafik Tren Pengajuan & Penyelesaian ({new Date().getFullYear()})</span>
-              </h3>
+              <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-[#B3912D]" />
+                <span>Tren Pengajuan & Penyelesaian Regulasi Daerah ({new Date().getFullYear()})</span>
+              </h2>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                Statistik jumlah berkas masuk, diproses, dan selesai per bulan
+                Diagram batang vertikal rekapitulasi jumlah berkas masuk, diproses dalam harmonisasi/fasilitasi, dan selesai tuntas
               </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+              <span className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 border border-slate-200/60">
+                Total: {metrics.total || 0} Berkas
+              </span>
+
+              {/* 6-Month Semester Slider Controls */}
+              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/80">
+                <button
+                  type="button"
+                  onClick={() => setSemester(1)}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                    semester === 1
+                      ? 'bg-white text-[#2B3056] shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="Tampilkan Semester 1 (Januari - Juni)"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                  <span>Jan - Jun</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSemester(2)}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
+                    semester === 2
+                      ? 'bg-white text-[#2B3056] shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="Tampilkan Semester 2 (Juli - Desember)"
+                >
+                  <span>Jul - Des</span>
+                  <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="h-56 w-full pt-1">
+          {/* Full-Width Vertical Bar Chart */}
+          <div className="h-[280px] w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E2DC" />
-                <XAxis dataKey="bulan" tick={{ fontSize: 11, fill: '#64748B', fontWeight: 700 }} />
-                <YAxis tick={{ fontSize: 11, fill: '#64748B', fontWeight: 700 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#1A1A5E', borderRadius: '10px', border: '1px solid #383F6A', color: '#fff', fontSize: '11px', fontWeight: 600 }} />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', fontWeight: 700 }} />
-                <Bar dataKey="Total Masuk" fill="#1A1A5E" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Diproses" fill="#38BDF8" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Selesai" fill="#10B981" radius={[4, 4, 0, 0]} />
+              <BarChart 
+                data={displayedTrendData} 
+                margin={{ top: 15, right: 20, left: -10, bottom: 5 }}
+                barGap={4}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                <XAxis 
+                  dataKey="bulan" 
+                  tick={{ fontSize: 11.5, fill: '#2B3056', fontWeight: 700 }} 
+                  axisLine={{ stroke: '#E2E8F0' }} 
+                  tickLine={false} 
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }} 
+                  axisLine={{ stroke: '#E2E8F0' }} 
+                  tickLine={false} 
+                  allowDecimals={false} 
+                />
+                <Tooltip content={<CustomChartTooltip />} cursor={{ fill: 'rgba(43, 48, 86, 0.04)', radius: 6 }} />
+                <Legend 
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 600 }} 
+                  iconType="circle" 
+                  iconSize={8} 
+                />
+                <Bar dataKey="Total Masuk" fill="#2B3056" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                <Bar dataKey="Diproses" fill="#3A4070" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                <Bar dataKey="Selesai" fill="#10B981" radius={[6, 6, 0, 0]} maxBarSize={28} />
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Footer Period Note */}
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+            <span>
+              Menampilkan periode <strong>Semester {semester} ({semester === 1 ? 'Januari – Juni' : 'Juli – Desember'} {new Date().getFullYear()})</strong>. Klik tombol di atas untuk beralih semester.
+            </span>
+            <span className="font-semibold text-slate-600">
+              Sinkronisasi Real-Time
+            </span>
+          </div>
+
         </div>
 
       </div>
+
+      {/* Activity Detail Modal */}
+      <ActivityDetailModal
+        isOpen={Boolean(selectedActivity)}
+        onClose={() => setSelectedActivity(null)}
+        activity={selectedActivity}
+      />
     </AppLayout>
   );
 };

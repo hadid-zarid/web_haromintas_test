@@ -28,7 +28,12 @@ import {
   ChevronLeft,
   ChevronRight,
   FileCheck,
-  RefreshCw
+  RefreshCw,
+  Landmark,
+  Scale,
+  Clock,
+  Building2,
+  FileSpreadsheet
 } from "lucide-react";
 
 export const PeraturanListPage = ({
@@ -239,15 +244,15 @@ export const PeraturanListPage = ({
         title={`Urutkan berdasarkan ${label}`}
       >
         <div className={`inline-flex items-center gap-1.5 ${alignRight ? "justify-end" : ""}`}>
-          <span className={isActive ? "text-[#1A1A5E] font-black" : "text-slate-600 font-extrabold"}>
+          <span className={isActive ? "text-[#2B3056] font-extrabold" : "text-slate-600 font-bold"}>
             {label}
           </span>
           <span className="shrink-0">
             {isActive ? (
               sortDir === "asc" ? (
-                <ArrowUp className="w-3.5 h-3.5 text-amber-500 font-black stroke-[2.5]" />
+                <ArrowUp className="w-3.5 h-3.5 text-[#FFC800] font-black stroke-[3]" />
               ) : (
-                <ArrowDown className="w-3.5 h-3.5 text-amber-500 font-black stroke-[2.5]" />
+                <ArrowDown className="w-3.5 h-3.5 text-[#FFC800] font-black stroke-[3]" />
               )
             ) : (
               <ArrowUpDown className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-colors" />
@@ -259,83 +264,110 @@ export const PeraturanListPage = ({
   };
 
   return (
-    <AppLayout>
-      <Head title="Daftar Permohonan Peraturan - HARMONITAS" />
+    <AppLayout
+      title="Permohonan Regulasi Daerah"
+      subtitle="Pengelolaan & pemantauan alur berkas harmonisasi Ranperda / Ranperkada se-Provinsi Riau."
+      headerAction={
+        canAdd ? (
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4 text-[#FFD82B]" />
+            <span>+ Tambah Permohonan Baru</span>
+          </button>
+        ) : null
+      }
+    >
+      <Head title="Daftar Permohonan Regulasi - HARMONITAS" />
 
       <div className="space-y-6">
-        {/* Flash Notification */}
+        {/* Flash Notifications */}
         {flash?.success && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold shadow-sm">
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold shadow-xs">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <p>{flash.success}</p>
           </div>
         )}
 
         {flash?.error && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold shadow-sm">
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold shadow-xs">
             <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <p>{flash.error}</p>
           </div>
         )}
 
-        {/* HEADER SECTION */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-[#1A1A5E] tracking-tight">
-              Permohonan Regulasi Daerah
-            </h1>
-            <p className="text-xs text-slate-500 font-semibold mt-1">
-              Pengelolaan & pemantauan alur berkas harmonisasi Ranperda / Ranperkada se-Provinsi Riau.
-            </p>
-          </div>
-
-          {canAdd && (
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A1A5E] hover:bg-[#2C3154] text-white text-xs font-black shadow-md shadow-[#1A1A5E]/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <PlusCircle className="w-4 h-4 text-[#FFC800]" />
-              <span>+ Tambah Permohonan Baru</span>
-            </button>
-          )}
-        </div>
-
-        {/* BENTO STATS BAR */}
+        {/* 5 BENTO STATS METRICS BAR */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-          <div className="bg-white p-4 rounded-2xl border border-[#E2E2DC] shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Berkas</p>
-            <p className="text-2xl font-black text-[#1A1A5E] mt-1">{stats?.total || 0}</p>
-            <p className="text-[10px] font-bold text-slate-500 mt-1">Permohonan terdaftar</p>
+          {/* Total Permohonan */}
+          <div className="relative overflow-hidden bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs transition-all hover:shadow-sm">
+            <span className="absolute inset-x-0 top-0 h-1 bg-[#2B3056]" />
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Total Berkas</p>
+              <div className="h-7 w-7 rounded-lg bg-slate-100 text-[#2B3056] flex items-center justify-center">
+                <FileText className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <p className="text-2xl font-extrabold text-[#2B3056] mt-1.5">{stats?.total || 0}</p>
+            <p className="text-[10px] font-medium text-slate-500 mt-0.5">Permohonan terdaftar</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-[#E2E2DC] shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Draf Awal</p>
-            <p className="text-2xl font-black text-slate-700 mt-1">{stats?.draft || 0}</p>
-            <p className="text-[10px] font-bold text-slate-500 mt-1">Pra-harmonisasi / AI</p>
+          {/* Draf Awal */}
+          <div className="relative overflow-hidden bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs transition-all hover:shadow-sm">
+            <span className="absolute inset-x-0 top-0 h-1 bg-amber-400" />
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700">Draf Awal</p>
+              <div className="h-7 w-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Clock className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <p className="text-2xl font-extrabold text-slate-800 mt-1.5">{stats?.draft || 0}</p>
+            <p className="text-[10px] font-medium text-slate-500 mt-0.5">Pra-harmonisasi / AI</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-[#E2E2DC] shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-wider text-blue-600">Proses Harmonisasi</p>
-            <p className="text-2xl font-black text-blue-700 mt-1">{stats?.harmonisasi || 0}</p>
-            <p className="text-[10px] font-bold text-slate-500 mt-1">Rapat Kanwil Riau</p>
+          {/* Proses Harmonisasi */}
+          <div className="relative overflow-hidden bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs transition-all hover:shadow-sm">
+            <span className="absolute inset-x-0 top-0 h-1 bg-blue-500" />
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700">Harmonisasi</p>
+              <div className="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Scale className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <p className="text-2xl font-extrabold text-blue-700 mt-1.5">{stats?.harmonisasi || 0}</p>
+            <p className="text-[10px] font-medium text-slate-500 mt-0.5">Rapat Kanwil Riau</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-[#E2E2DC] shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-wider text-purple-600">Proses Fasilitasi</p>
-            <p className="text-2xl font-black text-purple-700 mt-1">{stats?.fasilitasi || 0}</p>
-            <p className="text-[10px] font-bold text-slate-500 mt-1">Telaah Biro Hukum</p>
+          {/* Proses Fasilitasi */}
+          <div className="relative overflow-hidden bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs transition-all hover:shadow-sm">
+            <span className="absolute inset-x-0 top-0 h-1 bg-purple-500" />
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700">Fasilitasi</p>
+              <div className="h-7 w-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                <Building2 className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <p className="text-2xl font-extrabold text-purple-700 mt-1.5">{stats?.fasilitasi || 0}</p>
+            <p className="text-[10px] font-medium text-slate-500 mt-0.5">Telaah Biro Hukum</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-[#E2E2DC] shadow-sm col-span-2 sm:col-span-1">
-            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Selesai / Tuntas</p>
-            <p className="text-2xl font-black text-emerald-700 mt-1">{stats?.selesai || 0}</p>
-            <p className="text-[10px] font-bold text-slate-500 mt-1">Fasilitasi terbit</p>
+          {/* Selesai / Tuntas */}
+          <div className="relative overflow-hidden bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs transition-all hover:shadow-sm col-span-2 sm:col-span-1">
+            <span className="absolute inset-x-0 top-0 h-1 bg-emerald-500" />
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Selesai</p>
+              <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <p className="text-2xl font-extrabold text-emerald-700 mt-1.5">{stats?.selesai || 0}</p>
+            <p className="text-[10px] font-medium text-slate-500 mt-0.5">Fasilitasi terbit</p>
           </div>
         </div>
 
         {/* SEARCH & FILTER TOOLBAR */}
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E2E2DC] shadow-sm">
+        <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-slate-200/90 shadow-2xs">
           <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             {/* Search Input */}
             <div className="sm:col-span-4 relative">
@@ -347,7 +379,7 @@ export const PeraturanListPage = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Cari nomor berkas atau judul peraturan..."
-                className="w-full pl-10 pr-4 py-2 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               />
             </div>
 
@@ -360,7 +392,7 @@ export const PeraturanListPage = ({
                   setSelectedKabupaten(val);
                   triggerQuery({ kabupaten_id: val, page: 1 });
                 }}
-                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               >
                 <option value="ALL">
                   {isTimKerja 
@@ -384,7 +416,7 @@ export const PeraturanListPage = ({
                   setSelectedJenis(val);
                   triggerQuery({ jenis_regulasi_id: val, page: 1 });
                 }}
-                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               >
                 <option value="ALL">Semua Jenis</option>
                 {jenisRegulasis.map((j) => (
@@ -404,7 +436,7 @@ export const PeraturanListPage = ({
                   setSelectedStatus(val);
                   triggerQuery({ status_id: val, page: 1 });
                 }}
-                className="w-full py-2 px-3 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
+                className="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               >
                 <option value="ALL">Semua Status</option>
                 {statuses.map((s) => (
@@ -419,16 +451,16 @@ export const PeraturanListPage = ({
             <div className="sm:col-span-1 flex items-center gap-1.5">
               <button
                 type="submit"
-                className="flex-1 py-2 px-2.5 bg-[#1A1A5E] text-white hover:bg-[#2C3154] rounded-xl text-xs font-bold transition flex items-center justify-center shadow-xs"
+                className="flex-1 py-2 px-2.5 bg-[#2B3056] text-white hover:bg-[#3A4070] rounded-xl text-xs font-bold transition flex items-center justify-center shadow-2xs cursor-pointer"
                 title="Terapkan Filter"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5 text-[#FFC800]" />
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[#FFD82B]" />
               </button>
               <button
                 type="button"
                 onClick={handleResetFilter}
                 title="Reset Semua Filter"
-                className="p-2 bg-[#F8F8F5] border border-[#E2E2DC] hover:bg-white text-slate-600 rounded-xl transition shadow-xs"
+                className="p-2 bg-slate-50 border border-slate-200 hover:bg-white text-slate-600 rounded-xl transition shadow-2xs cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -436,20 +468,21 @@ export const PeraturanListPage = ({
           </form>
         </div>
 
-        {/* PERATURAN TABLE */}
-        <div className="bg-white rounded-3xl border border-[#E2E2DC] shadow-sm overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-[#E2E2DC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* PERATURAN TABLE CONTAINER */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+          {/* Table Header Bar */}
+          <div className="p-4 sm:p-5 border-b border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-black text-[#1A1A5E]">
+              <h2 className="text-sm font-extrabold text-[#2B3056]">
                 Daftar Permohonan Regulasi ({permohonans?.total || permohonans?.data?.length || 0})
               </h2>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Klik judul atau header tabel untuk mengurutkan data (Sort). Klik baris untuk melihat detail & 7 slot dokumen.
+              <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                Klik baris permohonan untuk membuka lembar kerja detail dan 7 slot dokumen.
               </p>
             </div>
 
             {/* Per Page Selector */}
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
               <span>Tampilkan:</span>
               <select
                 value={perPage}
@@ -458,7 +491,7 @@ export const PeraturanListPage = ({
                   setPerPage(val);
                   triggerQuery({ per_page: val, page: 1 });
                 }}
-                className="py-1 px-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-lg text-xs font-bold text-[#1A1A5E] focus:outline-none focus:ring-1 focus:ring-[#FFC800]"
+                className="py-1 px-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-[#2B3056] focus:outline-none focus:ring-1 focus:ring-[#FFD82B]"
               >
                 <option value={5}>5 baris</option>
                 <option value={10}>10 baris</option>
@@ -468,10 +501,11 @@ export const PeraturanListPage = ({
             </div>
           </div>
 
+          {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F8F8F5] border-b border-[#E2E2DC] text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <tr className="bg-slate-50/80 border-b border-slate-200/90 text-[10.5px] font-extrabold uppercase tracking-wider text-slate-500">
                   {renderSortableHeader("Nomor Berkas", "nomor_regulasi")}
                   {renderSortableHeader("Judul Peraturan & Wilayah", "judul_rancangan")}
                   {renderSortableHeader("Jenis", "jenis_regulasi_id")}
@@ -492,30 +526,30 @@ export const PeraturanListPage = ({
                     return (
                       <tr
                         key={item.rancangan_id}
-                        className="hover:bg-slate-50/70 transition cursor-pointer"
+                        className="hover:bg-slate-50/90 transition duration-150 cursor-pointer group"
                         onClick={() => router.visit(`/peraturan/${item.rancangan_id}`)}
                       >
                         {/* Nomor Berkas */}
-                        <td className="py-3.5 px-4 font-black text-[#1A1A5E] whitespace-nowrap">
-                          <span className="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg text-[11px] font-mono">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="px-2.5 py-1 bg-slate-100 border border-slate-200/80 rounded-lg text-[11px] font-mono font-bold text-[#2B3056] group-hover:border-[#2B3056]/30 transition-colors">
                             {item.nomor_regulasi}
                           </span>
                         </td>
 
                         {/* Judul & Wilayah */}
                         <td className="py-3.5 px-4 max-w-md">
-                          <p className="font-black text-[#1A1A5E] leading-snug line-clamp-2">
+                          <p className="font-bold text-[#2B3056] group-hover:text-[#3A4070] transition-colors leading-snug line-clamp-2">
                             {item.judul_rancangan}
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-bold">
-                            <span className="flex items-center gap-1 text-slate-700 font-bold">
+                          <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-semibold">
+                            <span className="flex items-center gap-1 text-slate-600">
                               <Building className="w-3 h-3 text-[#FFC800] shrink-0" />
                               <span>{kabName}</span>
                             </span>
                             {!isTimKerja && (
                               <>
                                 <span>•</span>
-                                <span className="text-blue-700 font-semibold">{timName}</span>
+                                <span className="text-[#3A4070] font-bold">{timName}</span>
                               </>
                             )}
                           </div>
@@ -523,7 +557,7 @@ export const PeraturanListPage = ({
 
                         {/* Jenis */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black border ${
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold border ${
                             jenisName === "Ranperda"
                               ? "bg-purple-50 text-purple-700 border-purple-200"
                               : "bg-teal-50 text-teal-700 border-teal-200"
@@ -538,9 +572,9 @@ export const PeraturanListPage = ({
                         </td>
 
                         {/* Tanggal */}
-                        <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-semibold">
+                        <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-medium">
                           <div className="flex items-center gap-1.5 text-[11px]">
-                            <Calendar className="w-3 h-3 text-slate-400" />
+                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
                             <span>
                               {item.tanggal_dibuat
                                 ? new Date(item.tanggal_dibuat).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
@@ -551,13 +585,21 @@ export const PeraturanListPage = ({
 
                         {/* Petugas / Dokumen */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <p className="font-bold text-slate-800 text-[11px] flex items-center gap-1">
+                          <p className="font-semibold text-slate-700 text-[11px] flex items-center gap-1">
                             <UserCheck className="w-3 h-3 text-slate-400" />
                             <span>{item.uploader?.nama || "Petugas Kanwil"}</span>
                           </p>
-                          <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
-                            {docCount > 0 ? `📁 ${docCount}/7 Dokumen Lengkap` : "Belum ada dokumen"}
-                          </p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
+                              docCount >= 7 
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                                : docCount > 0 
+                                ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                                : 'bg-slate-50 text-slate-500 border-slate-200'
+                            }`}>
+                              📁 {docCount}/7 Dokumen
+                            </span>
+                          </div>
                         </td>
 
                         {/* Actions */}
@@ -567,7 +609,7 @@ export const PeraturanListPage = ({
                               type="button"
                               onClick={() => router.visit(`/peraturan/${item.rancangan_id}`)}
                               title="Buka Lembar Detail Berkas"
-                              className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition shadow-xs"
+                              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-[#2B3056] hover:text-[#FFD82B] hover:border-[#2B3056] transition shadow-2xs cursor-pointer"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -577,7 +619,7 @@ export const PeraturanListPage = ({
                                 type="button"
                                 onClick={() => openEditModal(item)}
                                 title="Edit Data Berkas"
-                                className="p-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition shadow-xs"
+                                className="p-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition shadow-2xs cursor-pointer"
                               >
                                 <Edit3 className="w-4 h-4" />
                               </button>
@@ -588,7 +630,7 @@ export const PeraturanListPage = ({
                                 type="button"
                                 onClick={() => setDeletingPermohonan(item)}
                                 title="Hapus Berkas Permohonan"
-                                className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition shadow-xs"
+                                className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition shadow-2xs cursor-pointer"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -612,9 +654,9 @@ export const PeraturanListPage = ({
             </table>
           </div>
 
-          {/* COMPREHENSIVE PAGINATION SECTION (ALWAYS VISIBLE) */}
-          <div className="p-4 border-t border-[#E2E2DC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAFBFD]">
-            <div className="text-[11px] font-bold text-slate-500">
+          {/* COMPREHENSIVE PAGINATION SECTION */}
+          <div className="p-4 border-t border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
+            <div className="text-[11px] font-semibold text-slate-500">
               {permohonans?.total > 0 ? (
                 <>
                   Menampilkan <strong>{permohonans.from || 1}</strong> – <strong>{permohonans.to || permohonans.total}</strong> dari total <strong>{permohonans.total}</strong> permohonan
@@ -642,15 +684,14 @@ export const PeraturanListPage = ({
                       type="button"
                       disabled={!link.url || link.active}
                       onClick={() => link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })}
-                      className={`min-w-[32px] h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center ${
+                      className={`min-w-[32px] h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
                         link.active
-                          ? "bg-[#1A1A5E] text-white shadow-xs"
+                          ? "bg-[#2B3056] text-[#FFD82B] shadow-2xs font-extrabold"
                           : link.url
-                          ? "bg-white text-slate-700 hover:bg-slate-100 border border-[#E2E2DC] shadow-xs"
+                          ? "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-2xs"
                           : "opacity-40 text-slate-400 bg-slate-100 cursor-not-allowed border border-slate-200"
                       }`}
                       dangerouslySetInnerHTML={{ __html: displayLabel }}
-                      title={link.url ? `Pindah ke Halaman ${link.label.replace(/&[a-z]+;/g, '')}` : undefined}
                     />
                   );
                 })}
@@ -658,113 +699,114 @@ export const PeraturanListPage = ({
             )}
           </div>
         </div>
-      </div>
 
-      {/* MODAL: TAMBAH PERMOHONAN BARU */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A5E]/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl border border-[#E2E2DC] shadow-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
-            <div className="bg-[#2C3154] text-white p-5 flex items-center justify-between border-b border-[#383F6A]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FFC800]/20 border border-[#FFC800]/30 flex items-center justify-center text-[#FFC800]">
-                  <PlusCircle className="w-4 h-4" />
+        {/* MODAL: TAMBAH PERMOHONAN BARU */}
+        {isAddModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2B3056]/60 backdrop-blur-xs">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="bg-[#2B3056] text-white p-5 flex items-center justify-between border-b border-[#3A4070]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-white/10 text-[#FFD82B] flex items-center justify-center font-bold">
+                    <PlusCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-white">Tambah Permohonan Regulasi Baru</h3>
+                    <p className="text-[10px] text-slate-300 font-medium">
+                      Pengajuan berkas Ranperda / Ranperkada ke Kanwil Kemenkumham Riau
+                    </p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="text-slate-300 hover:text-white p-1 rounded-lg transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
+                {/* Judul Rancangan */}
                 <div>
-                  <h3 className="text-sm font-black text-white">Tambah Permohonan Regulasi Baru</h3>
-                  <p className="text-[10px] text-[#FFC800] font-bold">
-                    Pendaftaran Draf Ranperda / Ranperkada ke Sistem HARMONITAS
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-300 hover:text-white p-1 rounded-lg transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-4">
-              {/* Judul Rancangan */}
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Judul Rancangan Peraturan <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={addForm.data.judul_rancangan}
-                  onChange={(e) => addForm.setData("judul_rancangan", e.target.value)}
-                  placeholder="Contoh: Rancangan Peraturan Daerah tentang Pajak Daerah dan Retribusi Daerah..."
-                  className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                />
-                {addForm.errors.judul_rancangan && (
-                  <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.judul_rancangan}</p>
-                )}
-              </div>
-
-              {/* Nomor Berkas / Registrasi */}
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Nomor Registrasi / Berkas (Opsional - Otomatis dibuat jika kosong)
-                </label>
-                <input
-                  type="text"
-                  value={addForm.data.nomor_regulasi}
-                  onChange={(e) => addForm.setData("nomor_regulasi", e.target.value)}
-                  placeholder="Contoh: 09/RANPERDA/2026"
-                  className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                />
-              </div>
-
-              {/* Jenis Regulasi & Kabupaten */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Jenis Regulasi <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Judul Rancangan Peraturan <span className="text-rose-500">*</span>
                   </label>
-                  <select
-                    value={addForm.data.jenis_regulasi_id}
-                    onChange={(e) => addForm.setData("jenis_regulasi_id", Number(e.target.value))}
-                    className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                  >
-                    {jenisRegulasis.map((j) => (
-                      <option key={j.jenis_regulasi_id} value={j.jenis_regulasi_id}>
-                        {j.nama_jenis}
-                      </option>
-                    ))}
-                  </select>
+                  <textarea
+                    required
+                    rows={2}
+                    value={addForm.data.judul_rancangan}
+                    onChange={(e) => addForm.setData("judul_rancangan", e.target.value)}
+                    placeholder="Contoh: Rancangan Peraturan Daerah tentang Rencana Tata Ruang Wilayah..."
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  />
+                  {addForm.errors.judul_rancangan && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.judul_rancangan}</p>
+                  )}
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Jenis Regulasi */}
+                  <div>
+                    <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                      Jenis Regulasi <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={addForm.data.jenis_regulasi_id}
+                      onChange={(e) => addForm.setData("jenis_regulasi_id", e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                    >
+                      {jenisRegulasis.map((j) => (
+                        <option key={j.jenis_regulasi_id} value={j.jenis_regulasi_id}>
+                          {j.nama_jenis}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Kabupaten / Kota Pemohon */}
+                  <div>
+                    <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                      Kabupaten / Kota Pemohon <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={addForm.data.kabupaten_id}
+                      onChange={(e) => addForm.setData("kabupaten_id", e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                    >
+                      {availableKabupatens.map((k) => (
+                        <option key={k.kabupaten_id} value={k.kabupaten_id}>
+                          {k.nama_kabupaten}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Nomor Registrasi / Berkas (Opsional) */}
                 <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Pemerintah Daerah / Wilayah <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Nomor Surat / Registrasi Permohonan (Opsional)
                   </label>
-                  <select
-                    value={addForm.data.kabupaten_id}
-                    onChange={(e) => addForm.setData("kabupaten_id", Number(e.target.value))}
-                    className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                  >
-                    {availableKabupatens.map((k) => (
-                      <option key={k.kabupaten_id} value={k.kabupaten_id}>
-                        {k.nama_kabupaten} {k.tim_kerja?.nama_tim_kerja ? `(${k.tim_kerja.nama_tim_kerja})` : ""}
-                      </option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    value={addForm.data.nomor_regulasi}
+                    onChange={(e) => addForm.setData("nomor_regulasi", e.target.value)}
+                    placeholder="Kosongkan untuk penomoran otomatis sistem (cth: 01/RANPERDA/2026)"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  />
+                  {addForm.errors.nomor_regulasi && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.nomor_regulasi}</p>
+                  )}
                 </div>
-              </div>
 
-              {/* Upload Draf Awal (Slot 1) */}
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Lampiran Draf Awal Peraturan (Slot #1 - Opsional)
-                </label>
-
-                {!addForm.data.initial_file ? (
+                {/* Upload Draf Awal / Berkas Permohonan */}
+                <div>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Unggah Draf Awal Ranperda (Opsional)
+                  </label>
                   <div
                     onClick={() => addFileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-300 hover:border-[#1A1A5E] hover:bg-slate-50/60 rounded-2xl p-4 bg-[#F8F8F5] text-center transition cursor-pointer group"
+                    className="border-2 border-dashed border-slate-300 hover:border-[#2B3056] rounded-2xl p-4 bg-slate-50 text-center transition cursor-pointer group"
                   >
                     <input
                       type="file"
@@ -773,213 +815,216 @@ export const PeraturanListPage = ({
                       onChange={(e) => addForm.setData("initial_file", e.target.files[0])}
                       className="hidden"
                     />
-                    <Upload className="w-6 h-6 text-[#1A1A5E] mx-auto mb-1.5 group-hover:scale-105 transition" />
-                    <p className="text-xs font-black text-[#1A1A5E]">
-                      Pilih file Draf Awal (.PDF, .DOC, .DOCX)
+                    <Upload className="w-6 h-6 text-[#2B3056] mx-auto mb-1 group-hover:scale-105 transition" />
+                    <p className="text-xs font-bold text-[#2B3056]">
+                      {addForm.data.initial_file ? addForm.data.initial_file.name : "Klik untuk memilih berkas draf (.pdf, .doc, .docx)"}
                     </p>
-                    <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Maks. 25MB</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">Maks. 25MB</p>
                   </div>
-                ) : (
-                  <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 shadow-xs flex items-center justify-between">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-white border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
-                        <FileCheck className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[9px] font-black uppercase text-emerald-800 bg-emerald-200/80 px-1.5 py-0.5 rounded">
-                          Berkas Terlampir
-                        </span>
-                        <p className="text-xs font-black text-[#1A1A5E] truncate mt-0.5" title={addForm.data.initial_file.name}>
-                          {addForm.data.initial_file.name}
-                        </p>
-                        <p className="text-[10px] text-slate-500 font-bold">
-                          {formatFileSize(addForm.data.initial_file.size)}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => addForm.setData("initial_file", null)}
-                      className="p-1.5 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 transition"
-                      title="Hapus Berkas"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
+                  {addForm.errors.initial_file && (
+                    <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.initial_file}</p>
+                  )}
+                </div>
 
-              {/* Keterangan Tambahan */}
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Catatan / Keterangan (Opsional)
-                </label>
-                <input
-                  type="text"
-                  value={addForm.data.keterangan}
-                  onChange={(e) => addForm.setData("keterangan", e.target.value)}
-                  placeholder="Catatan pengajuan berkas..."
-                  className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                />
-              </div>
+                {/* Catatan Tambahan */}
+                <div>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Catatan / Keterangan Permohonan (Opsional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={addForm.data.keterangan}
+                    onChange={(e) => addForm.setData("keterangan", e.target.value)}
+                    placeholder="Catatan khusus dari pemohon..."
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  />
+                </div>
 
-              {/* Submit Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-[#E2E2DC] text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={addForm.processing}
-                  className="px-5 py-2.5 rounded-xl bg-[#1A1A5E] hover:bg-[#2C3154] text-white text-xs font-black transition flex items-center gap-1.5 shadow-md disabled:opacity-50"
-                >
-                  <PlusCircle className="w-3.5 h-3.5 text-[#FFC800]" />
-                  <span>{addForm.processing ? "Menyimpan..." : "Daftarkan Permohonan"}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: EDIT DATA PERMOHONAN */}
-      {editingPermohonan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A5E]/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl border border-[#E2E2DC] shadow-2xl max-w-lg w-full overflow-hidden">
-            <div className="bg-[#2C3154] text-white p-5 flex items-center justify-between border-b border-[#383F6A]">
-              <div className="flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-[#FFC800]" />
-                <h3 className="text-sm font-black text-white">Edit Data Permohonan</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingPermohonan(null)}
-                className="text-slate-300 hover:text-white p-1 rounded-lg transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
+                {/* Action Buttons */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addForm.processing}
+                    className="px-5 py-2.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5 text-[#FFD82B]" />
+                    <span>{addForm.processing ? "Menyimpan..." : "Simpan Permohonan"}</span>
+                  </button>
+                </div>
+              </form>
             </div>
+          </div>
+        )}
 
-            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Nomor Registrasi
-                </label>
-                <input
-                  type="text"
-                  value={editForm.data.nomor_regulasi}
-                  onChange={(e) => editForm.setData("nomor_regulasi", e.target.value)}
-                  className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                  Judul Rancangan Peraturan <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={editForm.data.judul_rancangan}
-                  onChange={(e) => editForm.setData("judul_rancangan", e.target.value)}
-                  className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Jenis Regulasi
-                  </label>
-                  <select
-                    value={editForm.data.jenis_regulasi_id}
-                    onChange={(e) => editForm.setData("jenis_regulasi_id", Number(e.target.value))}
-                    className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none"
-                  >
-                    {jenisRegulasis.map((j) => (
-                      <option key={j.jenis_regulasi_id} value={j.jenis_regulasi_id}>
-                        {j.nama_jenis}
-                      </option>
-                    ))}
-                  </select>
+        {/* MODAL: EDIT PERMOHONAN */}
+        {editingPermohonan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2B3056]/60 backdrop-blur-xs">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="bg-[#2B3056] text-white p-5 flex items-center justify-between border-b border-[#3A4070]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-white/10 text-[#FFD82B] flex items-center justify-center font-bold">
+                    <Edit3 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-white">Edit Data Permohonan</h3>
+                    <p className="text-[10px] text-slate-300 font-medium">
+                      Perbarui informasi dasar regulasi #{editingPermohonan.nomor_regulasi}
+                    </p>
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1">
-                    Pemerintah Daerah
-                  </label>
-                  <select
-                    value={editForm.data.kabupaten_id}
-                    onChange={(e) => editForm.setData("kabupaten_id", Number(e.target.value))}
-                    className="w-full p-2.5 bg-[#F8F8F5] border border-[#E2E2DC] rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none"
-                  >
-                    {availableKabupatens.map((k) => (
-                      <option key={k.kabupaten_id} value={k.kabupaten_id}>
-                        {k.nama_kabupaten}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setEditingPermohonan(null)}
-                  className="px-4 py-2.5 rounded-xl border border-[#E2E2DC] text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  className="text-slate-300 hover:text-white p-1 rounded-lg transition"
                 >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={editForm.processing}
-                  className="px-5 py-2.5 rounded-xl bg-[#1A1A5E] hover:bg-[#2C3154] text-white text-xs font-black transition flex items-center gap-1.5 shadow-md"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFC800]" />
-                  <span>{editForm.processing ? "Menyimpan..." : "Perbarui Data"}</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {/* MODAL: KONFIRMASI HAPUS */}
-      {deletingPermohonan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A5E]/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl border border-[#E2E2DC] shadow-2xl max-w-md w-full overflow-hidden p-6 text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-[#1A1A5E]">Hapus Permohonan Regulasi?</h3>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                Apakah Anda yakin ingin menghapus berkas <strong>{deletingPermohonan.nomor_regulasi}</strong>? Seluruh file dan riwayat dokumen yang terkait akan dihapus secara permanen.
-              </p>
-            </div>
-            <div className="pt-2 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setDeletingPermohonan(null)}
-                className="px-4 py-2.5 rounded-xl border border-[#E2E2DC] text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteConfirm}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition shadow-md"
-              >
-                Ya, Hapus Berkas
-              </button>
+              <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Judul Rancangan Peraturan <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={editForm.data.judul_rancangan}
+                    onChange={(e) => editForm.setData("judul_rancangan", e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                      Jenis Regulasi <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={editForm.data.jenis_regulasi_id}
+                      onChange={(e) => editForm.setData("jenis_regulasi_id", e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                    >
+                      {jenisRegulasis.map((j) => (
+                        <option key={j.jenis_regulasi_id} value={j.jenis_regulasi_id}>
+                          {j.nama_jenis}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                      Kabupaten / Kota <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      value={editForm.data.kabupaten_id}
+                      onChange={(e) => editForm.setData("kabupaten_id", e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                    >
+                      {availableKabupatens.map((k) => (
+                        <option key={k.kabupaten_id} value={k.kabupaten_id}>
+                          {k.nama_kabupaten}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Status Alur Berkas
+                  </label>
+                  <select
+                    value={editForm.data.status_id}
+                    onChange={(e) => editForm.setData("status_id", e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  >
+                    {statuses.map((s) => (
+                      <option key={s.status_id} value={s.status_id}>
+                        {s.nama_status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                    Catatan / Keterangan
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={editForm.data.keterangan}
+                    onChange={(e) => editForm.setData("keterangan", e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPermohonan(null)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editForm.processing}
+                    className="px-5 py-2.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-[#FFD82B]" />
+                    <span>{editForm.processing ? "Menyimpan..." : "Simpan Perubahan"}</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* MODAL: HAPUS PERMOHONAN */}
+        {deletingPermohonan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2B3056]/60 backdrop-blur-xs">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="p-6 text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+                  <Trash2 className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#2B3056]">Hapus Berkas Permohonan?</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus berkas <strong>"{deletingPermohonan.judul_rancangan}"</strong> ({deletingPermohonan.nomor_regulasi})? Seluruh riwayat dan dokumen terkait akan dihapus permanen.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setDeletingPermohonan(null)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteConfirm}
+                    className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Hapus Berkas</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </AppLayout>
   );
 };

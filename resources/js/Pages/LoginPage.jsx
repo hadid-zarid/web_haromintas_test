@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import HarmonitasLoader from '../components/common/HarmonitasLoader';
 import { 
   Lock, 
   Mail, 
@@ -12,9 +13,11 @@ import {
   CheckCircle2, 
   AlertCircle,
   Building,
-  KeyRound
+  KeyRound,
+  Check
 } from 'lucide-react';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
+import logoPengayoman from '../assets/logo_pengayoman.png';
 
 export const LoginPage = ({ demoUsers = [] }) => {
   const { flash } = usePage().props;
@@ -42,63 +45,104 @@ export const LoginPage = ({ demoUsers = [] }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F5F9] flex flex-col justify-center items-center p-4 sm:p-6">
+    <div className="min-h-screen w-full bg-white relative flex flex-col justify-center items-center p-4 sm:p-6 overflow-hidden antialiased font-sans">
       <Head title="Masuk ke Sistem - HARMONITAS" />
-      {/* Top Header Controls */}
-      <div className="w-full max-w-xl mb-4 flex items-center justify-between">
+
+      {/* Background Layer 1: Structured Micro Grid with Slow Subtle Drift Animation */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04] animate-hero-grid"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #2B3056 1px, transparent 1px),
+            linear-gradient(to bottom, #2B3056 1px, transparent 1px)
+          `,
+          backgroundSize: "32px 32px",
+          maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%)",
+        }}
+      />
+
+      {/* Background Layer 2: Subtle Ambient Warmth */}
+      <div
+        className="absolute -top-16 right-1/4 w-96 h-96 rounded-full pointer-events-none opacity-40 blur-3xl animate-hero-glow-1"
+        style={{
+          background: "radial-gradient(circle, rgba(255, 216, 43, 0.14) 0%, rgba(255, 255, 255, 0) 70%)",
+        }}
+      />
+      <div
+        className="absolute -bottom-16 left-1/4 w-96 h-96 rounded-full pointer-events-none opacity-30 blur-3xl animate-hero-glow-2"
+        style={{
+          background: "radial-gradient(circle, rgba(43, 48, 86, 0.10) 0%, rgba(255, 255, 255, 0) 70%)",
+        }}
+      />
+
+      {/* Top Header Navigation Controls */}
+      <div className="w-full max-w-lg mb-3 flex items-center justify-between z-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#E2E2DC] hover:border-[#1A1A5E]/30 rounded-xl text-xs font-bold text-[#1A1A5E] shadow-sm transition-all duration-150"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/90 hover:bg-white border border-slate-200 hover:border-[#2B3056]/30 rounded-xl text-xs font-bold text-[#2B3056] shadow-2xs transition-all duration-150 backdrop-blur-xs"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#2B3056]" />
           <span>Kembali ke Beranda</span>
         </Link>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FFC800]/15 text-[#1A1A5E] border border-[#FFC800]/40 rounded-full text-[11px] font-black">
-          <Sparkles className="w-3.5 h-3.5 text-[#E6B400]" />
-          Portal Autentikasi HARMONITAS
+
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FFF9DF] text-[#2B3056] border border-[#FFD82B]/60 rounded-md text-[10px] font-bold shadow-2xs">
+          <Sparkles className="w-3 h-3 text-[#B3912D]" />
+          Portal Autentikasi
         </span>
       </div>
 
       {/* Main Card Bento Container */}
-      <div className="w-full max-w-xl bg-white rounded-3xl border border-[#E2E2DC] shadow-[0_20px_60px_rgba(26,26,94,0.08)] overflow-hidden">
-        {/* Header Branding Navy Blue (#2C3154) */}
-        <div className="relative bg-[#2C3154] text-white p-7 text-center border-b border-[#383F6A] overflow-hidden">
-          <div className="absolute -top-12 -right-12 w-36 h-36 bg-[#FFC800]/10 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#383F6A] rounded-full blur-xl pointer-events-none" />
+      <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden backdrop-blur-sm z-10">
+        
+        {/* Header Branding in Official Kemenkumham Navy (#2B3056) - Sleek & Compact */}
+        <div className="relative bg-[#2B3056] text-white py-5 px-6 sm:py-6 sm:px-7 text-center border-b border-[#3A4070] overflow-hidden">
+          {/* Subtle Ambient Glow inside Header */}
+          <div 
+            className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-xl pointer-events-none opacity-25"
+            style={{ background: 'radial-gradient(circle, #FFC800 0%, transparent 70%)' }}
+          />
 
-          <div className="relative mx-auto w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-3 shadow-md overflow-hidden shrink-0 border-2 border-[#FFC800]">
-            <img src={logoHarmonitas} alt="Logo Harmonitas" className="w-full h-full object-contain p-1" />
+          {/* Logo HARMONITAS (Clear & High Contrast in Frosted White Rounded-xl Badge) */}
+          <div className="relative mx-auto w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/95 border border-white/30 shadow-sm flex items-center justify-center mb-2.5 p-1.5 shrink-0">
+            <img 
+              src={logoHarmonitas} 
+              alt="Logo HARMONITAS" 
+              className="w-full h-full object-contain" 
+            />
           </div>
 
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold mb-1 border border-white/10">
+          {/* Badge Wilayah with crisp rounded-md */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 text-white text-[10px] font-bold mb-1.5 border border-white/15 shadow-2xs">
+            <img src={logoPengayoman} alt="Pengayoman" className="h-3.5 w-3.5 object-contain" />
             <span>Kantor Wilayah Kementerian Hukum Riau</span>
           </div>
 
-          <h2 className="text-2xl font-black tracking-wider text-white">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-wide text-white">
             HARMONITAS
           </h2>
-          <p className="text-xs text-[#FFC800] font-black mt-0.5 tracking-wide">
+          <p className="text-[11px] text-[#FFD82B] font-medium mt-0.5 tracking-wide">
             Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
           </p>
         </div>
 
         {/* Flash Notifications */}
         {flash?.success && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold">
+          <div className="mx-6 mt-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-semibold">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <p>{flash.success}</p>
           </div>
         )}
 
         {flash?.info && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 flex items-start gap-3 text-blue-800 text-xs font-bold">
+          <div className="mx-6 mt-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 flex items-start gap-3 text-blue-800 text-xs font-semibold">
             <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <p>{flash.info}</p>
           </div>
         )}
 
         {flash?.error && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold">
+          <div className="mx-6 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-semibold">
             <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <p>{flash.error}</p>
           </div>
@@ -110,10 +154,10 @@ export const LoginPage = ({ demoUsers = [] }) => {
           <div>
             <a
               href="/auth/google/redirect"
-              className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-300 text-slate-800 font-black text-xs flex items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-200 group"
+              className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-xs flex items-center justify-center gap-3 shadow-2xs hover:shadow-sm transition-all duration-200 group cursor-pointer"
             >
               {/* Google SVG Logo */}
-              <svg className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
                 <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
                 <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
@@ -121,7 +165,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
               </svg>
               <span>Masuk Cepat dengan Akun Google</span>
             </a>
-            <p className="text-[10px] text-center text-slate-400 font-semibold mt-1.5">
+            <p className="text-[10px] text-center text-slate-400 font-medium mt-1.5">
               Gunakan akun Google kedinasan yang telah terdaftar di sistem.
             </p>
           </div>
@@ -129,7 +173,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
           {/* Divider */}
           <div className="flex items-center my-2">
             <div className="flex-1 border-t border-slate-200" />
-            <span className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <span className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Atau masuk manual
             </span>
             <div className="flex-1 border-t border-slate-200" />
@@ -139,7 +183,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Input */}
             <div>
-              <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1.5">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1.5">
                 Alamat Email Kedinasan
               </label>
               <div className="relative">
@@ -152,13 +196,13 @@ export const LoginPage = ({ demoUsers = [] }) => {
                   value={data.email}
                   onChange={(e) => setData('email', e.target.value)}
                   placeholder="nama@harmonitas.go.id"
-                  className={`w-full pl-10 pr-4 py-3 bg-[#F8F8F5] border rounded-xl text-xs font-bold text-[#1A1A5E] placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] focus:border-transparent transition-all ${
-                    errors.email ? 'border-rose-400 bg-rose-50/50' : 'border-[#E2E2DC]'
+                  className={`w-full pl-10 pr-4 py-3 bg-slate-50/70 border rounded-2xl text-xs font-semibold text-[#2B3056] placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2B3056]/10 focus:border-[#2B3056] transition-all ${
+                    errors.email ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
                   }`}
                 />
               </div>
               {errors.email && (
-                <p className="mt-1.5 text-xs text-rose-600 font-bold flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5" />
                   {errors.email}
                 </p>
@@ -167,7 +211,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
 
             {/* Password Input */}
             <div>
-              <label className="block text-xs font-extrabold text-[#1A1A5E] mb-1.5">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1.5">
                 Kata Sandi / Password
               </label>
               <div className="relative">
@@ -180,20 +224,20 @@ export const LoginPage = ({ demoUsers = [] }) => {
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
                   placeholder="Masukkan kata sandi"
-                  className={`w-full pl-10 pr-10 py-3 bg-[#F8F8F5] border rounded-xl text-xs font-bold text-[#1A1A5E] placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] focus:border-transparent transition-all ${
-                    errors.password ? 'border-rose-400 bg-rose-50/50' : 'border-[#E2E2DC]'
+                  className={`w-full pl-10 pr-10 py-3 bg-slate-50/70 border rounded-2xl text-xs font-semibold text-[#2B3056] placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2B3056]/10 focus:border-[#2B3056] transition-all ${
+                    errors.password ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-[#1A1A5E] transition"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-[#2B3056] transition cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-rose-600 font-bold flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5" />
                   {errors.password}
                 </p>
@@ -207,70 +251,79 @@ export const LoginPage = ({ demoUsers = [] }) => {
                   type="checkbox"
                   checked={data.remember}
                   onChange={(e) => setData('remember', e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 text-[#1A1A5E] focus:ring-[#FFC800] accent-[#1A1A5E] cursor-pointer"
+                  className="w-4 h-4 rounded border-slate-300 text-[#2B3056] focus:ring-[#FFC800] accent-[#2B3056] cursor-pointer"
                 />
-                <span className="text-xs font-bold text-[#3D3D3A]">Ingat Sesi Saya</span>
+                <span className="text-xs font-medium text-slate-600">Ingat Sesi Saya</span>
               </label>
 
               <Link
                 href="/forgot-password"
-                className="text-xs font-bold text-[#303661] hover:text-[#101b4f] hover:underline transition-colors"
+                className="text-xs font-semibold text-[#2B3056] hover:text-[#FFC800] transition-colors"
               >
                 Lupa Kata Sandi?
               </Link>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button with Kemenkumham Gold Gradient */}
             <button
               type="submit"
               disabled={processing}
-              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#FFD54F] to-[#FFB300] hover:from-[#FFE082] hover:to-[#FFC107] text-[#1A1A5E] font-black text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#2B3056] font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-85 cursor-pointer active:scale-98"
             >
-              <LogIn className="w-4 h-4" />
-              <span>{processing ? 'Memverifikasi...' : 'Masuk ke Sistem HARMONITAS'}</span>
+              {processing ? (
+                <HarmonitasLoader variant="button" title="Memverifikasi Kredensial..." />
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4" />
+                  <span>Masuk ke Sistem HARMONITAS</span>
+                </>
+              )}
             </button>
 
             {/* Demo Users Quick Selector */}
             {demoUsers.length > 0 && (
-              <div className="pt-5 mt-2 border-t border-[#E2E2DC]">
+              <div className="pt-5 mt-2 border-t border-slate-200">
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-[11px] font-black text-[#1A1A5E] uppercase tracking-wider flex items-center gap-1.5">
-                    <KeyRound className="w-3.5 h-3.5 text-[#E6B400]" />
+                  <span className="text-[11px] font-bold text-[#2B3056] uppercase tracking-wider flex items-center gap-1.5">
+                    <KeyRound className="w-3.5 h-3.5 text-[#B3912D]" />
                     Pilih Akun Demo Cepat (1-Klik)
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md border border-slate-200">
                     Password: password
                   </span>
                 </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {demoUsers.map((demo, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => handleSelectDemo(demo)}
-                      className={`p-2.5 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between ${
+                      className={`p-3 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between cursor-pointer ${
                         data.email === demo.email
-                          ? 'border-[#1A1A5E] bg-[#1A1A5E]/5 ring-2 ring-[#FFC800]/50'
-                          : 'border-[#E2E2DC] bg-[#F8F8F5] hover:bg-white hover:border-[#1A1A5E]/30'
+                          ? 'border-[#2B3056] bg-slate-50 ring-2 ring-[#FFD82B]/60 shadow-sm'
+                          : 'border-slate-200 bg-white hover:bg-slate-50/80 hover:border-[#2B3056]/30 shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
-                          demo.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                          (demo.role === 'TIM_KERJA' || demo.role === 'POKJA') ? 'bg-blue-100 text-blue-800' :
-                          demo.role === 'BIRO_HUKUM' ? 'bg-emerald-100 text-emerald-800' :
-                          'bg-amber-100 text-amber-800'
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
+                          demo.role === 'ADMIN' ? 'bg-slate-100 text-[#2B3056] border border-slate-200' :
+                          (demo.role === 'TIM_KERJA' || demo.role === 'POKJA') ? 'bg-[#FFF9DF] text-[#745C17] border border-[#FFD82B]/60' :
+                          demo.role === 'BIRO_HUKUM' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                          'bg-[#2B3056] text-[#FFD82B]'
                         }`}>
                           {demo.role}
                         </span>
                         {data.email === demo.email && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#1A1A5E]" />
+                          <span className="flex h-4 w-4 items-center justify-center rounded-md bg-[#2B3056] text-[#FFD82B]">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </span>
                         )}
                       </div>
-                      <p className="text-xs font-black text-[#1A1A5E] mt-1 truncate">
+                      <p className="text-xs font-bold text-[#2B3056] mt-2 truncate">
                         {demo.name}
                       </p>
-                      <p className="text-[10px] font-semibold text-slate-500 truncate">
+                      <p className="text-[10px] font-normal text-slate-500 truncate">
                         {demo.email}
                       </p>
                     </button>
@@ -282,7 +335,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
         </div>
 
         {/* Card Footer */}
-        <div className="px-6 py-3.5 bg-[#F8F8F5] border-t border-[#E2E2DC] text-center text-[10px] text-slate-500 font-bold flex items-center justify-center gap-2">
+        <div className="px-6 py-3.5 bg-slate-50/90 border-t border-slate-200 text-center text-[10px] text-slate-500 font-medium flex items-center justify-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>Sistem Informasi Terenkripsi • Kanwil Kemenkumham Provinsi Riau</span>
         </div>

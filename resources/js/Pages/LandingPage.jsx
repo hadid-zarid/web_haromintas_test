@@ -1,103 +1,409 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import PublicNavbar from '../components/layout/PublicNavbar';
+import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
+import logoPengayoman from '../assets/logo_pengayoman.png';
+import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
 import {
-  ArrowRight,
-  BookOpen,
-  Bot,
-  Building2,
-  Check,
-  CheckCircle2,
-  ChevronRight,
-  Clock3,
-  FileCheck2,
   FileText,
+  Clock,
+  ShieldCheck,
+  CheckCircle2,
+  UsersRound,
+  FileCheck2,
+  FileSpreadsheet,
+  TrendingUp,
+  AlertTriangle,
+  Scale,
+  Sparkles,
+  ArrowRight,
+  ChevronRight,
+  BookOpen,
+  MapPin,
+  Building2,
+  Landmark,
+  Bot,
+  Zap,
   Layers3,
   Mail,
-  MapPin,
   PhoneCall,
-  Scale,
-  SearchCheck,
-  ShieldCheck,
-  Sparkles,
-  UsersRound,
+  Check,
+  Lock,
+  ArrowUpRight,
+  Activity,
+  Layers,
+  ChevronLeft
 } from 'lucide-react';
 
-import PublicNavbar from '../components/layout/PublicNavbar';
-import { INITIAL_PERATURAN, KABUPATEN_LIST } from '../mock/mockPeraturan';
-import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
+/**
+ * Reveal Component: Smooth Scroll-Triggered Animation Wrapper
+ */
+const Reveal = ({ children, className = '', delay = 0, direction = 'up' }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const getTransform = () => {
+    if (isVisible) return 'none';
+    switch (direction) {
+      case 'up':
+        return 'translateY(24px)';
+      case 'down':
+        return 'translateY(-24px)';
+      case 'left':
+        return 'translateX(-24px)';
+      case 'right':
+        return 'translateX(24px)';
+      case 'scale':
+        return 'scale(0.96)';
+      default:
+        return 'translateY(24px)';
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`${className} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]`}
+      style={{
+        transform: getTransform(),
+        opacity: isVisible ? 1 : 0,
+        transitionDelay: `${delay}ms`,
+        willChange: 'transform, opacity',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/**
+ * CustomCursor Component: Elegant dual-ring fluid trailing cursor
+ */
+const CustomCursor = () => {
+  const [position, setPosition] = React.useState({ x: -100, y: -100 });
+  const [trailingPos, setTrailingPos] = React.useState({ x: -100, y: -100 });
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isClicked, setIsClicked] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    let rafId;
+    let targetX = -100;
+    let targetY = -100;
+    let currentX = -100;
+    let currentY = -100;
+
+    const handleMouseMove = (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      setPosition({ x: e.clientX, y: e.clientY });
+      if (!isVisible) setIsVisible(true);
+
+      const target = e.target;
+      const isClickable = target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, article');
+      setIsHovered(!!isClickable);
+    };
+
+    const handleMouseDown = () => setIsClicked(true);
+    const handleMouseUp = () => setIsClicked(false);
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
+
+    const render = () => {
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+      setTrailingPos({ x: currentX, y: currentY });
+      rafId = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseenter', handleMouseEnter);
+    rafId = requestAnimationFrame(render);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
+      cancelAnimationFrame(rafId);
+    };
+  }, [isVisible]);
+
+  if (!isVisible) return null;
+
+  return (
+    <>
+      {/* Outer Sleek Trailing Halo */}
+      <div
+        className="fixed top-0 left-0 pointer-events-none z-[99999] rounded-full transition-all duration-200 ease-out will-change-transform hidden md:block"
+        style={{
+          transform: `translate3d(${trailingPos.x}px, ${trailingPos.y}px, 0) translate(-50%, -50%) scale(${isClicked ? 0.75 : isHovered ? 1.35 : 1})`,
+          width: '26px',
+          height: '26px',
+          border: isHovered ? '1.5px solid rgba(255, 200, 0, 0.9)' : '1px solid rgba(43, 48, 86, 0.25)',
+          backgroundColor: isHovered ? 'rgba(255, 216, 43, 0.12)' : 'rgba(43, 48, 86, 0.03)',
+        }}
+      />
+      {/* Inner Precision Dot */}
+      <div
+        className="fixed top-0 left-0 pointer-events-none z-[99999] rounded-full will-change-transform hidden md:block transition-all duration-100"
+        style={{
+          transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%) scale(${isClicked ? 0.6 : isHovered ? 0.4 : 1})`,
+          width: '6px',
+          height: '6px',
+          backgroundColor: isHovered ? '#FFC800' : '#2B3056',
+          boxShadow: isHovered ? '0 0 8px rgba(255, 200, 0, 0.8)' : '0 0 3px rgba(43, 48, 86, 0.2)',
+        }}
+      />
+    </>
+  );
+};
 
 export const LandingPage = () => {
-  const totalPeraturan = INITIAL_PERATURAN.length;
-  const totalKabupaten = KABUPATEN_LIST.length;
-  const totalSelesai = INITIAL_PERATURAN.filter(
-    (peraturan) => peraturan.status === 'selesai',
-  ).length;
+  const [hoveredCardIndex, setHoveredCardIndex] = React.useState(null);
+  const [activeServiceTab, setActiveServiceTab] = React.useState(0);
+  const [activeAiClauseTab, setActiveAiClauseTab] = React.useState(0);
+  const [activeWorkflowStep, setActiveWorkflowStep] = React.useState(0);
+
+  const heroFeatures = [
+    {
+      label: 'Pengajuan Ranperda & Ranperkada',
+      desc: 'E-submission berkas & lampiran terpadu',
+      icon: FileSpreadsheet,
+      badge: 'Terpadu',
+    },
+    {
+      label: 'Pemeriksaan Status Berkala',
+      desc: 'Pelacakan progres telaah transparan',
+      icon: CheckCircle2,
+      badge: 'Real-time',
+    },
+    {
+      label: 'Telaah Awal Berbantuan AI',
+      desc: 'Analisis kesesuaian kaidah peraturan',
+      icon: Bot,
+      badge: 'AI Powered',
+      isAi: true,
+    },
+    {
+      label: 'Arsip Dokumen Terpusat',
+      desc: 'Penyimpanan digital aman & terstruktur',
+      icon: FileCheck2,
+      badge: 'e-Register',
+    },
+  ];
 
   const benefits = [
     {
       number: '01',
       title: 'Akses Mudah dan Cepat',
       description:
-        'Seluruh proses harmonisasi dapat dipantau dalam satu sistem yang ringkas, terarah, dan mudah digunakan.',
-      icon: Layers3,
+        'Satu pintu layanan digitalisasi pengajuan dan pemeriksaan dokumen harmonisasi, dapat diakses terpadu kapan saja.',
+      icon: Zap,
+      tag: 'Efisiensi Layanan',
     },
     {
       number: '02',
       title: 'Proses Lebih Efisien',
       description:
-        'Pengajuan, telaah, rapat pleno, validasi, dan pengarsipan tersusun dalam alur kerja yang jelas.',
-      icon: Clock3,
+        'Pengajuan, telaah, rapat pleno, validasi, dan pengarsipan terpadu dalam satu alur kerja yang jelas dan terstruktur.',
+      icon: Layers3,
+      tag: 'Alur Terstandarisasi',
     },
     {
       number: '03',
       title: 'Regulasi Lebih Berkualitas',
       description:
-        'Pemeriksaan terstruktur membantu menjaga keselarasan serta kualitas produk hukum daerah.',
+        'Pemeriksaan terstruktur untuk membantu menjaga keselarasan hierarki serta mutu perancangan produk hukum daerah.',
       icon: ShieldCheck,
+      tag: 'Kaidah Hukum Tertata',
     },
   ];
 
-  const heroFeatures = [
-    { label: 'Alur kerja terintegrasi', icon: Layers3 },
-    { label: 'Pemantauan status berkala', icon: Clock3 },
-    { label: 'Telaah awal berbantuan AI', icon: Bot },
-    { label: 'Arsip dokumen terpusat', icon: FileCheck2 },
+  const serviceItems = [
+    {
+      step: '01',
+      label: 'E-Submission & Kelengkapan Berkas',
+      desc: 'Unggah berkas draf Ranperda & checklist dokumen permohonan',
+      badge: 'Verifikasi Berkas',
+      icon: FileCheck2,
+      docTitle: 'Ranperda Pajak & Retribusi Daerah (PDRD)',
+      docMeta: 'Kabupaten Bengkalis • Register No. 041/PDRD/2026',
+      stage: 'Pemeriksaan Berkas Permohonan',
+      statusText: 'Berkas Lengkap & Terverifikasi',
+      progress: '25%',
+      details: [
+        { label: 'Surat Permohonan Kepala Daerah', status: 'Format Sesuai' },
+        { label: 'Naskah Akademik & Draf Ranperda', status: 'Terunggah (PDF/DOCX)' },
+        { label: 'Rekomendasi Bapenda & Dokumen Pendukung', status: 'Terverifikasi' },
+      ],
+      action: 'Lanjut ke Telaah Awal AI',
+    },
+    {
+      step: '02',
+      label: 'Telaah Hukum & Analisis AI',
+      desc: 'Deteksi kepatuhan hierarki UU & teknik penyusunan otomatis',
+      badge: 'Analisis Cerdas',
+      icon: Bot,
+      docTitle: 'Ranperda Tata Ruang Wilayah (RTRW) 2026-2046',
+      docMeta: 'Kabupaten Siak • Tim Kerja 1 (Harmonisasi)',
+      stage: 'Pemeriksaan Kaidah Perancangan UU 12/2011',
+      statusText: '2 Rekomendasi Penyelarasan',
+      progress: '50%',
+      details: [
+        { label: 'Penyelarasan Pasal 14 Ayat (2)', status: 'Rekomendasi UU 26/2007' },
+        { label: 'Konsistensi Definisi & Frasa Hukum', status: '100% Selaras Kamus' },
+        { label: 'Struktur Batang Tubuh & Lampiran', status: 'Sesuai Lampiran II' },
+      ],
+      action: 'Buka Matriks Telaah AI',
+    },
+    {
+      step: '03',
+      label: 'Rapat Pleno & Sandingan Pasal',
+      desc: 'Pembahasan bersama Kanwil, Tim Kerja, dan Biro Hukum Pemda',
+      badge: 'Sesi Kolaboratif',
+      icon: UsersRound,
+      docTitle: 'Ranperkada Rencana Detail Tata Ruang (RDTR)',
+      docMeta: 'Kabupaten Pelalawan • Tim Kerja 3',
+      stage: 'Pembahasan Bersama Tim Ahli & Pemrakarsa',
+      statusText: 'Rapat Pleno Berlangsung (12 Peserta)',
+      progress: '75%',
+      details: [
+        { label: 'Matriks Sandingan Pasal Digital', status: 'Sinkronisasi Real-time' },
+        { label: 'Catatan Tim Perancang Peraturan', status: '14 Masukan Disepakati' },
+        { label: 'Notula Resmi & Draf Perubahan', status: 'Terdokumentasi Otomatis' },
+      ],
+      action: 'Unduh Notula Berita Acara',
+    },
+    {
+      step: '04',
+      label: 'Validasi Akhir & e-Register Arsip',
+      desc: 'Persetujuan resmi Kanwil Kemenkumham & sertifikat arsip digital',
+      badge: 'Tuntas & Terarsip',
+      icon: CheckCircle2,
+      docTitle: 'Ranperda Penyelenggaraan Pelayanan Publik',
+      docMeta: 'Kota Pekanbaru • Selesai Harmonisasi',
+      stage: 'Penerbitan Surat Selesai Harmonisasi',
+      statusText: 'Harmonisasi Selesai (e-Register Terbit)',
+      progress: '100%',
+      details: [
+        { label: 'Surat Hasil Harmonisasi Kanwil Riau', status: 'TTE Pejabat Berwenang' },
+        { label: 'Draf Bersih Siap Pengundangan', status: 'Final & Terverifikasi' },
+        { label: 'Database Cloud Kemenkumham', status: 'Tersimpan Permanen' },
+      ],
+      action: 'Unduh Dokumen Tervalidasi',
+    },
   ];
 
-  const serviceItems = [
-    { label: 'Pengajuan dan pengelolaan dokumen', icon: FileCheck2 },
-    { label: 'Telaah awal berbantuan HARMONITAS AI', icon: Bot },
-    { label: 'Koordinasi dan pembahasan rapat pleno', icon: UsersRound },
-    { label: 'Validasi serta arsip hasil harmonisasi', icon: CheckCircle2 },
+  const aiClauseCases = [
+    {
+      tabLabel: 'Pasal 14 (Wewenang)',
+      title: 'Pasal 14 Ayat (2) • Sanksi & Delegasi Wewenang',
+      category: 'Inkonsistensi Hierarki Wewenang',
+      issueLevel: 'Perlu Penyelarasan',
+      originalSnippet: 'Ketentuan teknis mengenai tata cara perizinan dan denda administratif diatur lebih lanjut melalui Keputusan Kepala Dinas tanpa persetujuan Kepala Daerah.',
+      originalNote: 'Keputusan Kadis tidak dapat memuat norma sanksi atau mengikat publik (UU 12/2011 & UU 23/2014)',
+      recommendSnippet: 'Ketentuan lebih lanjut mengenai tata cara perizinan sebagaimana dimaksud pada ayat (1) diatur dengan Peraturan Kepala Daerah.',
+      recommendNote: 'Penyelarasan jenis produk hukum delegasi sesuai Pasal 8 ayat (2) UU No. 12 Tahun 2011',
+      score: '98.4%',
+      confidence: 'Akurasi Tinggi',
+      reference: 'Lampiran II Angka 198 UU 12/2011',
+    },
+    {
+      tabLabel: 'Pasal 8 (Sanksi Pidana)',
+      title: 'Pasal 8 Ayat (1) • Rumusan Sanksi Pidana',
+      category: 'Pelampauan Batas Ancaman Pidana',
+      issueLevel: 'Substansi Kritis',
+      originalSnippet: 'Setiap orang yang melanggar ketentuan Pasal 5 diancam pidana kurungan paling lama 1 (satu) tahun atau denda paling banyak Rp 100.000.000,00.',
+      originalNote: 'Ancaman pidana Perda melampaui batas maksimal 6 bulan kurungan & denda Rp 50.000.000 (Pasal 15 UU 12/2011)',
+      recommendSnippet: 'Setiap orang yang melanggar ketentuan sebagaimana dimaksud dalam Pasal 5 diancam pidana kurungan paling lama 6 (enam) bulan atau denda paling banyak Rp 50.000.000,00 (lima puluh juta rupiah).',
+      recommendNote: 'Penyesuaian batas maksimal pidana kurungan dan denda Perda sesuai Pasal 15 ayat (2) UU 12/2011',
+      score: '99.8%',
+      confidence: 'Sangat Akurat',
+      reference: 'Pasal 15 UU No. 12 Tahun 2011',
+    },
+    {
+      tabLabel: 'Pasal 27 (Peralihan)',
+      title: 'Pasal 27 • Ketentuan Pencabutan Regulasi',
+      category: 'Kaidah Teknik Penyusunan Baku',
+      issueLevel: 'Redaksional Baku',
+      originalSnippet: 'Peraturan lama dinyatakan masih berlaku selama tidak bertentangan dengan peraturan ini.',
+      originalNote: 'Rumusan frasa umum tanpa mencantumkan secara tegas nama dan nomor peraturan perundang-undangan yang digantikan',
+      recommendSnippet: 'Pada saat Peraturan Daerah ini mulai berlaku, Peraturan Daerah Kabupaten Siak Nomor 4 Tahun 2016 tentang Penataan Ruang dicabut dan dinyatakan tidak berlaku.',
+      recommendNote: 'Penyelarasan ketentuan pencabutan eksplisit sesuai Bab IV Lampiran II UU 12/2011',
+      score: '97.6%',
+      confidence: 'Standar Terpenuhi',
+      reference: 'Lampiran II Angka 234 UU 12/2011',
+    },
   ];
 
   const teamWorkAreas = [
     {
-      name: 'Tim Kerja 1',
+      name: 'Tim Kerja I',
+      roman: 'I',
+      tagline: 'Wilayah Pesisir & Sentral Provinsi',
+      totalRanperda: '48+ Tuntas',
+      leadInfo: 'Koordinator Wilayah I',
+      accentColor: 'from-[#FFD82B] to-[#FFB943]',
       wilayah: [
-        'Pemerintah Provinsi Riau',
-        'Kabupaten Siak',
-        'Kabupaten Kampar',
-        'Kabupaten Indragiri Hilir',
-        'Kabupaten Bengkalis',
+        { name: 'Pemerintah Provinsi Riau', type: 'Pusat Pemprov', isGov: true },
+        { name: 'Kabupaten Siak', type: 'Kabupaten' },
+        { name: 'Kabupaten Kampar', type: 'Kabupaten' },
+        { name: 'Kabupaten Indragiri Hilir', type: 'Kabupaten' },
+        { name: 'Kabupaten Bengkalis', type: 'Kabupaten' },
       ],
     },
     {
-      name: 'Tim Kerja 2',
+      name: 'Tim Kerja II',
+      roman: 'II',
+      tagline: 'Wilayah Utara & Selat Melaka',
+      totalRanperda: '36+ Tuntas',
+      leadInfo: 'Koordinator Wilayah II',
+      accentColor: 'from-blue-400 to-indigo-500',
       wilayah: [
-        'Kabupaten Rokan Hulu',
-        'Kabupaten Indragiri Hulu',
-        'Kabupaten Kepulauan Meranti',
-        'Kota Dumai',
+        { name: 'Kabupaten Rokan Hulu', type: 'Kabupaten' },
+        { name: 'Kabupaten Indragiri Hulu', type: 'Kabupaten' },
+        { name: 'Kabupaten Kepulauan Meranti', type: 'Kabupaten' },
+        { name: 'Kota Dumai', type: 'Kota', isCity: true },
       ],
     },
     {
-      name: 'Tim Kerja 3',
+      name: 'Tim Kerja III',
+      roman: 'III',
+      tagline: 'Pusat Ibukota & Wilayah Daratan',
+      totalRanperda: '52+ Tuntas',
+      leadInfo: 'Koordinator Wilayah III',
+      accentColor: 'from-emerald-400 to-teal-500',
       wilayah: [
-        'Kabupaten Kuantan Singingi',
-        'Kabupaten Pelalawan',
-        'Kabupaten Rokan Hilir',
-        'Kota Pekanbaru',
+        { name: 'Kota Pekanbaru', type: 'Ibukota Provinsi', isCapital: true },
+        { name: 'Kabupaten Pelalawan', type: 'Kabupaten' },
+        { name: 'Kabupaten Kuantan Singingi', type: 'Kabupaten' },
+        { name: 'Kabupaten Rokan Hilir', type: 'Kabupaten' },
       ],
     },
   ];
@@ -105,647 +411,1401 @@ export const LandingPage = () => {
   const workflowSteps = [
     {
       step: '01',
-      title: 'Input dan Pra-Harmonisasi',
-      description:
-        'Tim Kerja mengunggah draf regulasi dan kelengkapan permohonan untuk pemeriksaan awal.',
-      icon: FileCheck2,
+      title: 'Input & Pra-Harmonisasi',
+      actor: 'Pemrakarsa & Tim Kerja',
+      timeframe: 'Maks. 3 Hari Kerja',
+      description: 'Pengunggahan draf Ranperda, Naskah Akademik, dan verifikasi kelengkapan berkas permohonan melalui checklist digital.',
+      deliverable: 'Tanda Terima & Berkas Terdaftar',
+      icon: FileSpreadsheet,
+      color: 'from-amber-400 to-[#FFD82B]',
+      accentBg: 'bg-amber-500/10 text-amber-900',
+      features: [
+        'Unggah draf Ranperda / Ranperkada (.docx & .pdf)',
+        'Checklist kelengkapan surat permohonan kepala daerah',
+        'Validasi otomatis dokumen Naskah Akademik & pendukung',
+      ],
+      mockupBadge: 'Tahap 1: Verifikasi Berkas',
+      mockupStatus: 'Berkas Lengkap & Terverifikasi',
+      mockupDetail: 'Draf Ranperda Pajak & Retribusi Daerah berhasil diverifikasi kelengkapannya.',
     },
     {
       step: '02',
       title: 'Rapat Pleno Harmonisasi',
-      description:
-        'Tim Kerja, pemrakarsa, dan perancang membahas substansi serta teknik penyusunan peraturan.',
-      icon: SearchCheck,
+      actor: 'Kanwil & Tim Ahli Pemda',
+      timeframe: 'Sesuai Jadwal Pleno',
+      description: 'Pembahasan materi muatan pasal per pasal dan teknik perancangan PUU bersama Perancang Peraturan Kanwil Kemenkumham Riau.',
+      deliverable: 'Matriks Sandingan & Notula Pleno',
+      icon: UsersRound,
+      color: 'from-blue-500 to-indigo-600',
+      accentBg: 'bg-blue-500/10 text-blue-900',
+      features: [
+        'Matriks sandingan pasal per pasal real-time',
+        'Penyelarasan norma dengan hierarki peraturan lebih tinggi',
+        'Pencatatan notula rapat & kesepakatan berita acara pleno',
+      ],
+      mockupBadge: 'Tahap 2: Rapat Pleno',
+      mockupStatus: 'Pembahasan 24 Pasal Selesai',
+      mockupDetail: 'Seluruh masukan teknis redaksional dan substansi telah disepakati dalam Berita Acara.',
     },
     {
       step: '03',
-      title: 'Validasi Biro Hukum',
-      description:
-        'Biro atau Bagian Hukum menelaah hasil pembahasan dan memberikan keputusan akhir.',
+      title: 'Validasi & Penyelarasan',
+      actor: 'Biro Hukum & Kanwil',
+      timeframe: 'Maks. 2 Hari Kerja',
+      description: 'Pemeriksaan draf naskah hasil perbaikan pleno dan validasi kepatuhan hukum oleh Kepala Biro Hukum dan Kanwil Kemenkumham.',
+      deliverable: 'Surat Selesai Harmonisasi',
       icon: Scale,
+      color: 'from-purple-500 to-indigo-700',
+      accentBg: 'bg-purple-500/10 text-purple-900',
+      features: [
+        'Pemeriksaan draf final hasil perbaikan naskah',
+        'Penerbitan surat keterangan selesai harmonisasi',
+        'Penandatanganan elektronik (TTE) pejabat berwenang',
+      ],
+      mockupBadge: 'Tahap 3: Validasi Hukum',
+      mockupStatus: 'Surat Kemenkumham Terbit',
+      mockupDetail: 'Surat Hasil Harmonisasi telah disahkan dan siap untuk proses fasilitasi/pengundangan.',
     },
     {
       step: '04',
-      title: 'Tuntas dan Diarsipkan',
-      description:
-        'Dokumen yang disetujui tersimpan sebagai arsip digital dan dapat dipantau kembali.',
+      title: 'Tuntas & Arsip Digital',
+      actor: 'Sekda & Bagian Hukum',
+      timeframe: 'Pengundangan Resmi',
+      description: 'Penerbitan nomor registrasi (e-Register), pengundangan dalam Lembaran Daerah, dan penyimpanan permanen pada repositori Kanwil.',
+      deliverable: 'e-Register & Arsip Cloud',
       icon: CheckCircle2,
+      color: 'from-emerald-500 to-teal-600',
+      accentBg: 'bg-emerald-500/10 text-emerald-900',
+      features: [
+        'Pemberian nomor register resmi regulasi (e-Register)',
+        'Penyimpanan arsip digital aman di cloud Kanwil Kemenkumham',
+        'Akses riwayat dokumen dapat ditelusuri kapan saja',
+      ],
+      mockupBadge: 'Tahap 4: Tuntas & Terarsip',
+      mockupStatus: 'Nomor e-Register Diterbitkan',
+      mockupDetail: 'Regulasi resmi terarsip secara digital dan dapat diakses publik/instansi terkait.',
     },
   ];
 
+  const getCardDeckClasses = (idx) => {
+    if (hoveredCardIndex === null) {
+      if (idx === 0) return 'lg:-rotate-1 lg:translate-y-0';
+      if (idx === 1) return 'lg:rotate-0 lg:-translate-y-0.5';
+      if (idx === 2) return 'lg:rotate-1 lg:translate-y-0';
+      return '';
+    }
+
+    if (hoveredCardIndex === idx) {
+      return 'lg:-translate-y-4 lg:scale-[1.035] lg:rotate-0 z-30 shadow-2xl border-[#2B3056]/40 ring-4 ring-[#FFD82B]/25';
+    }
+
+    if (hoveredCardIndex === 0) {
+      if (idx === 1) return 'lg:translate-x-3 lg:translate-y-1 lg:rotate-1 lg:scale-[0.98] opacity-85 z-10';
+      if (idx === 2) return 'lg:translate-x-6 lg:translate-y-2 lg:rotate-2 lg:scale-[0.96] opacity-75 z-0';
+    }
+
+    if (hoveredCardIndex === 1) {
+      if (idx === 0) return 'lg:-translate-x-3 lg:translate-y-1 lg:-rotate-2 lg:scale-[0.98] opacity-85 z-10';
+      if (idx === 2) return 'lg:translate-x-3 lg:translate-y-1 lg:rotate-2 lg:scale-[0.98] opacity-85 z-10';
+    }
+
+    if (hoveredCardIndex === 2) {
+      if (idx === 0) return 'lg:-translate-x-6 lg:translate-y-2 lg:-rotate-2 lg:scale-[0.96] opacity-75 z-0';
+      if (idx === 1) return 'lg:-translate-x-3 lg:translate-y-1 lg:-rotate-1 lg:scale-[0.98] opacity-85 z-10';
+    }
+
+    return '';
+  };
+
   return (
-    <div
-      className="min-h-screen overflow-x-hidden bg-[#F5F7FA] text-[#1E293B]"
-      style={{ fontFamily: '"Outfit", ui-sans-serif, system-ui, sans-serif' }}
-    >
+    <div className="min-h-screen w-full bg-white text-slate-800 antialiased font-sans">
+      <CustomCursor />
       <Head title="HARMONITAS - Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas" />
       <PublicNavbar />
 
       <main>
-        {/* =========================================
-            HERO SECTION
-        ========================================= */}
+        {/* =========================================================================
+            SECTION 1: HERO SECTION (Luminous Soft Navy Gradient Background)
+            ========================================================================= */}
         <section
           id="beranda"
-          className="relative scroll-mt-28 overflow-hidden border-b border-[#DCE2EC] bg-[#F2F5F9]"
+          className="relative scroll-mt-28 overflow-hidden border-b border-slate-200 bg-white pt-6 pb-12 sm:pt-8 sm:pb-14 lg:pt-10 lg:pb-16"
         >
-          {/* Ambient Background Glows */}
+          {/* Background Layer 1: Structured Micro Grid with Slow Subtle Drift Animation */}
           <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-48 -top-64 h-[620px] w-[620px] rounded-full border-[80px] border-[#E7EBF2]"
+            className="absolute inset-0 pointer-events-none opacity-[0.045] animate-hero-grid"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, #2B3056 1px, transparent 1px),
+                linear-gradient(to bottom, #2B3056 1px, transparent 1px)
+              `,
+              backgroundSize: "32px 32px",
+              maskImage: "radial-gradient(ellipse 75% 75% at 50% 40%, black 40%, transparent 100%)",
+              WebkitMaskImage: "radial-gradient(ellipse 75% 75% at 50% 40%, black 40%, transparent 100%)",
+            }}
+          />
+
+          {/* Background Layer 2: Subtle Ambient Warmth with Slow Organic Breathing */}
+          <div
+            className="absolute -top-16 right-1/4 w-96 h-96 rounded-full pointer-events-none opacity-40 blur-3xl animate-hero-glow-1"
+            style={{
+              background: "radial-gradient(circle, rgba(255, 216, 43, 0.14) 0%, rgba(255, 255, 255, 0) 70%)",
+            }}
           />
           <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-56 -left-52 h-[460px] w-[460px] rounded-full border-[64px] border-white/80"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute right-1/4 top-1/3 h-72 w-72 rounded-full bg-[#17336F]/5 blur-3xl"
+            className="absolute -bottom-16 left-10 w-80 h-80 rounded-full pointer-events-none opacity-25 blur-3xl animate-hero-glow-2"
+            style={{
+              background: "radial-gradient(circle, rgba(43, 48, 86, 0.09) 0%, rgba(255, 255, 255, 0) 70%)",
+            }}
           />
 
-          <div className="relative mx-auto grid min-h-[670px] max-w-7xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:px-8 lg:py-20">
-            {/* Left Column Content */}
-            <div className="lg:col-span-7 lg:pr-6">
-              {/* Institution Pill Badge with small soft pulse */}
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#C9D2E2] bg-white px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#21366F] shadow-[0_4px_14px_rgba(20,42,94,0.06)] select-none">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#B08A22] animate-pulse-soft" />
-                Kantor Wilayah Kementerian Hukum Riau
-              </span>
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
+            <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
+              
+              {/* Left Column: Hero Content with Reveal Animation */}
+              <div className="lg:col-span-7">
+                <Reveal direction="up" delay={0} className="space-y-5">
+                  <span className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2B3056] shadow-2xs backdrop-blur-md">
+                    <span className="flex h-4 w-4 items-center justify-center shrink-0">
+                      <img 
+                        src={logoPengayoman} 
+                        alt="Logo Pengayoman" 
+                        className="h-full w-full object-contain"
+                      />
+                    </span>
+                    Kantor Wilayah Kementerian Hukum Riau
+                  </span>
 
-              {/* Main Headline */}
-              <h1 className="mt-7 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-[#142A5E] sm:text-5xl lg:text-[58px]">
-                Harmonisasi Regulasi Daerah yang Lebih Tertata
-              </h1>
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2B3056] leading-[1.15]">
+                    Harmonisasi Regulasi Daerah yang Lebih Tertata
+                  </h1>
 
-              <p className="mt-6 max-w-2xl text-sm font-medium leading-7 text-[#5B6475] sm:text-base">
-                Kelola pengajuan, telaah, pembahasan, validasi, dan arsip Ranperda serta Ranperkada dalam satu layanan digital resmi yang terintegrasi.
-              </p>
+                  <p className="text-xs sm:text-sm font-normal text-slate-600 leading-relaxed max-w-2xl pt-1">
+                    Kelola pengajuan, telaah, pembahasan, validasi, dan arsip Ranperda serta Ranperkada dalam satu layanan digital resmi yang terintegrasi.
+                  </p>
 
-              {/* 4 Feature Badges (Non-clickable: only subtle indicator on cursor) */}
-              <div className="mt-7 grid max-w-2xl gap-3 sm:grid-cols-2">
-                {heroFeatures.map((feature) => {
-                  const Icon = feature.icon;
-
-                  return (
-                    <div
-                      key={feature.label}
-                      className="flex min-h-12 items-center gap-3 rounded-xl border border-[#D6DDE8] bg-white px-3.5 py-3 text-xs font-semibold text-[#3E4A5E] shadow-[0_5px_16px_rgba(20,42,94,0.05)] transition-colors duration-200 hover:border-[#B4C0D4] hover:bg-[#FAFBFD]"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E9EDF5] text-[#203B78] transition-colors duration-200">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span>{feature.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Clickable Action Buttons (Interactive with Hover Effects) */}
-              <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/login"
-                  className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#17336F] px-6 text-xs font-bold text-white shadow-[0_10px_24px_rgba(20,42,94,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#10285E] hover:shadow-[0_14px_30px_rgba(20,42,94,0.28)] active:translate-y-0 active:scale-[0.98]"
-                >
-                  <span>Masuk ke Dashboard</span>
-                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </Link>
-
-                <a
-                  href="#alur"
-                  className="group inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[#AEBBD0] bg-white px-6 text-xs font-bold text-[#17336F] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#17336F] hover:bg-[#F8FAFD] hover:shadow active:translate-y-0 active:scale-[0.98]"
-                >
-                  <BookOpen className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  <span>Pelajari Alur</span>
-                </a>
-              </div>
-
-              {/* Trust Badge */}
-              <div className="mt-8 flex items-center gap-3 text-[11px] font-medium text-[#6B7280] select-none">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D5C183] bg-[#FBF7EA] text-[#927018] shadow-sm">
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-                Layanan resmi untuk mendukung harmonisasi produk hukum daerah
-              </div>
-            </div>
-
-            {/* Right Column (Informative Showcase Card) */}
-            <div className="lg:col-span-5">
-              <div className="relative mx-auto max-w-[470px]">
-                {/* Layered Decorative Shadow Box */}
-                <div
-                  aria-hidden="true"
-                  className="absolute -bottom-5 -right-5 h-full w-full rounded-[28px] border border-[#CBD3E0] bg-[#E4E8EF]"
-                />
-
-                {/* Main Showcase Card */}
-                <div className="relative overflow-hidden rounded-[28px] border border-[#243E77] bg-[#142A5E] shadow-[0_24px_60px_rgba(20,42,94,0.20)]">
-                  {/* Subtle Background Glows */}
-                  <div className="pointer-events-none absolute -right-20 -top-20 h-44 w-44 rounded-full bg-[#FFC800]/10 blur-2xl" />
-                  <div className="pointer-events-none absolute -bottom-20 -left-20 h-44 w-44 rounded-full bg-[#384A7F]/40 blur-2xl" />
-
-                  {/* Header Branding */}
-                  <div className="border-b border-white/10 px-6 py-6 sm:px-7">
-                    <div className="flex items-center gap-4">
-                      <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-sm">
-                        <img
-                          src={logoHarmonitas}
-                          alt="Logo HARMONITAS"
-                          className="h-full w-full object-contain"
-                        />
-                      </span>
-                      <div>
-                        <p className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#D5B95F]">
-                          <Sparkles className="h-3 w-3 animate-pulse-soft" />
-                          Layanan Digital Resmi
-                        </p>
-                        <h2 className="mt-1 text-xl font-extrabold tracking-[0.04em] text-white">
-                          HARMONITAS
-                        </h2>
-                        <p className="mt-1 text-[10px] font-medium text-white/60">
-                          Kanwil Kementerian Hukum Riau
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="px-6 py-7 sm:px-7">
-                    <p className="text-sm font-bold text-white">Pusat kendali harmonisasi terpadu</p>
-                    <p className="mt-2 text-xs font-medium leading-6 text-white/65">
-                      Informasi proses tersusun dalam satu ruang kerja yang aman, terdokumentasi, dan mudah dipantau.
-                    </p>
-
-                    <div className="mt-6 space-y-3">
-                      {[
-                        'Dokumen tersimpan secara terpusat',
-                        'Status proses dapat dipantau',
-                        'Riwayat telaah terdokumentasi',
-                      ].map((item) => (
+                  {/* 4 Feature Micro-Cards in 2x2 Bento Grid with Interactive Hover & Animations */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {heroFeatures.map((feat) => {
+                      const Icon = feat.icon;
+                      return (
                         <div
-                          key={item}
-                          className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-3 text-xs font-semibold text-white/85 backdrop-blur-sm transition-colors duration-200 hover:bg-white/[0.10] hover:border-white/20"
+                          key={feat.label}
+                          className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 p-3.5 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:border-[#2B3056]/35 hover:shadow-md cursor-pointer backdrop-blur-sm"
                         >
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-[#D5B95F]" />
-                          <span>{item}</span>
+                          {/* Subtle Ambient Hover Gradient Glow */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-slate-50/60 via-transparent to-amber-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                          {/* Left Accent Indicator Bar on Hover */}
+                          <span className="absolute left-0 inset-y-2 w-1 rounded-r-full bg-[#FFD82B] opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:inset-y-1" />
+
+                          <div className="relative z-10 flex items-center gap-3 min-w-0">
+                            {/* Icon Container with smooth tilt & rotation */}
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100/90 border border-slate-200/80 text-[#2B3056] shadow-2xs transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B] group-hover:shadow-sm">
+                              <Icon className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-105" />
+                            </div>
+
+                            {/* Text Content */}
+                            <div className="min-w-0 pr-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-bold text-[#2B3056] group-hover:text-[#3A4070] transition-colors leading-tight truncate">
+                                  {feat.label}
+                                </span>
+                                {feat.isAi && (
+                                  <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-100/90 border border-amber-300/60 px-1.5 py-0.2 text-[9px] font-extrabold text-amber-900 shrink-0">
+                                    <Sparkles className="h-2.5 w-2.5 text-amber-600" />
+                                    AI
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-0.5 text-[10.5px] text-slate-500 font-normal truncate group-hover:text-slate-600 transition-colors">
+                                {feat.desc}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Right Arrow Hover Action */}
+                          <div className="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 group-hover:bg-[#FFD82B] group-hover:text-[#2B3056]">
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
 
-                  {/* 3 Stat Counters */}
-                  <div className="grid grid-cols-3 border-t border-[#DCE2EC] bg-white">
-                    {[
-                      { label: 'Permohonan', value: `${totalPeraturan}+` },
-                      { label: 'Tuntas', value: totalSelesai },
-                      { label: 'Wilayah', value: totalKabupaten },
-                    ].map((item, index) => (
-                      <div
-                        key={item.label}
-                        className={`px-3 py-4 text-center transition-colors duration-200 hover:bg-slate-50 ${index !== 0 ? 'border-l border-[#E1E5EC]' : ''}`}
-                      >
-                        <p className="text-xl font-extrabold text-[#142A5E]">
-                          {item.value}
-                        </p>
-                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#7A8392]">
-                          {item.label}
-                        </p>
-                      </div>
-                    ))}
+                  {/* Call to Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <Link
+                      href="/login"
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-6 text-xs font-bold text-[#2B3056] shadow-sm transition duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <span>Masuk ke Dashboard</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+
+                    <a
+                      href="#alur"
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#2B3056] transition shadow-2xs"
+                    >
+                      <BookOpen className="h-4 w-4 text-[#FFC800]" />
+                      <span>Pelajari Alur</span>
+                    </a>
                   </div>
-                </div>
+
+                  {/* Bottom Assurance Note */}
+                  <div className="flex items-center gap-2 pt-1 text-[11px] font-medium text-slate-500">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+                      <Check className="h-3 w-3 stroke-[3]" />
+                    </span>
+                    <span>Layanan resmi untuk mendukung harmonisasi produk hukum daerah</span>
+                  </div>
+                </Reveal>
               </div>
+
+              {/* Right Column: Clean Free-Standing 3D Mascot Workstation with Slide-in Animation */}
+              <div className="lg:col-span-5 relative flex items-center justify-center min-h-[380px] sm:min-h-[440px] lg:min-h-[480px]">
+                <Reveal direction="right" delay={150} className="w-full flex items-center justify-center">
+                  {/* Ambient Soft Glow Behind Illustration */}
+                  <div 
+                    className="absolute w-[360px] h-[360px] sm:w-[440px] sm:h-[440px] rounded-full pointer-events-none opacity-55 blur-3xl"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(255, 216, 43, 0.20) 0%, rgba(43, 48, 86, 0.05) 55%, transparent 75%)'
+                    }}
+                  />
+
+                  {/* Floating Minimal Icon 1: Top-Left (Timbangan Keadilan) */}
+                  <div className="absolute top-4 left-2 sm:-left-2 z-20 flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/95 text-[#2B3056] shadow-lg backdrop-blur-md animate-float-badge1 hover:scale-110 transition-all duration-300">
+                    <Scale className="h-6 w-6 text-[#2B3056]" />
+                  </div>
+
+                  {/* Floating Minimal Icon 2: Top-Right (Pengayoman / Shield) */}
+                  <div className="absolute top-8 -right-2 sm:-right-4 z-20 flex h-11 w-11 items-center justify-center rounded-2xl border border-[#FFD82B]/60 bg-white/95 shadow-lg backdrop-blur-md animate-float-badge2 hover:scale-110 transition-all duration-300">
+                    <ShieldCheck className="h-5 w-5 text-[#B3912D]" />
+                  </div>
+
+                  {/* Floating Minimal Icon 3: Bottom-Left (Validasi Tuntas) */}
+                  <div className="absolute bottom-8 left-4 sm:left-0 z-20 flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-200 bg-white/95 shadow-lg backdrop-blur-md animate-float-badge1 hover:scale-110 transition-all duration-300">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  </div>
+
+                  {/* Floating Minimal Icon 4: Bottom-Right (Arsip Dokumen) */}
+                  <div className="absolute bottom-12 -right-2 sm:right-2 z-20 flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200/90 bg-white/95 text-[#2B3056] shadow-lg backdrop-blur-md animate-float-badge2 hover:scale-110 transition-all duration-300">
+                    <FileCheck2 className="h-5 w-5 text-[#2B3056]" />
+                  </div>
+
+                  {/* Free-Standing 3D System Illustration with Mascot Character */}
+                  <div className="relative flex flex-col items-center justify-center z-10 select-none group cursor-pointer">
+                    <img
+                      src={harmonitasMascot3d}
+                      alt="Ilustrasi Digital Workspace Harmonisasi Regulasi HARMONITAS bersama Maskot Kanwil Kemenkumham Riau"
+                      className="w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[490px] h-auto object-contain drop-shadow-2xl animate-float-slow transition-all duration-500 group-hover:scale-[1.03] group-hover:-translate-y-2 select-none pointer-events-none"
+                    />
+                    {/* Organic Soft Ground Shadow */}
+                    <div className="w-56 sm:w-64 h-5 rounded-full bg-slate-400/25 blur-md mt-[-14px] pointer-events-none transition-all duration-500 group-hover:scale-105 group-hover:opacity-75" />
+                  </div>
+                </Reveal>
+              </div>
+
             </div>
           </div>
         </section>
 
-        {/* =========================================
-            SECTION 2: KEUNGGULAN LAYANAN
-        ========================================= */}
-        <section id="tentang" className="scroll-mt-28 bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#8A6B18] select-none">
-                <span className="h-px w-8 bg-[#C5A64B]" />
-                Keunggulan Layanan
-                <span className="h-px w-8 bg-[#C5A64B]" />
-              </span>
-              <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.025em] text-[#142A5E] sm:text-4xl">
-                Mendukung Proses yang Lebih Terarah
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-7 text-[#687184]">
-                HARMONITAS membantu kolaborasi harmonisasi regulasi daerah menjadi lebih cepat, konsisten, transparan, dan mudah dipantau.
-              </p>
-            </div>
+        {/* =========================================================================
+            SECTION 2: KEUNGGULAN LAYANAN (Soft Gradient Background)
+            ========================================================================= */}
+        <section id="tentang" className="scroll-mt-28 bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
+            <Reveal direction="up" delay={0}>
+              <div className="mx-auto max-w-3xl text-center">
+                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#B3912D]">
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                  Keunggulan Layanan
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                </span>
+                <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
+                  Mendukung Proses yang Lebih Terarah
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
+                  HARMONITAS membantu kolaborasi harmonisasi regulasi daerah menjadi lebih cepat, teratur, terpusat, dan mudah dipantau.
+                </p>
+              </div>
+            </Reveal>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {benefits.map((benefit) => {
+            <div 
+              className="mt-12 grid gap-6 md:grid-cols-3 relative"
+              onMouseLeave={() => setHoveredCardIndex(null)}
+            >
+              {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon;
+                const deckClasses = getCardDeckClasses(idx);
 
                 return (
-                  <article
-                    key={benefit.title}
-                    className="relative rounded-2xl border border-[#DCE2EC] bg-white p-7 shadow-[0_10px_30px_rgba(20,42,94,0.07)] transition-colors duration-200 hover:border-[#B4C0D4]"
-                  >
-                    {/* Top Golden Accent Line */}
-                    <span className="absolute inset-x-7 top-0 h-[3px] bg-[#C5A64B]" />
+                  <Reveal key={benefit.title} direction="up" delay={idx * 160 + 60} className="h-full">
+                    <article
+                      onMouseEnter={() => setHoveredCardIndex(idx)}
+                      className={`group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50/40 to-white p-7 sm:p-8 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] h-full flex flex-col justify-between cursor-pointer ${deckClasses}`}
+                    >
+                      {/* Top Gradient Stripe */}
+                      <span className="absolute inset-x-6 top-0 h-1 rounded-b-md bg-gradient-to-r from-[#FFC800] via-[#FFD82B] to-[#2B3056]" />
 
-                    <div className="flex items-start justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E9EDF5] text-[#17336F]">
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <span className="text-4xl font-extrabold text-[#E7EAF0]">
+                      {/* Watermark Number */}
+                      <span className="absolute -right-2 -bottom-4 text-7xl font-black text-slate-100/80 select-none pointer-events-none group-hover:text-slate-200/90 transition-colors">
                         {benefit.number}
                       </span>
-                    </div>
 
-                    <h3 className="mt-6 text-lg font-extrabold text-[#1E293B]">
-                      {benefit.title}
-                    </h3>
-                    <p className="mt-3 text-xs font-medium leading-6 text-[#626D7F]">
-                      {benefit.description}
-                    </p>
-                  </article>
+                      <div>
+                        <div className="relative z-10 flex items-start justify-between">
+                          <span className={`flex h-13 w-13 items-center justify-center rounded-2xl bg-[#2B3056] text-[#FFD82B] shadow-md transition-all duration-300 ${
+                            hoveredCardIndex === idx ? 'scale-110 shadow-lg ring-2 ring-[#FFD82B]/60' : 'group-hover:scale-105'
+                          }`}>
+                            <Icon className="h-6 w-6" />
+                          </span>
+                          <span className={`inline-flex items-center rounded-md border border-slate-200 bg-white/90 px-3 py-1 text-[10px] font-bold text-slate-700 shadow-2xs backdrop-blur-xs transition-colors ${
+                            hoveredCardIndex === idx ? 'border-[#2B3056]/30 text-[#2B3056] bg-slate-50' : ''
+                          }`}>
+                            {benefit.tag}
+                          </span>
+                        </div>
+
+                        <div className="relative z-10 mt-6 space-y-2">
+                          <h3 className={`text-lg font-bold transition-colors ${
+                            hoveredCardIndex === idx ? 'text-[#3A4070]' : 'text-[#2B3056] group-hover:text-[#3A4070]'
+                          }`}>
+                            {benefit.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
+                            {benefit.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#2B3056]">
+                        <span className="inline-flex items-center gap-1.5 text-slate-500 font-medium">
+                          Standar Prosedur Operasional
+                        </span>
+                        <span className={`flex h-6 w-6 items-center justify-center rounded-md transition-all duration-300 ${
+                          hoveredCardIndex === idx 
+                            ? 'bg-[#FFD82B] text-[#2B3056] translate-x-1 shadow-xs' 
+                            : 'bg-slate-50 text-[#2B3056] group-hover:bg-[#FFD82B]'
+                        }`}>
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </span>
+                      </div>
+                    </article>
+                  </Reveal>
                 );
               })}
             </div>
           </div>
         </section>
 
-        {/* =========================================
+        {/* =========================================================================
             SECTION 3: LAYANAN TERINTEGRASI
-        ========================================= */}
-        <section className="border-y border-[#E0E5ED] bg-[#F3F5F8] py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
-            <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#CCD5E3] bg-white px-3.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17336F] shadow-sm select-none">
-                <CheckCircle2 className="h-3.5 w-3.5 text-[#9A781C]" />
-                Layanan Terintegrasi
-              </span>
-              <h2 className="mt-5 max-w-xl text-3xl font-extrabold tracking-[-0.025em] text-[#142A5E] sm:text-4xl">
-                Satu Ruang Kerja untuk Seluruh Proses Harmonisasi
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-[#626D7F]">
-                Setiap tahapan tersusun rapi agar Tim Kerja, Biro Hukum, dan Bagian Hukum daerah dapat bekerja pada data yang sama tanpa kehilangan riwayat proses.
-              </p>
+            ========================================================================= */}
+        <section className="border-b border-slate-200 bg-slate-50/60 py-16 sm:py-20 overflow-hidden">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8">
+            
+            {/* Left Column: Interactive 4-Stage Workflow Selector */}
+            <div className="lg:col-span-6">
+              <Reveal direction="left" delay={50} className="space-y-4">
+                <span className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2B3056] shadow-2xs">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#FFC800]" />
+                  Layanan Terintegrasi
+                </span>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056] leading-tight">
+                  Satu Ruang Kerja untuk Seluruh Proses Harmonisasi
+                </h2>
+                <p className="text-xs sm:text-sm font-normal text-slate-600 leading-relaxed max-w-2xl pt-0.5">
+                  Setiap tahapan terorganisir agar Kemenkumham, Tim Kerja, Biro Hukum, dan Bagian Hukum Daerah dapat bekerja pada data yang sama tanpa kehilangan riwayat proses.
+                </p>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {serviceItems.map((item) => {
-                  const Icon = item.icon;
+                {/* 4 Interactive Process Steps */}
+                <div className="mt-6 space-y-2.5 pt-1">
+                  {serviceItems.map((item, idx) => {
+                    const Icon = item.icon;
+                    const isActive = activeServiceTab === idx;
 
-                  return (
-                    <div
-                      key={item.label}
-                      className="flex min-h-16 items-center gap-3 rounded-xl border border-[#D8DEE8] bg-white px-4 py-3 shadow-[0_5px_16px_rgba(20,42,94,0.04)] transition-colors duration-200 hover:border-[#B4C0D4] hover:bg-[#FAFBFD]"
-                    >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E9EDF5] text-[#17336F]">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="text-xs font-bold leading-5 text-[#3F4A5D]">
-                        {item.label}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                    return (
+                      <div
+                        key={item.step}
+                        onClick={() => setActiveServiceTab(idx)}
+                        onMouseEnter={() => setActiveServiceTab(idx)}
+                        className={`group relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 transition-all duration-300 cursor-pointer ${
+                          isActive
+                            ? 'bg-white border-[#2B3056]/50 shadow-md ring-2 ring-[#FFD82B]/60 -translate-y-0.5'
+                            : 'bg-white/80 border-slate-200/90 hover:bg-white hover:border-slate-300 hover:shadow-2xs'
+                        }`}
+                      >
+                        {/* Active Indicator Left Stripe */}
+                        <span
+                          className={`absolute left-0 inset-y-0 w-1.5 bg-gradient-to-b from-[#FFD82B] via-[#FFC800] to-[#2B3056] transition-opacity duration-300 ${
+                            isActive ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+
+                        <div className="flex items-center gap-3.5 min-w-0 pl-1">
+                          {/* Step Number Badge */}
+                          <span
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-xs transition-all duration-300 ${
+                              isActive
+                                ? 'bg-[#2B3056] text-[#FFD82B] shadow-sm scale-105'
+                                : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                            }`}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </span>
+
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs sm:text-sm font-bold transition-colors leading-tight ${
+                                  isActive ? 'text-[#2B3056]' : 'text-slate-700 group-hover:text-[#2B3056]'
+                                }`}
+                              >
+                                {item.label}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 text-[11px] text-slate-500 font-normal truncate">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span
+                            className={`rounded-md px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase transition-colors ${
+                              isActive
+                                ? 'bg-[#2B3056] text-[#FFD82B]'
+                                : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                          <span
+                            className={`flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-200 ${
+                              isActive
+                                ? 'bg-[#FFD82B] text-[#2B3056] translate-x-0.5'
+                                : 'text-slate-400 group-hover:text-slate-600'
+                            }`}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Reveal>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="mx-auto max-w-[410px] rounded-[26px] border border-[#263F78] bg-[#142A5E] p-5 shadow-[0_18px_45px_rgba(20,42,94,0.17)]">
-                <div className="rounded-[20px] border border-white/10 bg-white/[0.05] px-6 py-7">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-5">
-                    <div>
-                      <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#D5B95F]">
-                        Sistem Terpadu
-                      </p>
-                      <p className="mt-1 text-lg font-extrabold text-white">Ruang Kerja Digital</p>
+            {/* Right Column: Dynamic Live Legal Workspace Window Mockup */}
+            <div className="lg:col-span-6 relative">
+              <Reveal direction="right" delay={150}>
+                {/* Ambient Soft Glow Behind Window */}
+                <div 
+                  className="absolute -inset-4 rounded-3xl pointer-events-none opacity-40 blur-2xl -z-10"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(255, 216, 43, 0.25) 0%, rgba(43, 48, 86, 0.08) 60%, transparent 80%)'
+                  }}
+                />
+
+                <div className="mx-auto max-w-[520px] rounded-3xl border border-slate-200/90 bg-white shadow-2xl overflow-hidden transition-all duration-300">
+                  
+                  {/* Window Header Chrome (macOS Style) */}
+                  <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100/90 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="h-3 w-3 rounded-full bg-red-400 border border-red-500/20" />
+                      <span className="h-3 w-3 rounded-full bg-amber-400 border border-amber-500/20" />
+                      <span className="h-3 w-3 rounded-full bg-emerald-400 border border-emerald-500/20" />
+                      <span className="ml-2 text-[11px] font-bold text-[#2B3056]">
+                        HARMONITAS • Ruang Kerja Digital
+                      </span>
                     </div>
-                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
-                      <img src={logoHarmonitas} alt="Logo HARMONITAS" className="h-full w-full object-contain" />
-                    </span>
+                    <div className="flex items-center gap-1.5 rounded-md bg-white border border-slate-200 px-2 py-0.5 shadow-2xs">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-bold text-slate-700">Sinkron Kanwil Riau</span>
+                    </div>
                   </div>
 
-                  <div className="mt-6 space-y-3">
-                    {[
-                      { label: 'Pengajuan Dokumen', value: 'Terkelola' },
-                      { label: 'Proses Telaah', value: 'Terpantau' },
-                      { label: 'Arsip Regulasi', value: 'Terpusat' },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 transition-colors duration-200 hover:bg-white/[0.10]"
-                      >
-                        <span className="text-xs font-semibold text-white/75">{item.label}</span>
-                        <span className="rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold text-[#E7D48A]">
-                          {item.value}
+                  {/* Active Document Inspector Panel */}
+                  <div className="p-5 sm:p-6 space-y-4">
+                    {/* Document Header with Stage Progress */}
+                    <div className="border-b border-slate-100 pb-3.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#2B3056] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#FFD82B]">
+                          {serviceItems[activeServiceTab].badge}
+                        </span>
+                        <span className="text-[11px] font-mono font-bold text-slate-500">
+                          Progres: {serviceItems[activeServiceTab].progress}
                         </span>
                       </div>
+
+                      <h3 className="mt-2.5 text-sm sm:text-base font-extrabold text-[#2B3056] leading-snug">
+                        {serviceItems[activeServiceTab].docTitle}
+                      </h3>
+                      <p className="mt-1 text-[11px] text-slate-500 font-medium">
+                        {serviceItems[activeServiceTab].docMeta}
+                      </p>
+                    </div>
+
+                    {/* Live Progress Bar with Stage Title */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-[10.5px] font-bold">
+                        <span className="text-slate-600">{serviceItems[activeServiceTab].stage}</span>
+                        <span className="text-emerald-600 font-extrabold">{serviceItems[activeServiceTab].statusText}</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden border border-slate-200/80">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[#FFD82B] via-[#FFC800] to-[#2B3056] transition-all duration-500 ease-out"
+                          style={{ width: serviceItems[activeServiceTab].progress }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dynamic Detail Checklist Items */}
+                    <div className="space-y-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        Poin Verifikasi & Kelengkapan Tahap
+                      </p>
+                      <div className="space-y-2 pt-1">
+                        {serviceItems[activeServiceTab].details.map((item, dIdx) => (
+                          <div
+                            key={dIdx}
+                            className="flex items-center justify-between gap-2 rounded-xl bg-white p-2.5 border border-slate-200/80 shadow-2xs transition-all hover:border-[#2B3056]/30"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-emerald-100/90 text-emerald-700">
+                                <Check className="h-3 w-3 stroke-[3]" />
+                              </span>
+                              <span className="text-xs font-semibold text-slate-700 truncate">
+                                {item.label}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-500 shrink-0 bg-slate-100 px-2 py-0.5 rounded-md">
+                              {item.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Button & Metadata Footer */}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+                        <ShieldCheck className="h-4 w-4 text-[#B3912D]" />
+                        <span>SOP Kanwil Kemenkumham Riau</span>
+                      </div>
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] px-3.5 py-1.5 text-xs font-bold text-white shadow-2xs transition-colors cursor-pointer"
+                      >
+                        <span>{serviceItems[activeServiceTab].action}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-[#FFD82B]" />
+                      </Link>
+                    </div>
+
+                  </div>
+
+                </div>
+              </Reveal>
+            </div>
+
+          </div>
+        </section>
+
+        {/* =========================================================================
+            SECTION 4: DUKUNGAN TEKNOLOGI AI
+            ========================================================================= */}
+        <section className="bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8">
+            
+            {/* Left Column: Interactive AI Legal Clause Inspector & Diff Studio */}
+            <div className="order-2 lg:order-1 lg:col-span-6 relative">
+              <Reveal direction="left" delay={100}>
+                {/* Soft Warm Glow Behind Mockup */}
+                <div 
+                  className="absolute -inset-4 rounded-3xl pointer-events-none opacity-35 blur-2xl -z-10"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(255, 200, 0, 0.20) 0%, rgba(43, 48, 86, 0.08) 60%, transparent 80%)'
+                  }}
+                />
+
+                <div className="mx-auto max-w-[520px] rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xl space-y-4">
+                  
+                  {/* Top Window Bar */}
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                        <Bot className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold text-[#2B3056]">HARMONITAS AI Studio</p>
+                        <p className="text-[10px] text-slate-500 font-medium">Penelaah Kaidah Peraturan PUU</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 shadow-2xs">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-bold text-emerald-700">Model Hukum Aktif</span>
+                    </div>
+                  </div>
+
+                  {/* Clause Switcher Tabs */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                    {aiClauseCases.map((c, idx) => (
+                      <button
+                        key={c.tabLabel}
+                        onClick={() => setActiveAiClauseTab(idx)}
+                        className={`rounded-xl px-3 py-1.5 text-[10.5px] font-bold transition-all whitespace-nowrap cursor-pointer ${
+                          activeAiClauseTab === idx
+                            ? 'bg-[#2B3056] text-[#FFD82B] shadow-xs'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                        }`}
+                      >
+                        {c.tabLabel}
+                      </button>
                     ))}
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* =========================================
-            SECTION 4: ASISTEN AI (HARMONITAS AI)
-        ========================================= */}
-        <section className="bg-white py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
-            <div className="order-2 lg:order-1 lg:col-span-5">
-              <div className="mx-auto max-w-[410px] rounded-[26px] border border-[#D5DCE7] bg-[#F4F6F9] p-6 shadow-[0_16px_38px_rgba(20,42,94,0.10)]">
-                <div className="rounded-[20px] border border-[#D9DFE8] bg-white p-6">
-                  <div className="flex items-center justify-between border-b border-[#E4E7EC] pb-5">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E9EDF5] text-[#17336F] shadow-sm">
-                      <Bot className="h-6 w-6" />
+                  {/* Active Clause Header & Category */}
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-2">
+                    <span className="text-xs font-bold text-[#2B3056]">
+                      {aiClauseCases[activeAiClauseTab].title}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D8C889] bg-[#FAF7EC] px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.12em] text-[#826515] select-none">
-                      <Sparkles className="h-3 w-3 text-[#B08A22] animate-pulse-soft" />
-                      Asisten Telaah
+                    <span className="rounded-md bg-amber-50 border border-amber-200/80 px-2 py-0.5 text-[9.5px] font-bold text-amber-800">
+                      {aiClauseCases[activeAiClauseTab].category}
                     </span>
                   </div>
 
-                  {/* Simulated Analysis Preview */}
-                  <div className="mt-6 rounded-xl border border-[#DEE3EA] bg-[#F8F9FB] p-4">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-[#17336F]" />
-                      <div className="h-2.5 w-36 rounded-full bg-[#C9D0DC]" />
+                  {/* Clause Diff & AI Recommendation Comparison */}
+                  <div className="space-y-2.5">
+                    {/* Box A: Original Draft with Detected Issue */}
+                    <div className="rounded-2xl border border-rose-200/80 bg-rose-50/40 p-3 space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-rose-900">
+                        <span className="flex items-center gap-1.5">
+                          <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0" />
+                          <span>Draf Awal Pemda (Masalah Terdeteksi)</span>
+                        </span>
+                        <span className="rounded bg-rose-100 px-1.5 py-0.2 text-[9px] text-rose-800 font-extrabold">
+                          {aiClauseCases[activeAiClauseTab].issueLevel}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-rose-950 font-mono leading-relaxed bg-white/90 rounded-xl p-2.5 border border-rose-200/60 shadow-2xs">
+                        "{aiClauseCases[activeAiClauseTab].originalSnippet}"
+                      </p>
+                      <p className="text-[10px] text-rose-700 font-medium pl-1">
+                        Catatan: {aiClauseCases[activeAiClauseTab].originalNote}
+                      </p>
                     </div>
-                    <div className="mt-4 space-y-2.5">
-                      <div className="h-2 rounded-full bg-[#D9DEE6]" />
-                      <div className="h-2 w-11/12 rounded-full bg-[#D9DEE6]" />
-                      <div className="h-2 w-4/5 rounded-full bg-[#D9DEE6]" />
+
+                    {/* Box B: AI Recommendation with Clean Legal Phrasing */}
+                    <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/40 p-3 space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-emerald-900">
+                        <span className="flex items-center gap-1.5">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>Rekomendasi AI Penyelarasan Perancang</span>
+                        </span>
+                        <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[9px] text-emerald-800 font-extrabold">
+                          Kaidah Terpenuhi
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-emerald-950 font-mono leading-relaxed bg-white/90 rounded-xl p-2.5 border border-emerald-200/60 shadow-2xs">
+                        "{aiClauseCases[activeAiClauseTab].recommendSnippet}"
+                      </p>
+                      <p className="text-[10px] text-emerald-700 font-medium pl-1">
+                        Dasar: {aiClauseCases[activeAiClauseTab].recommendNote}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#D8C889] bg-[#FBF8EE] px-4 py-3 text-xs font-semibold text-[#66531B] select-none">
-                    <SearchCheck className="h-4 w-4 shrink-0 text-[#9A781C]" />
-                    Pemeriksaan awal siap ditinjau
+                  {/* Quality Score & Citation Footer */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10.5px]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500 font-medium">Kesesuaian Kaidah:</span>
+                      <span className="rounded-md bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 text-[10px]">
+                        {aiClauseCases[activeAiClauseTab].score}
+                      </span>
+                    </div>
+                    <span className="text-slate-400 font-mono text-[10px]">
+                      {aiClauseCases[activeAiClauseTab].reference}
+                    </span>
                   </div>
+
                 </div>
-              </div>
+              </Reveal>
             </div>
 
-            <div className="order-1 lg:order-2 lg:col-span-7 lg:pl-8">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#CCD5E3] bg-[#F5F7FA] px-3.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17336F] shadow-sm select-none">
-                <Bot className="h-3.5 w-3.5 text-[#9A781C]" />
-                Dukungan Teknologi
-              </span>
-              <h2 className="mt-5 max-w-xl text-3xl font-extrabold tracking-[-0.025em] text-[#142A5E] sm:text-4xl">
-                Pemeriksaan Awal Dokumen Menjadi Lebih Terarah
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-[#626D7F]">
-                HARMONITAS AI membantu tim mengenali potensi ketidaksesuaian format, struktur, dan teknik penyusunan sebelum dokumen masuk ke tahap pembahasan.
-              </p>
+            {/* Right Column: AI Feature Capabilities & Pillars */}
+            <div className="order-1 lg:order-2 lg:col-span-6 lg:pl-4">
+              <Reveal direction="right" delay={150} className="space-y-5">
+                <span className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2B3056] shadow-2xs">
+                  <Sparkles className="h-3.5 w-3.5 text-[#FFC800]" />
+                  Kecerdasan Buatan Terintegrasi
+                </span>
 
-              {/* Clickable Button with Hover Lift */}
-              <Link
-                href="/login"
-                className="group mt-7 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#17336F] px-5 text-xs font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#10285E] hover:shadow-lg active:translate-y-0 active:scale-[0.98]"
-              >
-                <span>Gunakan HARMONITAS AI</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056] leading-tight">
+                  Pemeriksaan Awal Dokumen yang Cepat, Akurat, dan Terarah
+                </h2>
+
+                <p className="text-xs sm:text-sm font-normal text-slate-600 leading-relaxed max-w-2xl">
+                  HARMONITAS AI membantu Tim Perancang Kanwil dan Bagian Hukum Daerah mendeteksi potensi pertentangan norma, inkonsistensi frasa, dan pelampauan kewenangan secara presisi sebelum rapat pleno.
+                </p>
+
+                {/* 3 Capability Bento Cards */}
+                <div className="space-y-2.5 pt-1">
+                  {[
+                    {
+                      title: 'Deteksi Hierarki & Batas Wewenang',
+                      desc: 'Otomatis mencocokkan norma pasal terhadap regulasi yang lebih tinggi (UUD 1945, UU, PP, Permen).',
+                      icon: Scale,
+                    },
+                    {
+                      title: 'Standarisasi Lampiran II UU 12/2011',
+                      desc: 'Memastikan sistematika bab, penomoran ayat, dan frasa baku perancangan PUU terpenuhi 100%.',
+                      icon: CheckCircle2,
+                    },
+                    {
+                      title: 'Efisiensi Waktu Pra-Harmonisasi',
+                      desc: 'Memangkas waktu telaah awal dari 3 hari menjadi hitungan menit dengan akurasi teruji.',
+                      icon: Zap,
+                    },
+                  ].map((feat) => {
+                    const FIcon = feat.icon;
+                    return (
+                      <div
+                        key={feat.title}
+                        className="group flex items-start gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-2xs hover:border-[#2B3056]/30 hover:shadow-sm transition-all"
+                      >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[#2B3056] group-hover:bg-[#2B3056] group-hover:text-[#FFD82B] transition-colors mt-0.5">
+                          <FIcon className="h-4.5 w-4.5" />
+                        </span>
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-[#2B3056] group-hover:text-[#3A4070] transition-colors">
+                            {feat.title}
+                          </h4>
+                          <p className="mt-0.5 text-[11px] text-slate-500 font-normal leading-relaxed">
+                            {feat.desc}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="pt-2">
+                  <Link
+                    href="/login"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] px-6 text-xs font-bold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    <Sparkles className="h-4 w-4 text-[#FFD82B]" />
+                    <span>Masuk & Gunakan Bantuan AI</span>
+                    <ArrowRight className="h-4 w-4 text-white" />
+                  </Link>
+                </div>
+              </Reveal>
             </div>
+
           </div>
         </section>
 
-        {/* =========================================
-            SECTION 5: PEMBAGIAN WILAYAH KERJA
-        ========================================= */}
+        {/* =========================================================================
+            SECTION 5: WILAYAH TIM KERJA
+            ========================================================================= */}
         <section
           id="wilayah"
-          className="scroll-mt-28 border-y border-[#E0E5ED] bg-[#F3F5F8] py-20 sm:py-24"
+          className="scroll-mt-28 bg-slate-50/60 py-16 sm:py-20 border-b border-slate-200 overflow-hidden"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#CCD5E3] bg-white px-3.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17336F] shadow-sm select-none">
-                <Building2 className="h-3.5 w-3.5 text-[#9A781C]" />
-                Pembagian Wilayah Kerja
-              </span>
-              <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.025em] text-[#142A5E] sm:text-4xl">
-                Cakupan Tim Kerja Kanwil Riau
-              </h2>
-              <p className="mt-3 text-sm font-medium leading-7 text-[#687184]">
-                Pelayanan untuk Pemerintah Provinsi serta Kabupaten/Kota di Riau dikelola melalui tiga Tim Kerja.
-              </p>
-            </div>
+            <Reveal direction="up" delay={0}>
+              <div className="mx-auto max-w-3xl text-center">
+                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#B3912D]">
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                  Pembagian Wilayah Kerja
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                </span>
+                <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
+                  Cakupan Tim Kerja Kanwil Riau
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
+                  Pelayanan harmonisasi untuk Pemerintah Provinsi dan seluruh 12 Kabupaten/Kota di Riau dibagi secara terstruktur dalam tiga Tim Kerja.
+                </p>
+              </div>
+            </Reveal>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {teamWorkAreas.map((team) => (
-                <article
-                  key={team.name}
-                  className="overflow-hidden rounded-2xl border border-[#D5DCE7] bg-white shadow-[0_10px_30px_rgba(20,42,94,0.07)] transition-colors duration-200 hover:border-[#B4C0D4]"
-                >
-                  <div className="flex items-center justify-between border-b border-white/10 bg-[#17336F] px-5 py-4 text-white">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10">
-                        <Building2 className="h-4 w-4 text-[#E1CA77]" />
-                      </span>
-                      <h3 className="text-base font-extrabold">{team.name}</h3>
+            {/* Top Territory Stats Ribbon */}
+            <Reveal direction="up" delay={80}>
+              <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                    <Landmark className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-extrabold text-[#2B3056]">1 Provinsi & 12 Kab/Kota</p>
+                    <p className="text-[11px] text-slate-500 font-medium">Cakupan Wilayah Administratif</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                    <UsersRound className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-extrabold text-[#2B3056]">3 Tim Kerja Harmonisasi</p>
+                    <p className="text-[11px] text-slate-500 font-medium">Perancang Peraturan Kanwil Riau</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-extrabold text-[#2B3056]">136+ Regulasi Tuntas</p>
+                    <p className="text-[11px] text-slate-500 font-medium">Standar Layanan SOP Resmi</p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* 3 Rich Interactive Tim Kerja Cards */}
+            <div className="mt-8 grid gap-6 lg:grid-cols-3">
+              {teamWorkAreas.map((team, idx) => (
+                <Reveal key={team.name} direction="up" delay={idx * 160 + 60} className="h-full">
+                  <article
+                    className="group relative overflow-hidden flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#2B3056]/35 hover:shadow-2xl h-full cursor-pointer"
+                  >
+                    {/* Top Gradient Stripe */}
+                    <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${team.accentColor}`} />
+
+                    {/* Roman Numeral Watermark */}
+                    <span className="absolute right-4 bottom-2 text-8xl font-black text-slate-100/70 select-none pointer-events-none group-hover:text-slate-200/80 transition-colors">
+                      {team.roman}
+                    </span>
+
+                    <div className="relative z-10">
+                      {/* Card Header Bar */}
+                      <div className="flex items-start justify-between border-b border-slate-100 pb-5">
+                        <div className="flex items-center gap-3.5">
+                          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2B3056] text-[#FFD82B] shadow-md font-extrabold text-base group-hover:scale-105 transition-transform">
+                            {team.roman}
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-base font-bold text-[#2B3056]">{team.name}</h3>
+                            </div>
+                            <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                              {team.tagline}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-[#2B3056]">
+                          {team.totalRanperda}
+                        </span>
+                      </div>
+
+                      {/* District Interactive Chips Grid */}
+                      <div className="mt-5 space-y-2">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Wilayah Administrasi yang Dilayani:
+                        </p>
+                        <div className="space-y-1.5 pt-1">
+                          {team.wilayah.map((w) => (
+                            <div
+                              key={w.name}
+                              className="group/chip flex items-center justify-between gap-2 rounded-xl bg-slate-50 border border-slate-200/70 px-3 py-2 text-xs font-semibold text-slate-700 transition-all hover:bg-white hover:border-[#2B3056]/30 hover:shadow-2xs"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
+                                  w.isGov ? 'bg-[#2B3056] text-[#FFD82B]' : w.isCapital ? 'bg-amber-100 text-amber-800' : 'bg-white border border-slate-200 text-slate-600'
+                                }`}>
+                                  {w.isGov ? <Landmark className="h-3 w-3" /> : w.isCapital || w.isCity ? <Building2 className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
+                                </span>
+                                <span className="truncate">{w.name}</span>
+                              </div>
+                              <span className="text-[9.5px] font-bold text-slate-400 group-hover/chip:text-[#2B3056] shrink-0 bg-white border border-slate-200/60 px-1.5 py-0.2 rounded">
+                                {w.type}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[9px] font-bold text-white/80">
-                      {team.wilayah.length} Wilayah
-                    </span>
-                  </div>
 
-                  <ul className="space-y-1.5 p-5">
-                    {team.wilayah.map((wilayah) => (
-                      <li
-                        key={wilayah}
-                        className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-[#4B5565] transition-colors duration-150 hover:bg-[#F2F5F9] hover:text-[#17336F]"
-                      >
-                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#A98522]" />
-                        <span>{wilayah}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="px-5 pb-5">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#D8C889] bg-[#FBF8EE] px-3 py-1.5 text-[9px] font-bold text-[#745C17] shadow-sm select-none">
-                      {/* Pulsing Beacon Dot */}
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#A98522] opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#A98522]" />
+                    {/* Card Footer */}
+                    <div className="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
+                      <span className="inline-flex items-center gap-1.5 text-emerald-600">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Aktif Melayani
                       </span>
-                      Aktif melayani
-                    </span>
-                  </div>
-                </article>
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center gap-1 text-[#2B3056] group-hover:text-[#3A4070] font-bold text-xs hover:underline"
+                      >
+                        <span>Masuk Tim Kerja</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-[#FFC800] group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        {/* =========================================
-            SECTION 6: ALUR KERJA (SOP)
-        ========================================= */}
-        <section id="alur" className="scroll-mt-28 bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#CCD5E3] bg-[#F5F7FA] px-3.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17336F] shadow-sm select-none">
-                <Scale className="h-3.5 w-3.5 text-[#9A781C]" />
-                SOP Harmonisasi
-              </span>
-              <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.025em] text-[#142A5E] sm:text-4xl">
-                Alur Kerja yang Terstruktur
-              </h2>
-              <p className="mt-3 text-sm font-medium leading-7 text-[#687184]">
-                Empat tahap utama menjaga proses tetap transparan sejak dokumen masuk hingga hasil akhir diarsipkan.
-              </p>
-            </div>
+        {/* =========================================================================
+            SECTION 6: ALUR KERJA
+            ========================================================================= */}
+        <section id="alur" className="scroll-mt-28 bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+            
+            {/* Header Section */}
+            <Reveal direction="up" delay={0}>
+              <div className="mx-auto max-w-3xl text-center">
+                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#B3912D]">
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                  SOP Harmonisasi Terpadu
+                  <span className="h-px w-6 bg-[#FFC800]" />
+                </span>
+                <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
+                  Alur Kerja & Tahapan SOP Harmonisasi
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
+                  Empat tahap terstandar menjamin proses harmonisasi regulasi daerah berjalan transparan, akuntabel, dan terukur dari awal permohonan hingga arsip digital.
+                </p>
+              </div>
+            </Reveal>
 
-            <div className="relative mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              {/* Connecting Line */}
+            {/* 4 Interactive Phase Pipeline Cards */}
+            <div className="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Connected Line on Desktop */}
               <div
                 aria-hidden="true"
-                className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-[#CBD3E0] lg:block"
+                className="absolute left-[12%] right-[12%] top-10 hidden h-0.5 bg-slate-200 lg:block pointer-events-none -z-0"
               />
 
               {workflowSteps.map((step, index) => {
                 const Icon = step.icon;
+                const isActive = activeWorkflowStep === index;
 
                 return (
-                  <article
-                    key={step.step}
-                    className="relative rounded-2xl border border-[#DCE2EC] bg-white p-6 shadow-[0_10px_28px_rgba(20,42,94,0.06)] transition-colors duration-200 hover:border-[#B4C0D4]"
-                  >
-                    <div className="relative flex items-center justify-between">
-                      {/* Step Number Circle */}
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-[#17336F] text-sm font-extrabold text-white shadow-[0_4px_14px_rgba(20,42,94,0.16)]">
-                        {step.step}
-                      </span>
-                      {/* Step Icon */}
-                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E9EDF5] text-[#17336F] shadow-sm">
-                        <Icon className="h-5 w-5" />
-                      </span>
-                    </div>
+                  <Reveal key={step.step} direction="up" delay={index * 120 + 50}>
+                    <article
+                      onClick={() => setActiveWorkflowStep(index)}
+                      className={`group relative flex flex-col justify-between rounded-3xl border p-5 sm:p-6 transition-all duration-300 cursor-pointer h-full ${
+                        isActive
+                          ? 'bg-gradient-to-b from-white to-slate-50/80 border-[#2B3056] shadow-xl ring-2 ring-[#FFD82B]/80 -translate-y-1.5'
+                          : 'bg-white border-slate-200/90 shadow-2xs hover:border-[#2B3056]/30 hover:shadow-md hover:-translate-y-0.5'
+                      }`}
+                    >
+                      {/* Top Glowing Active Bar */}
+                      {isActive && (
+                        <span className={`absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r ${step.color}`} />
+                      )}
 
-                    <h3 className="mt-6 text-base font-extrabold leading-6 text-[#1E293B]">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 text-xs font-medium leading-6 text-[#687184]">
-                      {step.description}
-                    </p>
+                      <div>
+                        {/* Step Header */}
+                        <div className="relative flex items-center justify-between">
+                          <span
+                            className={`flex h-11 w-11 items-center justify-center rounded-2xl text-xs font-black shadow-md transition-transform ${
+                              isActive
+                                ? 'bg-[#2B3056] text-[#FFD82B] ring-4 ring-[#FFD82B]/30 scale-105'
+                                : 'bg-slate-100 text-slate-700 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B]'
+                            }`}
+                          >
+                            {step.step}
+                          </span>
 
-                    <div className="mt-6 flex items-center gap-2 border-t border-[#E2E6EC] pt-4 text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#8A6B18]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#B3912D]" />
-                      Tahap {index + 1} dari 4
-                    </div>
-                  </article>
+                          <span
+                            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
+                              isActive
+                                ? 'bg-[#2B3056] text-[#FFD82B]'
+                                : 'bg-slate-50 border border-slate-200/80 text-slate-500 group-hover:text-[#2B3056]'
+                            }`}
+                          >
+                            <Icon className="h-4.5 w-4.5" />
+                          </span>
+                        </div>
+
+                        <h3 className="mt-5 text-sm sm:text-base font-bold text-[#2B3056]">
+                          {step.title}
+                        </h3>
+
+                        <p className="mt-2 text-xs text-slate-600 font-normal leading-relaxed line-clamp-3">
+                          {step.description}
+                        </p>
+                      </div>
+
+                      {/* Step Footer Metadata */}
+                      <div className="mt-5 pt-3.5 border-t border-slate-100 space-y-2">
+                        <div className="flex items-center justify-between text-[10.5px]">
+                          <span className="font-semibold text-slate-500">{step.timeframe}</span>
+                          <span className="font-bold text-[#2B3056] bg-slate-100 px-2 py-0.5 rounded-md">
+                            {step.actor.split('&')[0]}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] font-bold">
+                          <span className="text-[#B3912D] truncate max-w-[140px]">
+                            {step.deliverable}
+                          </span>
+                          <span className={`text-[9px] uppercase px-1.5 py-0.2 rounded font-extrabold ${
+                            isActive ? 'bg-[#2B3056] text-[#FFD82B]' : 'bg-slate-100 text-slate-500'
+                          }`}>
+                            {isActive ? 'Aktif' : 'Pilih'}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  </Reveal>
                 );
               })}
             </div>
+
+            {/* Interactive Live SOP Stage Simulator / Document Inspector Panel */}
+            <Reveal direction="up" delay={200}>
+              <div className="rounded-3xl border border-slate-200/90 bg-gradient-to-b from-slate-900 via-[#1E223D] to-[#2B3056] p-6 sm:p-8 text-white shadow-2xl overflow-hidden relative">
+                
+                {/* Background Ambient Aura */}
+                <div 
+                  className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full pointer-events-none opacity-25 blur-3xl -z-0"
+                  style={{
+                    background: 'radial-gradient(circle, #FFD82B 0%, #2B3056 70%, transparent 100%)'
+                  }}
+                />
+
+                {/* Simulator Top Chrome */}
+                <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-3 w-3 rounded-full bg-rose-500/90 shadow-2xs" />
+                      <span className="h-3 w-3 rounded-full bg-amber-400/90 shadow-2xs" />
+                      <span className="h-3 w-3 rounded-full bg-emerald-400/90 shadow-2xs" />
+                    </div>
+                    <span className="h-3.5 w-px bg-white/20" />
+                    <p className="text-xs font-bold text-[#FFD82B] flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-[#FFD82B]" />
+                      Simulasi Alur SOP: Tahap {workflowSteps[activeWorkflowStep].step} — {workflowSteps[activeWorkflowStep].title}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-lg bg-white/10 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-slate-200 border border-white/10">
+                      Pelaksana: {workflowSteps[activeWorkflowStep].actor}
+                    </span>
+                    <span className="rounded-lg bg-emerald-500/20 px-2.5 py-1 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                      ⏱️ {workflowSteps[activeWorkflowStep].timeframe}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Simulator Content Grid */}
+                <div className="relative z-10 mt-6 grid gap-6 lg:grid-cols-12 items-center">
+                  
+                  {/* Left Column: Key Execution Checklist */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-[#FFD82B]" />
+                        Kegiatan Utama & Ketentuan Prosedur
+                      </h4>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                        {workflowSteps[activeWorkflowStep].description}
+                      </p>
+                    </div>
+
+                    {/* Features Checklist */}
+                    <div className="space-y-2.5 pt-1">
+                      {workflowSteps[activeWorkflowStep].features.map((feat, fIdx) => (
+                        <div
+                          key={fIdx}
+                          className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-3 backdrop-blur-sm transition-colors hover:bg-white/10"
+                        >
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#FFD82B] text-[#2B3056] font-bold text-xs">
+                            <Check className="h-3 w-3 stroke-[3]" />
+                          </span>
+                          <span className="text-xs text-slate-200 font-medium leading-normal">
+                            {feat}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Output & Legal Deliverable Card */}
+                  <div className="lg:col-span-5">
+                    <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md space-y-4 shadow-xl">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#FFD82B]">
+                          Output Resmi Tahap Ini
+                        </span>
+                        <span className="rounded-md bg-emerald-500/20 border border-emerald-400/30 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
+                          SOP Terpenuhi
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-3">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFD82B] text-[#2B3056] shadow-md font-bold">
+                            <FileText className="h-5 w-5" />
+                          </span>
+                          <div>
+                            <p className="text-xs font-bold text-white">
+                              {workflowSteps[activeWorkflowStep].deliverable}
+                            </p>
+                            <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                              {workflowSteps[activeWorkflowStep].mockupDetail}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10.5px]">
+                        <div className="flex items-center gap-1.5 text-slate-300">
+                          <ShieldCheck className="h-4 w-4 text-[#FFD82B]" />
+                          <span>Tervalidasi Kanwil Riau</span>
+                        </div>
+                        <Link
+                          href="/login"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-[#FFD82B] hover:underline"
+                        >
+                          <span>Mulai Tahap Ini</span>
+                          <ArrowRight className="h-3.5 w-3.5 text-[#FFD82B]" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </Reveal>
+
           </div>
         </section>
 
-        {/* =========================================
-            SECTION 7: CTA CALLOUT BOX
-        ========================================= */}
-        <section className="border-t border-[#E0E5ED] bg-[#F3F5F8] py-20 sm:py-24">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden rounded-[28px] border border-[#29447D] bg-[#142A5E] px-7 py-10 text-white shadow-[0_18px_45px_rgba(20,42,94,0.16)] sm:px-10 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-12 lg:py-12">
-              {/* Gold Side Accent Bar */}
-              <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-[#C5A64B]" />
+        {/* =========================================================================
+            SECTION 7: BANNER CTA
+            ========================================================================= */}
+        <section className="bg-slate-50/70 py-16 sm:py-20 overflow-hidden">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <Reveal direction="scale" delay={50}>
+              <div className="relative overflow-hidden rounded-3xl border border-[#3A4070] bg-gradient-to-r from-[#2B3056] via-[#323963] to-[#2B3056] p-7 sm:p-10 lg:p-12 text-white shadow-2xl">
+                {/* Gold Left Accent Border */}
+                <div aria-hidden="true" className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-b from-[#FFC800] via-[#FFD82B] to-[#FFC800]" />
 
-              <div className="relative max-w-2xl text-center lg:text-left">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.15em] text-[#E4CE7B] select-none">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  Akses Layanan Resmi
-                </span>
-                <h2 className="mt-4 text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
-                  Siap Mengelola Proses Harmonisasi?
-                </h2>
-                <p className="mt-3 text-sm font-medium leading-6 text-white/70">
-                  Gunakan akun resmi Kanwil atau Biro/Bagian Hukum untuk mengakses dashboard dan melanjutkan pekerjaan Anda.
-                </p>
+                {/* Soft Radial Ambient Glow */}
+                <div 
+                  className="absolute -right-16 -top-16 w-80 h-80 rounded-full pointer-events-none opacity-20 blur-3xl"
+                  style={{ background: 'radial-gradient(circle, #FFD82B 0%, transparent 70%)' }}
+                />
+
+                <div className="relative z-10 grid gap-8 lg:grid-cols-12 lg:items-center">
+                  
+                  {/* Left Column: Headline & Action Buttons */}
+                  <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-widest text-[#FFD82B] backdrop-blur-xs">
+                      <ShieldCheck className="h-4 w-4 text-[#FFD82B]" />
+                      Akses Layanan Resmi Kanwil Kemenkumham Riau
+                    </span>
+
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                      Siap Mengakselerasi Harmonisasi Regulasi Daerah?
+                    </h2>
+
+                    <p className="text-xs sm:text-sm font-normal leading-relaxed text-slate-200 max-w-xl">
+                      Gunakan akun resmi Kanwil Kemenkumham Riau, Biro Hukum Provinsi, atau Bagian Hukum Kabupaten/Kota untuk mengakses dashboard digital terpadu, telaah draf dengan AI, dan pantau status secara real-time.
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                      <Link
+                        href="/login"
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-6 text-xs font-bold text-[#2B3056] shadow-lg transition duration-200 hover:-translate-y-0.5 cursor-pointer"
+                      >
+                        <span>Masuk ke HARMONITAS</span>
+                        <ArrowRight className="h-4 w-4 text-[#2B3056]" />
+                      </Link>
+
+                      <Link
+                        href="/panduan"
+                        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-xs px-5 text-xs font-bold text-white transition duration-200 cursor-pointer"
+                      >
+                        <BookOpen className="h-4 w-4 text-[#FFD82B]" />
+                        <span>Panduan Penggunaan</span>
+                      </Link>
+                    </div>
+
+                    {/* Trust Footnotes */}
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3 text-[10.5px] text-slate-300 font-medium border-t border-white/10">
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-3.5 w-3.5 text-[#FFD82B] stroke-[3]" />
+                        12 Kab/Kota Terkoneksi
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-3.5 w-3.5 text-[#FFD82B] stroke-[3]" />
+                        SOP Resmi Kemenkumham
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-3.5 w-3.5 text-[#FFD82B] stroke-[3]" />
+                        Bantuan Telaah AI
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Mini Dashboard Workstation Mockup */}
+                  <div className="lg:col-span-5">
+                    <div className="rounded-2xl border border-white/20 bg-white/10 p-4.5 backdrop-blur-md space-y-3.5 shadow-2xl">
+                      {/* Window Header */}
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-2.5 w-2.5 rounded-full bg-rose-500/90" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
+                          <span className="ml-1.5 text-[10px] font-bold text-slate-200">Dashboard Quick Access</span>
+                        </div>
+                        <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[8.5px] font-extrabold text-emerald-300 border border-emerald-400/30">
+                          Sistem Aktif
+                        </span>
+                      </div>
+
+                      {/* Mockup Active User Pill */}
+                      <div className="flex items-center justify-between rounded-xl bg-white/5 border border-white/10 p-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFD82B] text-[#2B3056] font-black text-xs">
+                            P
+                          </span>
+                          <div>
+                            <p className="text-[11px] font-bold text-white leading-none">Perancang Peraturan PUU</p>
+                            <p className="text-[9.5px] text-slate-300 mt-0.5">Kanwil Kemenkumham Riau</p>
+                          </div>
+                        </div>
+                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+                      </div>
+
+                      {/* Mini Regulation Queue Preview */}
+                      <div className="space-y-1.5 text-[10px]">
+                        <p className="text-[9.5px] font-bold uppercase tracking-wider text-slate-300">
+                          Antrean Regulasi Aktif:
+                        </p>
+                        <div className="flex items-center justify-between rounded-lg bg-black/20 px-2.5 py-1.5 border border-white/5">
+                          <span className="truncate text-slate-200 font-medium">Ranperda Tata Ruang Kab. Siak</span>
+                          <span className="shrink-0 font-bold text-amber-300">Tahap Pleno</span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-lg bg-black/20 px-2.5 py-1.5 border border-white/5">
+                          <span className="truncate text-slate-200 font-medium">Ranperda Pajak Kab. Bengkalis</span>
+                          <span className="shrink-0 font-bold text-emerald-300">Validasi</span>
+                        </div>
+                      </div>
+
+                      {/* Launch Button */}
+                      <Link
+                        href="/login"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 py-2 text-[11px] font-bold text-white transition-colors"
+                      >
+                        <Lock className="h-3 w-3 text-[#FFD82B]" />
+                        <span>Buka Ruang Kerja Digital</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                </div>
               </div>
-
-              {/* Clickable CTA Button with Interactive Hover & Feedback */}
-              <Link
-                href="/login"
-                className="group/btn relative mx-auto mt-7 inline-flex h-12 min-w-[228px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[#D2B24F] px-6 text-xs font-extrabold text-[#12275A] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E5C96B] hover:shadow-[0_12px_28px_rgba(210,178,79,0.35)] active:translate-y-0 active:scale-[0.98] lg:mx-0 lg:mt-0"
-              >
-                <span>Masuk ke HARMONITAS</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
-              </Link>
-            </div>
+            </Reveal>
           </div>
         </section>
       </main>
 
-      {/* =========================================
-          FOOTER
-      ========================================= */}
-      <footer id="kontak" className="border-t-4 border-[#C5A64B] bg-[#102454] text-white">
+      {/* =========================================================================
+          SECTION 8: FOOTER (Official Kemenkumham Navy #2B3056)
+          ========================================================================= */}
+      <footer id="kontak" className="bg-[#2B3056] text-white pt-14 pb-8 border-t border-[#3A4070] overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 border-b border-white/10 py-12 md:grid-cols-12">
-            <div className="md:col-span-5">
-              <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm">
-                  <img src={logoHarmonitas} alt="Logo HARMONITAS" className="h-full w-full object-contain" />
-                </span>
-                <div>
-                  <p className="text-base font-extrabold tracking-[0.08em]">HARMONITAS</p>
-                  <p className="text-[10px] font-medium text-white/60">Kanwil Kementerian Hukum Riau</p>
+          <Reveal direction="up" delay={50}>
+            <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-12 text-xs">
+              
+              {/* Brand & Identity Column */}
+              <div className="md:col-span-5 space-y-4">
+                <div className="flex items-center gap-3.5">
+                  {/* High-Contrast White Container for Brand Logos */}
+                  <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-lg border border-white/20">
+                    <img src={logoHarmonitas} alt="Logo HARMONITAS" className="h-8 w-auto object-contain" />
+                    <img src={logoPengayoman} alt="Logo Pengayoman" className="h-8 w-auto object-contain" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-black tracking-wider text-white">HARMONITAS</p>
+                      <span className="rounded-full bg-[#FFD82B] px-2 py-0.5 text-[9px] font-extrabold text-[#2B3056]">
+                        RIAU
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] font-medium text-slate-300">Kanwil Kementerian Hukum Riau</p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-300 font-normal leading-relaxed max-w-md">
+                  Sistem Informasi Harmonisasi dan Fasilitasi Ranperda serta Ranperkada terintegrasi untuk mendukung pembentukan regulasi daerah yang berkualitas, berkeadilan, dan taat asas.
+                </p>
+
+                <div className="flex items-center gap-2 text-[11px] font-bold text-[#FFD82B]">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Portal Resmi Kanwil Kementerian Hukum Riau</span>
                 </div>
               </div>
-              <p className="mt-4 max-w-md text-xs font-medium leading-6 text-white/65">
-                Sistem harmonisasi dan fasilitasi Ranperda serta Ranperkada yang terintegrasi untuk mendukung regulasi daerah berkualitas.
-              </p>
+
+              {/* Quick Links Column */}
+              <div className="md:col-span-3 space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#FFD82B]">Tautan Cepat</h3>
+                <ul className="space-y-2.5 text-xs text-slate-300 font-normal">
+                  <li><a href="#beranda" className="hover:text-[#FFD82B] transition">Beranda</a></li>
+                  <li><a href="#tentang" className="hover:text-[#FFD82B] transition">Tentang Sistem</a></li>
+                  <li><a href="#wilayah" className="hover:text-[#FFD82B] transition">Wilayah Tim Kerja</a></li>
+                  <li><a href="#alur" className="hover:text-[#FFD82B] transition">Alur Kerja SOP</a></li>
+                  <li><Link href="/panduan" className="hover:text-[#FFD82B] transition">Panduan Sistem</Link></li>
+                  <li><Link href="/login" className="hover:text-[#FFD82B] transition font-bold text-white">Masuk Petugas</Link></li>
+                </ul>
+              </div>
+
+              {/* Contact Column */}
+              <div className="md:col-span-4 space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#FFD82B]">Hubungi Kami</h3>
+                <ul className="space-y-3 text-xs text-slate-300 font-normal">
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#FFD82B]">
+                      <Mail className="h-3.5 w-3.5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-white">Email Resmi:</p>
+                      <span className="text-slate-300">harmonitas.kanwil@kemenkum.go.id</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#FFD82B]">
+                      <PhoneCall className="h-3.5 w-3.5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-white">Telepon / Hotline:</p>
+                      <span className="text-slate-300">(0761) 853000</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#FFD82B]">
+                      <MapPin className="h-3.5 w-3.5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-white">Kantor Wilayah:</p>
+                      <span className="text-slate-300">Jl. Jend. Sudirman No. 233, Kota Pekanbaru, Riau</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
             </div>
 
-            {/* Clickable Quick Links */}
-            <div className="md:col-span-3">
-              <h3 className="text-xs font-extrabold">Tautan Cepat</h3>
-              <ul className="mt-4 space-y-2.5 text-xs font-medium text-white/65">
-                <li>
-                  <a href="#tentang" className="inline-block transition-all duration-200 hover:translate-x-1 hover:text-[#E4CE7B]">
-                    Tentang Sistem
-                  </a>
-                </li>
-                <li>
-                  <a href="#alur" className="inline-block transition-all duration-200 hover:translate-x-1 hover:text-[#E4CE7B]">
-                    Alur Kerja
-                  </a>
-                </li>
-                <li>
-                  <a href="#wilayah" className="inline-block transition-all duration-200 hover:translate-x-1 hover:text-[#E4CE7B]">
-                    Wilayah Tim Kerja
-                  </a>
-                </li>
-                <li>
-                  <Link href="/login" className="inline-block transition-all duration-200 hover:translate-x-1 hover:text-[#E4CE7B]">
-                    Login
-                  </Link>
-                </li>
-              </ul>
+            <div className="flex flex-col gap-2 pt-6 text-[10.5px] text-slate-400 font-normal sm:flex-row sm:items-center sm:justify-between">
+              <p>© {new Date().getFullYear()} HARMONITAS • Kantor Wilayah Kementerian Hukum Riau.</p>
+              <p className="text-slate-400 font-medium">Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas</p>
             </div>
-
-            {/* Contact Info */}
-            <div className="md:col-span-4">
-              <h3 className="text-xs font-extrabold">Hubungi Kami</h3>
-              <ul className="mt-4 space-y-3 text-xs font-medium text-white/65">
-                <li className="flex items-start gap-2.5">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#D5B95F]" />
-                  <span>harmonitas.kanwil@kemenkum.go.id</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <PhoneCall className="mt-0.5 h-4 w-4 shrink-0 text-[#D5B95F]" />
-                  <span>(0761) 853000</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#D5B95F]" />
-                  <span>Jl. Jend. Sudirman No. 233, Kota Pekanbaru, Riau</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 py-6 text-[10px] font-medium text-white/50 sm:flex-row sm:items-center sm:justify-between">
-            <p>Hak cipta {new Date().getFullYear()} HARMONITAS Kanwil Kementerian Hukum Riau.</p>
-            <p>Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas</p>
-          </div>
+          </Reveal>
         </div>
       </footer>
     </div>
