@@ -182,10 +182,11 @@ export const AppLayout = ({
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((current) => !current)}
-                className={`group flex h-10 items-center gap-2 rounded-xl px-2.5 transition-all duration-200 border cursor-pointer select-none ${isProfileOpen
-                  ? "border-[#2B3056] bg-[#2B3056] text-white shadow-sm"
-                  : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
-                  }`}
+                className={`group flex h-10 items-center gap-2 rounded-xl px-2.5 transition-all duration-200 border cursor-pointer select-none ${
+                  isProfileOpen
+                    ? "border-[#2B3056] bg-[#2B3056] text-white shadow-sm"
+                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
+                }`}
                 title="Menu Akun"
                 aria-label="Buka informasi akun"
                 aria-haspopup="menu"
@@ -207,8 +208,9 @@ export const AppLayout = ({
                   {displayName.split(" ")[0]}
                 </span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${isProfileOpen ? "rotate-180 text-[#FFD82B]" : "text-slate-400"
-                    }`}
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    isProfileOpen ? "rotate-180 text-[#FFD82B]" : "text-slate-400"
+                  }`}
                 />
               </button>
 
