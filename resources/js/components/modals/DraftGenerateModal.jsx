@@ -741,14 +741,27 @@ Tembusan:
                 Tanggal Surat Permohonan Pemda
               </label>
               <input
-                type="text"
-                value={formData.tanggalSuratP}
-                onChange={(e) =>
-                  setFormData({ ...formData, tanggalSuratP: e.target.value })
-                }
+                type="date"
+                value={inputDateVal}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setInputDateVal(val);
+                  setFormData({
+                    ...formData,
+                    tanggalSurat: formatIndonesianDate(val)
+                  });
+                }}
                 className="flat-input w-full p-2 text-xs font-medium"
-                placeholder="12 Juli 2024"
               />
+
+              {formData.tanggalSurat && (
+                <p className="mt-1 text-[10px] text-[#3D3D3A]/70 font-semibold">
+                  Akan tertulis:{' '}
+                  <span className="text-[#1A1A5E] font-black">
+                    {formData.tanggalSurat}
+                  </span>
+                </p>
+              )}
             </div>
 
             {/* JENIS PERATURAN */}
