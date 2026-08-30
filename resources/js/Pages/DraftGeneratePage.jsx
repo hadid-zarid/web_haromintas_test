@@ -233,7 +233,7 @@ const DraftGeneratePage = () => {
                         </div>
                         <div className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                          <span>Format Penomoran: <strong>W.4-PP.04.02-«NOMOR»</strong></span>
+                          <span>Format Penomoran: <strong>Sesuai input (Kustom)</strong></span>
                         </div>
                         <div className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -294,7 +294,7 @@ const DraftGeneratePage = () => {
                         </div>
                         <div className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                          <span>Format Penomoran: <strong>W.4-PP.04.02-«NOMOR»</strong></span>
+                          <span>Format Penomoran: <strong>Sesuai input (Kustom)</strong></span>
                         </div>
                         <div className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />

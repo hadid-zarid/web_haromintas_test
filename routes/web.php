@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
     // Draft Generate Surat
     Route::get('/draft-generate', function () {
         return Inertia::render('DraftGeneratePage');
-    })->name('draft.generate');
+    })->name('draft.generate')->middleware('role:TIM_KERJA');
 
     // Notifikasi Sistem
     Route::get('/notifikasi', [\App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');

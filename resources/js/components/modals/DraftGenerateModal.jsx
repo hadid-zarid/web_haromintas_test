@@ -419,7 +419,7 @@ export const DraftGenerateModal = ({
       if (onSaveHistory) {
         onSaveHistory({
           id: `DRAFT-${Date.now()}`,
-          nomorSurat: `W.4-PP.04.02-${formData.nomorSurat}`,
+          nomorSurat: formData.nomorSurat,
           jenis: letterType === 'perda' ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA',
           judul: `Rancangan ${formData.jenisPeraturan} ${formData.asalPemrakarsa} tentang ${formData.judulPeraturan}`,
           kabupaten: formData.asalPemrakarsa,
@@ -454,7 +454,7 @@ Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
 Telepon: (0761) 23846 - 0811-6904-422
 Laman: https://riau.kemenkum.go.id/ Pos-el: subbidfpphdriaubedelau@gmail.com
 
-Nomor : W.4-PP.04.02-${formData.nomorSurat}                                                                      ${formData.tanggalSurat}
+Nomor : ${formData.nomorSurat}                                                                      ${formData.tanggalSurat}
 Sifat : Penting
 Hal   : ${formData.hal}
 
@@ -595,16 +595,12 @@ Tembusan:
             {/* NOMOR SURAT KELUAR KANWIL */}
             <div>
               <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Nomor Surat Keluar Kanwil (setelah W.4-PP.04.02-)
+                Nomor Surat Keluar Kanwil
                 <span className="text-red-500"> *</span>
               </label>
 
               <div className="flex items-center gap-1.5">
-                {/* Input Group Menyatukan Prefix & Input */}
                 <div className="flex items-center flex-1 rounded-xl border border-[#D5D5CE] bg-white overflow-hidden focus-within:border-[#1A1A5E] focus-within:ring-1 focus-within:ring-[#1A1A5E] transition-all">
-                  <span className="inline-flex items-center px-3 py-2 bg-[#F5F5F0] border-r border-[#D5D5CE] text-xs font-mono font-bold text-[#1A1A5E] whitespace-nowrap select-none">
-                    W.4-PP.04.02-
-                  </span>
                   <input
                     type="text"
                     value={formData.nomorSurat}
@@ -612,7 +608,7 @@ Tembusan:
                       setFormData({ ...formData, nomorSurat: e.target.value })
                     }
                     className="w-full px-3 py-2 text-xs font-mono font-bold text-[#1A1A5E] bg-transparent focus:outline-none"
-                    placeholder="1489"
+                    placeholder="Contoh: W.4-PP.04.02-1489"
                   />
                 </div>
 
@@ -895,7 +891,7 @@ Tembusan:
                     <td className="w-16 align-top py-0.5">Nomor</td>
                     <td className="w-4 align-top py-0.5">:</td>
                     <td className="align-top py-0.5">
-                      W.4-PP.04.02-{formData.nomorSurat}
+                      {formData.nomorSurat}
                     </td>
                     <td className="text-right align-top py-0.5 whitespace-nowrap">
                       {formData.tanggalSurat}

@@ -21,28 +21,33 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
   const authUser = props?.auth?.user;
   const isAdmin = authUser?.role === 'ADMIN';
 
-  const navItems = [
-    {
-      label: "Beranda",
-      path: "/home",
-      icon: Home,
-    },
-    {
-      label: "Daftar Permohonan",
-      path: "/peraturan",
-      icon: FileText,
-    },
-    {
-      label: "Draft Generate Surat",
-      path: "/draft-generate",
-      icon: FileOutput,
-    },
-    {
-      label: "Buku Panduan",
-      path: "/panduan",
-      icon: BookOpen,
-    },
-  ];
+    const isTimKerja = authUser?.role === 'TIM_KERJA';
+
+    const baseNavItems = [
+        {
+            label: "Beranda",
+            path: "/home",
+            icon: Home,
+        },
+        {
+            label: "Daftar Permohonan",
+            path: "/peraturan",
+            icon: FileText,
+        },
+        {
+            label: "Draft Generate Surat",
+            path: "/draft-generate",
+            icon: FileOutput,
+            show: isTimKerja,
+        },
+        {
+            label: "Buku Panduan",
+            path: "/panduan",
+            icon: BookOpen,
+        },
+    ];
+
+    const navItems = baseNavItems.filter((item) => item.show !== false);
 
   const isAiActive = currentPath.startsWith("/ai");
   const isManageAccountsActive = currentPath.startsWith("/admin/users");
