@@ -20,9 +20,16 @@ import {
   Compass,
   AlertTriangle,
   Flame,
-  Activity
+  Activity,
+  ArrowRight,
+  ChevronRight,
+  LogIn,
+  LayoutDashboard,
+  ExternalLink
 } from 'lucide-react';
-import LogoPengayoman from '../components/common/LogoPengayoman';
+import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
+import logoPengayoman from '../assets/logo_pengayoman.png';
+import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
 
 const ERROR_CONFIGS = {
   404: {
@@ -32,13 +39,13 @@ const ERROR_CONFIGS = {
     description:
       'Tautan atau berkas regulasi yang Anda tuju mungkin salah ketik, telah dipindahkan ke arsip lain, atau sudah tidak tersedia di sistem HARMONITAS.',
     icon: FileQuestion,
-    accentColor: 'from-[#FFD82B] to-[#FFB943]',
-    badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-    iconBg: 'bg-amber-400/10 text-[#FFD82B] border-amber-400/20',
+    badgeBg: 'bg-amber-50 text-amber-900 border-amber-200',
+    iconColor: 'text-[#2B3056]',
+    iconBg: 'bg-amber-100 text-amber-800 border-amber-200',
     solutions: [
       'Periksa kembali penulisan alamat URL pada bilah peramban Anda.',
       'Gunakan fitur pencarian pada menu Berkas Permohonan Regulasi.',
-      'Kembali ke Beranda atau halaman navigasi sebelumnya.'
+      'Kembali ke Beranda atau gunakan menu navigasi utama.'
     ]
   },
   403: {
@@ -48,9 +55,9 @@ const ERROR_CONFIGS = {
     description:
       'Akun Anda tidak memiliki wewenang atau hak akses untuk membuka halaman/dokumen ini. Beberapa fitur dibatasi khusus untuk peran tertentu (Tim Kerja, Biro Hukum, atau Administrator).',
     icon: ShieldAlert,
-    accentColor: 'from-rose-400 to-rose-600',
-    badgeBg: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
-    iconBg: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+    badgeBg: 'bg-rose-50 text-rose-800 border-rose-200',
+    iconColor: 'text-rose-600',
+    iconBg: 'bg-rose-100 text-rose-700 border-rose-200',
     solutions: [
       'Pastikan Anda telah masuk (login) dengan akun yang memiliki peran sesuai.',
       'Fitur Draft Generate Surat hanya dapat diakses oleh role Tim Kerja.',
@@ -64,9 +71,9 @@ const ERROR_CONFIGS = {
     description:
       'Anda harus masuk terlebih dahulu dengan akun resmi untuk mengakses layanan dan informasi regulasi terintegrasi.',
     icon: Lock,
-    accentColor: 'from-blue-400 to-indigo-500',
-    badgeBg: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
-    iconBg: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    badgeBg: 'bg-blue-50 text-blue-800 border-blue-200',
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-blue-100 text-blue-700 border-blue-200',
     solutions: [
       'Klik tombol Masuk / Login untuk melanjutkan autentikasi.',
       'Gunakan kredensial resmi Kanwil Kemenkumham atau SSO Google yang terdaftar.',
@@ -80,9 +87,9 @@ const ERROR_CONFIGS = {
     description:
       'Sesi keamanan (CSRF Token) halaman Anda telah berakhir karena tidak ada aktivitas dalam beberapa waktu demi menjaga keamanan data Anda.',
     icon: Clock,
-    accentColor: 'from-amber-400 to-orange-500',
-    badgeBg: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
-    iconBg: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+    badgeBg: 'bg-orange-50 text-orange-800 border-orange-200',
+    iconColor: 'text-orange-600',
+    iconBg: 'bg-orange-100 text-orange-700 border-orange-200',
     solutions: [
       'Muat ulang halaman ini untuk memperbarui token keamanan.',
       'Kirim ulang formulir Anda setelah halaman berhasil disegarkan.',
@@ -96,9 +103,9 @@ const ERROR_CONFIGS = {
     description:
       'Sistem mendeteksi aktivitas pengiriman permintaan yang terlalu cepat dari perangkat Anda untuk menjaga stabilitas dan keamanan server.',
     icon: Activity,
-    accentColor: 'from-orange-400 to-rose-500',
-    badgeBg: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
-    iconBg: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+    badgeBg: 'bg-rose-50 text-rose-800 border-rose-200',
+    iconColor: 'text-rose-600',
+    iconBg: 'bg-rose-100 text-rose-700 border-rose-200',
     solutions: [
       'Mohon jeda sejenak (sekitar 1-2 menit) sebelum mencoba kembali.',
       'Hindari menekan tombol formulir secara berulang-ulang dengan cepat.',
@@ -112,9 +119,9 @@ const ERROR_CONFIGS = {
     description:
       'Sistem mengalami kesalahan pemrosesan tak terduga saat memuat data. Tim teknis HARMONITAS telah mencatat galat ini untuk segera ditangani.',
     icon: ServerCrash,
-    accentColor: 'from-red-500 to-rose-600',
-    badgeBg: 'bg-red-500/10 text-red-300 border-red-500/30',
-    iconBg: 'bg-red-500/10 text-red-400 border-red-500/20',
+    badgeBg: 'bg-red-50 text-red-800 border-red-200',
+    iconColor: 'text-red-600',
+    iconBg: 'bg-red-100 text-red-700 border-red-200',
     solutions: [
       'Coba muat ulang halaman dalam beberapa saat.',
       'Kembali ke halaman Beranda untuk mengakses fitur lainnya.',
@@ -128,9 +135,9 @@ const ERROR_CONFIGS = {
     description:
       'Platform HARMONITAS Kanwil Kemenkumham Riau sedang dalam proses pemeliharaan rutin atau peningkatan kapasitas infrastruktur server.',
     icon: Flame,
-    accentColor: 'from-amber-400 to-yellow-500',
-    badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-    iconBg: 'bg-amber-400/10 text-amber-300 border-amber-400/20',
+    badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
+    iconColor: 'text-amber-600',
+    iconBg: 'bg-amber-100 text-amber-800 border-amber-200',
     solutions: [
       'Sistem akan segera kembali aktif dalam beberapa waktu ke depan.',
       'Silakan cek kembali secara berkala.',
@@ -144,9 +151,9 @@ const ERROR_CONFIGS = {
     description:
       'Server perantara tidak menerima respons valid dari layanan utama saat memproses permintaan Anda.',
     icon: AlertTriangle,
-    accentColor: 'from-amber-500 to-rose-500',
-    badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-    iconBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
+    iconColor: 'text-amber-600',
+    iconBg: 'bg-amber-100 text-amber-800 border-amber-200',
     solutions: [
       'Periksa kestabilan koneksi internet Anda.',
       'Muat ulang halaman untuk mengirim ulang permintaan.',
@@ -160,9 +167,9 @@ const ERROR_CONFIGS = {
     description:
       'Proses memakan waktu lebih lama dari batas normal server saat mengambil atau mengolah data regulasi daerah.',
     icon: Clock,
-    accentColor: 'from-amber-500 to-rose-500',
-    badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-    iconBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
+    iconColor: 'text-amber-600',
+    iconBg: 'bg-amber-100 text-amber-800 border-amber-200',
     solutions: [
       'Muat ulang halaman atau coba kembali beberapa saat lagi.',
       'Pastikan koneksi jaringan Anda dalam kondisi optimal.'
@@ -172,14 +179,14 @@ const ERROR_CONFIGS = {
 
 const DEFAULT_CONFIG = {
   code: 'Error',
-  badge: 'Terjadi Kendala Sistem',
+  badge: 'Kendala Sistem',
   title: 'Terjadi Kesalahan yang Tidak Terduga',
   description:
     'Permintaan Anda tidak dapat diproses secara sempurna oleh sistem aplikasi saat ini.',
   icon: AlertTriangle,
-  accentColor: 'from-amber-400 to-rose-500',
-  badgeBg: 'bg-slate-500/10 text-slate-300 border-slate-500/30',
-  iconBg: 'bg-slate-500/10 text-slate-300 border-slate-500/20',
+  badgeBg: 'bg-slate-100 text-slate-800 border-slate-200',
+  iconColor: 'text-[#2B3056]',
+  iconBg: 'bg-slate-100 text-slate-700 border-slate-200',
   solutions: [
     'Muat ulang halaman untuk mencoba kembali.',
     'Kembali ke halaman utama untuk melanjutkan pekerjaan Anda.'
@@ -229,86 +236,89 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
     <>
       <Head title={`${statusCode} - ${config.badge} | HARMONITAS`} />
 
-      <div className="min-h-screen bg-[#101B4F] text-slate-100 flex flex-col justify-between selection:bg-[#FFD82B] selection:text-[#101B4F] relative overflow-hidden font-sans">
-        {/* Background Ambient Glow & Grid Effects */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Subtle Grid Pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
-              backgroundSize: '32px 32px'
-            }}
-          />
+      <div className="min-h-screen w-full bg-white text-slate-800 antialiased font-sans flex flex-col justify-between selection:bg-[#FFD82B] selection:text-[#2B3056] relative overflow-hidden">
+        {/* Background Layer 1: Structured Micro Grid matching Landing Page */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.045]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #2B3056 1px, transparent 1px),
+              linear-gradient(to bottom, #2B3056 1px, transparent 1px)
+            `,
+            backgroundSize: "32px 32px",
+            maskImage: "radial-gradient(ellipse 75% 75% at 50% 40%, black 40%, transparent 100%)",
+            WebkitMaskImage: "radial-gradient(ellipse 75% 75% at 50% 40%, black 40%, transparent 100%)",
+          }}
+        />
 
-          {/* Primary Navy Radial Glow */}
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[#3A4070]/30 rounded-full blur-[120px]" />
+        {/* Background Layer 2: Subtle Ambient Warmth */}
+        <div
+          className="absolute -top-16 right-1/4 w-96 h-96 rounded-full pointer-events-none opacity-40 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 216, 43, 0.14) 0%, rgba(255, 255, 255, 0) 70%)",
+          }}
+        />
+        <div
+          className="absolute -bottom-16 left-10 w-80 h-80 rounded-full pointer-events-none opacity-25 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, rgba(43, 48, 86, 0.08) 0%, rgba(255, 255, 255, 0) 70%)",
+          }}
+        />
 
-          {/* Golden Corner Accents */}
-          <div className="absolute top-1/4 -right-24 w-96 h-96 bg-[#FFD82B]/10 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#2B3056]/50 rounded-full blur-[100px]" />
-        </div>
-
-        {/* Top Header Bar */}
-        <header className="relative z-10 border-b border-white/10 bg-[#101B4F]/60 backdrop-blur-md">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+        {/* Top Header Bar matching PublicNavbar */}
+        <header className="sticky top-0 z-50 w-full border-b border-slate-200/90 bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto flex h-[66px] max-w-7xl items-center justify-between">
             {/* Brand Logo & Title */}
-            <Link
-              href={user ? '/home' : '/'}
-              className="flex items-center gap-3.5 group cursor-pointer"
-            >
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/20 p-1 flex items-center justify-center shadow-md group-hover:border-[#FFD82B]/60 transition-all duration-300">
-                  <img
-                    src="/LOGO HARMONITAS.png"
-                    alt="Logo HARMONITAS"
-                    className="w-full h-full object-contain drop-shadow-sm"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              </div>
+            <Link href="/" className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer">
+              <span className="shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
+                <img
+                  src={logoHarmonitas}
+                  alt="Logo HARMONITAS"
+                  className="h-full w-full object-contain drop-shadow-2xs"
+                />
+              </span>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-base sm:text-lg font-extrabold tracking-wider text-white group-hover:text-[#FFD82B] transition-colors">
+              <span className="min-w-0">
+                <span className="flex items-center gap-2">
+                  <span className="font-bold tracking-wide text-[#2B3056] text-base sm:text-[17px]">
                     HARMONITAS
                   </span>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFD82B] text-[#101B4F] uppercase tracking-wider">
-                    Kanwil Riau
+                  <span className="hidden rounded-full border border-[#FFD82B]/60 bg-[#FFF9DF] px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#2B3056] sm:inline-flex">
+                    Riau
                   </span>
-                </div>
-                <p className="text-[10px] text-slate-300 font-medium hidden sm:block">
-                  Harmonisasi Ranperda & Ranperkada Terpadu
-                </p>
-              </div>
+                </span>
+                <span className="hidden truncate text-[10px] font-medium tracking-wide text-slate-500 sm:block">
+                  Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
+                </span>
+              </span>
             </Link>
 
             {/* Header Right Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               <Link
                 href="/panduan"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 transition-all cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors shadow-2xs"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#FFD82B]" />
-                <span className="hidden sm:inline">Buku Panduan</span>
+                <BookOpen className="w-3.5 h-3.5 text-[#FFC800]" />
+                <span>Buku Panduan</span>
               </Link>
 
               {user ? (
                 <Link
                   href="/home"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#101B4F] text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-4 sm:px-5 h-10 text-xs font-bold text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <Home className="w-3.5 h-3.5" />
-                  <span>Dashboard</span>
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span>Ke Dashboard</span>
+                  <ArrowRight className="h-3.5 w-3.5 opacity-70 hidden sm:inline" />
                 </Link>
               ) : (
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#101B4F] text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-4 sm:px-5 h-10 text-xs font-bold text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <span>Masuk Akun</span>
+                  <LogIn className="h-3.5 w-3.5" />
+                  <span>Masuk Petugas</span>
                 </Link>
               )}
             </div>
@@ -316,154 +326,202 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
         </header>
 
         {/* Main Error Content Area */}
-        <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-          <div className="max-w-3xl w-full text-center">
+        <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="max-w-4xl w-full">
             
-            {/* Status Code Large Visual Indicator */}
-            <div className="relative inline-flex items-center justify-center mb-6 sm:mb-8">
-              {/* Outer Glowing Rings */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FFD82B]/20 to-transparent blur-2xl animate-pulse" />
+            {/* Top Container: Error Details & Mascot */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left Column: Status Display, Texts, & Actions */}
+              <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+                
+                {/* Government Institution Badge */}
+                <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2B3056] shadow-2xs backdrop-blur-md">
+                  <span className="flex h-4 w-4 items-center justify-center shrink-0">
+                    <img
+                      src={logoPengayoman}
+                      alt="Logo Pengayoman"
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                  Kantor Wilayah Kementerian Hukum Riau
+                </div>
 
-              <div className="relative flex flex-col items-center">
-                {/* Large 3D Gradient Text for Error Code */}
-                <div className="relative">
-                  <span className="text-7xl sm:text-9xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400/30 drop-shadow-2xl select-none leading-none">
+                {/* Big Status Code & Pill */}
+                <div className="flex flex-col lg:flex-row items-center lg:items-baseline gap-3">
+                  <span className="text-6xl sm:text-8xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-[#2B3056] via-[#3A4070] to-[#2B3056] leading-none drop-shadow-2xs">
                     {statusCode}
                   </span>
 
-                  {/* Floating Icon Floating at Top Right */}
-                  <div
-                    className={`absolute -top-3 -right-4 sm:-top-4 sm:-right-6 p-2.5 sm:p-3 rounded-2xl border shadow-xl backdrop-blur-md ${config.iconBg} animate-bounce`}
-                    style={{ animationDuration: '3s' }}
-                  >
-                    <IconComponent className="w-5 h-5 sm:w-7 sm:h-7" />
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider ${config.badgeBg}`}>
+                    <span className="w-2 h-2 rounded-full bg-current animate-ping" />
+                    <span>{config.badge}</span>
                   </div>
                 </div>
 
-                {/* Status Pill Badge */}
-                <div
-                  className={`mt-3 inline-flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-bold uppercase tracking-wider backdrop-blur-md ${config.badgeBg}`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-current animate-ping" />
-                  <span>{config.badge}</span>
+                {/* Error Headlines & Explanations */}
+                <div className="space-y-2 max-w-xl mx-auto lg:mx-0">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2B3056] tracking-tight leading-snug">
+                    {config.title}
+                  </h1>
+
+                  <p className="text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
+                    {message || config.description}
+                  </p>
+                </div>
+
+                {/* Primary Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleGoBack}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#2B3056] transition shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-slate-500" />
+                    <span>Halaman Sebelumnya</span>
+                  </button>
+
+                  <Link
+                    href={user ? '/home' : '/'}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-6 text-xs font-bold text-[#2B3056] shadow-sm transition duration-200 hover:-translate-y-0.5 cursor-pointer active:scale-95"
+                  >
+                    <Home className="w-4 h-4 text-[#2B3056]" />
+                    <span>{user ? 'Buka Dashboard' : 'Ke Halaman Utama'}</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleReload}
+                    disabled={isReloading}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+                    title="Muat Ulang Halaman"
+                  >
+                    <RefreshCw
+                      className={`w-3.5 h-3.5 text-[#2B3056] ${
+                        isReloading ? 'animate-spin' : ''
+                      }`}
+                    />
+                    <span className="hidden sm:inline">Segarkan</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Right Column: Clean Mascot Workstation matching Landing Page */}
+              <div className="lg:col-span-5 relative flex items-center justify-center">
+                <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-square flex items-center justify-center">
+                  {/* Ambient Soft Glow Behind Mascot */}
+                  <div
+                    className="absolute w-64 h-64 rounded-full pointer-events-none opacity-60 blur-2xl"
+                    style={{
+                      background: "radial-gradient(circle, rgba(255, 216, 43, 0.25) 0%, rgba(255, 255, 255, 0) 70%)",
+                    }}
+                  />
+
+                  {/* Mascot Image */}
+                  <img
+                    src={harmonitasMascot3d}
+                    alt="Maskot Harmonisasi Regulasi Kanwil Riau"
+                    className="relative z-10 w-full h-full object-contain drop-shadow-md select-none animate-float-slow"
+                  />
+
+                  {/* Floating Status Icon Badge on Mascot */}
+                  <div className={`absolute top-2 right-2 z-20 flex h-10 w-10 items-center justify-center rounded-2xl border shadow-lg backdrop-blur-md ${config.iconBg}`}>
+                    <IconComponent className="h-5 w-5" />
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            {/* Error Headlines & Explanations */}
-            <div className="space-y-3 mb-8 sm:mb-10 max-w-xl mx-auto">
-              <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
-                {config.title}
-              </h1>
-
-              <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
-                {message || config.description}
-              </p>
-            </div>
-
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10">
-              <button
-                type="button"
-                onClick={handleGoBack}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 border border-white/20 text-xs sm:text-sm font-bold text-white transition-all duration-200 cursor-pointer shadow-sm hover:border-white/40"
-              >
-                <ArrowLeft className="w-4 h-4 text-slate-300" />
-                <span>Halaman Sebelumnya</span>
-              </button>
-
-              <Link
-                href={user ? '/home' : '/'}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:from-[#FFE082] hover:to-[#FFC107] active:scale-95 text-xs sm:text-sm font-extrabold text-[#101B4F] transition-all duration-200 cursor-pointer shadow-lg shadow-[#FFD82B]/20"
-              >
-                <Home className="w-4 h-4 text-[#101B4F]" />
-                <span>{user ? 'Kembali ke Beranda' : 'Ke Halaman Utama'}</span>
-              </Link>
-
-              <button
-                type="button"
-                onClick={handleReload}
-                disabled={isReloading}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50"
-                title="Muat Ulang Halaman"
-              >
-                <RefreshCw
-                  className={`w-4 h-4 text-[#FFD82B] ${
-                    isReloading ? 'animate-spin' : ''
-                  }`}
-                />
-                <span className="hidden sm:inline">Segarkan</span>
-              </button>
-            </div>
-
-            {/* Helpful Solution Recommendations Card */}
-            <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md p-5 sm:p-6 text-left max-w-2xl mx-auto shadow-xl">
-              <div className="flex items-center gap-2 text-[#FFD82B] mb-3">
-                <Compass className="w-4 h-4" />
-                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-100">
+            {/* Bottom Section: Solution Steps & Quick Links Bento Box */}
+            <div className="mt-8 rounded-2xl border border-slate-200/90 bg-white/95 p-5 sm:p-6 shadow-2xs backdrop-blur-sm space-y-4">
+              <div className="flex items-center gap-2 text-[#2B3056]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 border border-amber-200/60 text-[#B3912D]">
+                  <Compass className="w-3.5 h-3.5" />
+                </span>
+                <h2 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#2B3056]">
                   Langkah yang Dapat Anda Lakukan
                 </h2>
               </div>
 
-              <ul className="space-y-2 text-xs sm:text-[13px] text-slate-300">
+              {/* 3 Numbered Steps with Golden Badges */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {config.solutions.map((sol, index) => (
-                  <li key={index} className="flex items-start gap-2.5">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFD82B]/10 text-[#FFD82B] text-[10px] font-bold mt-0.5 border border-[#FFD82B]/20">
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/70 text-xs text-slate-700 leading-relaxed"
+                  >
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] text-[10px] font-extrabold shadow-2xs mt-0.5">
                       {index + 1}
                     </span>
-                    <span className="leading-relaxed">{sol}</span>
-                  </li>
+                    <span>{sol}</span>
+                  </div>
                 ))}
-              </ul>
+              </div>
 
-              {/* Quick Jump Links inside app */}
-              <div className="mt-5 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {/* Quick Navigation Cards */}
+              <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Link
                   href="/peraturan"
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-slate-200 transition-colors group cursor-pointer"
+                  className="group flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white hover:border-[#2B3056]/30 hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
                 >
-                  <FileText className="w-4 h-4 text-[#FFD82B] shrink-0" />
-                  <div className="truncate">
-                    <p className="font-bold text-white text-[11px]">Daftar Berkas</p>
-                    <p className="text-[10px] text-slate-400">Rancangan Regulasi</p>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#2B3056] border border-blue-100">
+                      <FileText className="w-4 h-4" />
+                    </span>
+                    <div className="truncate">
+                      <p className="text-xs font-bold text-[#2B3056] group-hover:text-[#3A4070]">Daftar Berkas</p>
+                      <p className="text-[10px] text-slate-500">Rancangan Regulasi</p>
+                    </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#2B3056] group-hover:translate-x-0.5 transition-all" />
                 </Link>
 
                 <Link
                   href="/ai"
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-slate-200 transition-colors group cursor-pointer"
+                  className="group flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white hover:border-[#2B3056]/30 hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-[#FFD82B] shrink-0" />
-                  <div className="truncate">
-                    <p className="font-bold text-white text-[11px]">Asisten AI</p>
-                    <p className="text-[10px] text-slate-400">Analisis Regulasi</p>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-[#B3912D] border border-amber-100">
+                      <Sparkles className="w-4 h-4" />
+                    </span>
+                    <div className="truncate">
+                      <p className="text-xs font-bold text-[#2B3056] group-hover:text-[#3A4070]">Asisten AI</p>
+                      <p className="text-[10px] text-slate-500">Analisis Kepatuhan</p>
+                    </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#2B3056] group-hover:translate-x-0.5 transition-all" />
                 </Link>
 
                 <Link
                   href="/panduan"
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-slate-200 transition-colors group cursor-pointer"
+                  className="group flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white hover:border-[#2B3056]/30 hover:bg-slate-50 transition-all shadow-2xs cursor-pointer"
                 >
-                  <BookOpen className="w-4 h-4 text-[#FFD82B] shrink-0" />
-                  <div className="truncate">
-                    <p className="font-bold text-white text-[11px]">Panduan SOP</p>
-                    <p className="text-[10px] text-slate-400">Buku Petunjuk</p>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
+                      <BookOpen className="w-4 h-4" />
+                    </span>
+                    <div className="truncate">
+                      <p className="text-xs font-bold text-[#2B3056] group-hover:text-[#3A4070]">Panduan SOP</p>
+                      <p className="text-[10px] text-slate-500">Buku Petunjuk</p>
+                    </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#2B3056] group-hover:translate-x-0.5 transition-all" />
                 </Link>
               </div>
             </div>
 
-            {/* Technical Details Toggle (For IT Admin / Developers / Troubleshooting) */}
-            <div className="mt-6 max-w-2xl mx-auto">
+            {/* Technical Diagnostics Accordion */}
+            <div className="mt-4 text-center">
               <button
                 type="button"
                 onClick={() => setShowTechnical(!showTechnical)}
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 hover:text-[#FFD82B] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-[#2B3056] transition-colors cursor-pointer"
               >
-                <HelpCircle className="w-3.5 h-3.5" />
+                <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
                 <span>
                   {showTechnical
-                    ? 'Sembunyikan Informasi Teknis'
+                    ? 'Sembunyikan Informasi Diagnostik'
                     : 'Tampilkan Informasi Diagnostik Teknis'}
                 </span>
                 {showTechnical ? (
@@ -474,15 +532,15 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
               </button>
 
               {showTechnical && (
-                <div className="mt-3 p-4 rounded-xl bg-slate-900/90 border border-white/10 text-left font-mono text-[11px] space-y-2 animate-fadeIn">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="mt-3 p-4 rounded-xl bg-slate-900 text-slate-100 text-left font-mono text-[11px] space-y-2 shadow-sm animate-fadeIn">
+                  <div className="flex items-center justify-between border-b border-slate-700 pb-2">
                     <span className="text-slate-400 font-bold uppercase text-[10px]">
                       Detail Galat Sistem
                     </span>
                     <button
                       type="button"
                       onClick={handleCopyDebug}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-slate-200 text-[10px] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] transition-colors cursor-pointer"
                     >
                       {copied ? (
                         <>
@@ -491,7 +549,7 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3 h-3 text-slate-300" />
+                          <Copy className="w-3 h-3 text-slate-400" />
                           <span>Salin Laporan</span>
                         </>
                       )}
@@ -500,15 +558,15 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300 pt-1">
                     <div>
-                      <span className="text-slate-500">Status Code: </span>
+                      <span className="text-slate-400">Status Code: </span>
                       <span className="text-[#FFD82B] font-bold">{statusCode}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">Timestamp: </span>
+                      <span className="text-slate-400">Timestamp: </span>
                       <span>{new Date().toLocaleString('id-ID')}</span>
                     </div>
                     <div className="sm:col-span-2 truncate">
-                      <span className="text-slate-500">Path: </span>
+                      <span className="text-slate-400">Path: </span>
                       <span>
                         {typeof window !== 'undefined'
                           ? window.location.pathname
@@ -517,16 +575,16 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
                     </div>
                     {user && (
                       <div className="sm:col-span-2">
-                        <span className="text-slate-500">User Session: </span>
+                        <span className="text-slate-400">User Session: </span>
                         <span>
-                          {user.nama || user.name} [{user.role || 'ROLE'}]
+                          {user.nama || user.name} [{user.role || 'USER'}]
                         </span>
                       </div>
                     )}
                   </div>
 
                   {debug && (
-                    <div className="mt-2 pt-2 border-t border-white/5 space-y-1">
+                    <div className="mt-2 pt-2 border-t border-slate-800 space-y-1">
                       <p className="text-rose-400 font-bold">
                         {debug.exception || 'Exception'}
                       </p>
@@ -553,16 +611,22 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
           </div>
         </main>
 
-        {/* Footer Area */}
-        <footer className="relative z-10 border-t border-white/10 bg-[#101B4F]/80 backdrop-blur-md py-4 text-center">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400 font-medium">
+        {/* Footer Area matching Landing Page Footer */}
+        <footer className="relative z-10 border-t border-slate-200 bg-white py-4 text-center">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 font-medium">
             <div className="flex items-center gap-2">
-              <LogoPengayoman className="w-5 h-6" bgColor="transparent" symbolColor="#FFD82B" />
-              <span>Kantor Wilayah Kementerian Hukum & HAM Riau</span>
+              <span className="flex h-4 w-4 items-center justify-center shrink-0">
+                <img
+                  src={logoPengayoman}
+                  alt="Logo Pengayoman"
+                  className="h-full w-full object-contain"
+                />
+              </span>
+              <span>Kantor Wilayah Kementerian Hukum Riau</span>
             </div>
 
             <p>
-              &copy; {new Date().getFullYear()} HARMONITAS. Hak Cipta Dilindungi.
+              &copy; {new Date().getFullYear()} HARMONITAS • Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
             </p>
           </div>
         </footer>

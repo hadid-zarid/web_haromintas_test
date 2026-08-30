@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman.png';
@@ -185,6 +185,8 @@ const CustomCursor = () => {
 };
 
 export const LandingPage = () => {
+  const { auth } = usePage().props || {};
+  const user = auth?.user;
   const [hoveredCardIndex, setHoveredCardIndex] = React.useState(null);
   const [activeServiceTab, setActiveServiceTab] = React.useState(0);
   const [activeAiClauseTab, setActiveAiClauseTab] = React.useState(0);
@@ -636,10 +638,10 @@ export const LandingPage = () => {
                   {/* Call to Action Buttons */}
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Link
-                      href="/login"
+                      href={user ? "/home" : "/login"}
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-6 text-xs font-bold text-[#2B3056] shadow-sm transition duration-200 hover:-translate-y-0.5 cursor-pointer"
                     >
-                      <span>Masuk ke Dashboard</span>
+                      <span>{user ? 'Buka Dashboard' : 'Masuk ke Dashboard'}</span>
                       <ArrowRight className="h-4 w-4" />
                     </Link>
 
@@ -1827,7 +1829,14 @@ export const LandingPage = () => {
                   <li><a href="#wilayah" className="hover:text-[#FFD82B] transition">Wilayah Tim Kerja</a></li>
                   <li><a href="#alur" className="hover:text-[#FFD82B] transition">Alur Kerja SOP</a></li>
                   <li><Link href="/panduan" className="hover:text-[#FFD82B] transition">Panduan Sistem</Link></li>
-                  <li><Link href="/login" className="hover:text-[#FFD82B] transition font-bold text-white">Masuk Petugas</Link></li>
+                  <li>
+                    <Link
+                      href={user ? "/home" : "/login"}
+                      className="hover:text-[#FFD82B] transition font-bold text-white"
+                    >
+                      {user ? 'Dashboard Utama' : 'Masuk Petugas'}
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
