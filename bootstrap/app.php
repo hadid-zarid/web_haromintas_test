@@ -13,8 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
-            'api/*',
-            '/api/generate-surat-docx',
+            //
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,

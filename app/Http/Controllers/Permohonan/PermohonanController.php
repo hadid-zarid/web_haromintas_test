@@ -252,7 +252,8 @@ class PermohonanController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Gagal mendaftarkan permohonan: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Gagal mendaftarkan permohonan: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()->with('error', 'Gagal mendaftarkan permohonan. Silakan coba beberapa saat lagi.');
         }
     }
 
@@ -390,7 +391,8 @@ class PermohonanController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menghapus permohonan: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Gagal menghapus permohonan: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Gagal menghapus permohonan. Silakan coba beberapa saat lagi.');
         }
     }
 
