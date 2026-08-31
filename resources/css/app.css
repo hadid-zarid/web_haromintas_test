@@ -705,6 +705,173 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: pulse-soft 3s ease-in-out infinite;
 }
 
+/* =========================================================
+   3D TILT ANIMATION FOR HERO MASCOT (Uiverse.io 5x5 Matrix Tilt)
+   ========================================================= */
+.hero-tilt-container {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+@media (max-width: 640px) {
+  .hero-tilt-container {
+    max-width: 360px;
+    height: 340px;
+  }
+}
+
+.hero-tilt-canvas {
+  perspective: 1000px;
+  inset: 0;
+  z-index: 20;
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-tilt-tracker {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.hero-tilt-card {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 28px;
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1), filter 400ms ease;
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+  pointer-events: none;
+}
+
+.hero-tilt-card::before {
+  content: '';
+  position: absolute;
+  inset: 5%;
+  background: radial-gradient(circle at center, rgba(255, 216, 43, 0.38) 0%, rgba(43, 48, 86, 0.15) 55%, transparent 75%);
+  filter: blur(28px);
+  opacity: 45%;
+  border-radius: 36px;
+  z-index: -1;
+  transition: opacity 300ms ease, transform 300ms ease;
+  transform: translateZ(-25px);
+}
+
+.hero-tilt-container:hover .hero-tilt-card::before {
+  opacity: 85%;
+  transform: translateZ(-35px) scale(1.1);
+}
+
+.hero-tilt-container:hover .animate-float-slow {
+  animation-play-state: paused;
+}
+
+.hero-tilt-tracker:hover ~ .hero-tilt-card {
+  transition: transform 120ms cubic-bezier(0.2, 0.9, 0.3, 1), filter 250ms ease;
+  filter: brightness(1.06) drop-shadow(0 24px 36px rgba(43, 48, 86, 0.22));
+}
+
+/* 5x5 Grid Tilt Transformation Matrix */
+.hero-tilt-tracker.tr-1:hover ~ .hero-tilt-card {
+  transform: rotateX(16deg) rotateY(-14deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-2:hover ~ .hero-tilt-card {
+  transform: rotateX(16deg) rotateY(-7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-3:hover ~ .hero-tilt-card {
+  transform: rotateX(16deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-4:hover ~ .hero-tilt-card {
+  transform: rotateX(16deg) rotateY(7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-5:hover ~ .hero-tilt-card {
+  transform: rotateX(16deg) rotateY(14deg) scale3d(1.03, 1.03, 1.03);
+}
+
+.hero-tilt-tracker.tr-6:hover ~ .hero-tilt-card {
+  transform: rotateX(8deg) rotateY(-14deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-7:hover ~ .hero-tilt-card {
+  transform: rotateX(8deg) rotateY(-7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-8:hover ~ .hero-tilt-card {
+  transform: rotateX(8deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-9:hover ~ .hero-tilt-card {
+  transform: rotateX(8deg) rotateY(7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-10:hover ~ .hero-tilt-card {
+  transform: rotateX(8deg) rotateY(14deg) scale3d(1.03, 1.03, 1.03);
+}
+
+.hero-tilt-tracker.tr-11:hover ~ .hero-tilt-card {
+  transform: rotateX(0deg) rotateY(-14deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-12:hover ~ .hero-tilt-card {
+  transform: rotateX(0deg) rotateY(-7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-13:hover ~ .hero-tilt-card {
+  transform: rotateX(0deg) rotateY(0deg) scale3d(1.04, 1.04, 1.04);
+}
+.hero-tilt-tracker.tr-14:hover ~ .hero-tilt-card {
+  transform: rotateX(0deg) rotateY(7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-15:hover ~ .hero-tilt-card {
+  transform: rotateX(0deg) rotateY(14deg) scale3d(1.03, 1.03, 1.03);
+}
+
+.hero-tilt-tracker.tr-16:hover ~ .hero-tilt-card {
+  transform: rotateX(-8deg) rotateY(-14deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-17:hover ~ .hero-tilt-card {
+  transform: rotateX(-8deg) rotateY(-7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-18:hover ~ .hero-tilt-card {
+  transform: rotateX(-8deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-19:hover ~ .hero-tilt-card {
+  transform: rotateX(-8deg) rotateY(7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-20:hover ~ .hero-tilt-card {
+  transform: rotateX(-8deg) rotateY(14deg) scale3d(1.03, 1.03, 1.03);
+}
+
+.hero-tilt-tracker.tr-21:hover ~ .hero-tilt-card {
+  transform: rotateX(-16deg) rotateY(-14deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-22:hover ~ .hero-tilt-card {
+  transform: rotateX(-16deg) rotateY(-7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-23:hover ~ .hero-tilt-card {
+  transform: rotateX(-16deg) rotateY(0deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-24:hover ~ .hero-tilt-card {
+  transform: rotateX(-16deg) rotateY(7deg) scale3d(1.03, 1.03, 1.03);
+}
+.hero-tilt-tracker.tr-25:hover ~ .hero-tilt-card {
+  transform: rotateX(-16deg) rotateY(14deg) scale3d(1.03, 1.03, 1.03);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -715,4 +882,5 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     animation-iteration-count: 1 !important;
   }
 }
+
 

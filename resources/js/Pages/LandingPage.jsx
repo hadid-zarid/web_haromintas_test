@@ -695,15 +695,25 @@ export const LandingPage = () => {
                     <FileCheck2 className="h-5 w-5 text-[#2B3056]" />
                   </div>
 
-                  {/* Free-Standing 3D System Illustration with Mascot Character */}
-                  <div className="relative flex flex-col items-center justify-center z-10 select-none group cursor-pointer">
-                    <img
-                      src={harmonitasMascot3d}
-                      alt="Ilustrasi Digital Workspace Harmonisasi Regulasi HARMONITAS bersama Maskot Kanwil Kemenkumham Riau"
-                      className="w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[490px] h-auto object-contain drop-shadow-2xl animate-float-slow transition-all duration-500 group-hover:scale-[1.03] group-hover:-translate-y-2 select-none pointer-events-none"
-                    />
-                    {/* Organic Soft Ground Shadow */}
-                    <div className="w-56 sm:w-64 h-5 rounded-full bg-slate-400/25 blur-md mt-[-14px] pointer-events-none transition-all duration-500 group-hover:scale-105 group-hover:opacity-75" />
+                  {/* Free-Standing 3D System Illustration with Mascot Character & Interactive 3D Tilt Matrix */}
+                  <div className="hero-tilt-container group">
+                    <div className="hero-tilt-canvas">
+                      {Array.from({ length: 25 }, (_, i) => (
+                        <div key={i} className={`hero-tilt-tracker tr-${i + 1}`} />
+                      ))}
+
+                      <div className="hero-tilt-card">
+                        <div className="flex flex-col items-center justify-center animate-float-slow">
+                          <img
+                            src={harmonitasMascot3d}
+                            alt="Ilustrasi Digital Workspace Harmonisasi Regulasi HARMONITAS bersama Maskot Kanwil Kemenkumham Riau"
+                            className="w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[490px] h-auto object-contain drop-shadow-2xl select-none pointer-events-none"
+                          />
+                          {/* Organic Soft Ground Shadow */}
+                          <div className="w-56 sm:w-64 h-5 rounded-full bg-slate-400/25 blur-md mt-[-14px] pointer-events-none transition-all duration-500" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </Reveal>
               </div>
