@@ -328,7 +328,7 @@ export const HomePage = ({
           />
 
           <MetricCard
-            title="Selesai & Sah"
+            title="Selesai"
             value={metrics.selesai || 0}
             icon={CheckCircle2}
             variant="selesai"
@@ -623,7 +623,7 @@ export const HomePage = ({
             <div>
               <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-[#B3912D]" />
-                <span>Tren Pengajuan & Penyelesaian Regulasi Daerah ({new Date().getFullYear()})</span>
+                <span>Tren Selesai Harmonisasi dan Fasilitasi ({new Date().getFullYear()})</span>
               </h2>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                 Diagram batang vertikal rekapitulasi jumlah berkas masuk, diproses dalam harmonisasi/fasilitasi, dan selesai tuntas

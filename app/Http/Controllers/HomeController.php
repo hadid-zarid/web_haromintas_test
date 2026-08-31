@@ -90,7 +90,7 @@ class HomeController extends Controller
             ],
             [
                 'status_id' => 4,
-                'label' => 'Selesai & Tuntas',
+                'label' => 'Selesai',
                 'count' => $selesai,
                 'max' => max($total, 1),
                 'color' => 'from-emerald-500 to-emerald-600',
@@ -183,7 +183,7 @@ class HomeController extends Controller
                 ],
                 [
                     'id' => 2,
-                    'title' => 'Regulasi Selesai & Sah (Tuntas)',
+                    'title' => 'Regulasi Selesai',
                     'desc' => 'Total produk hukum daerah yang tuntas difasilitasi di Provinsi Riau.',
                     'count' => $selesai,
                     'link' => '/peraturan?status_id=4',
