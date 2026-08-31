@@ -104,7 +104,7 @@ export const ForgotPasswordPage = () => {
         {flash?.success && (
           <div className="mx-6 mt-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-semibold shadow-xs">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <div dangerouslySetInnerHTML={{ __html: flash.success }} />
+            <p>{flash.success}</p>
           </div>
         )}
 

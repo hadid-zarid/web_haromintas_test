@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,11 +16,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', new NoHtmlContent()],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'nip' => ['nullable', 'string', 'max:18', 'regex:/^[0-9]+$/'],
-            'jabatan' => ['nullable', 'string', 'max:100'],
+            'jabatan' => ['nullable', 'string', 'max:100', new NoHtmlContent()],
             'no_hp' => ['nullable', 'string', 'max:13', 'regex:/^[0-9]+$/'],
             'role' => ['required', 'string', Rule::in(['BIRO_HUKUM', 'POKJA', 'PIMPINAN'])],
             'pokja_id' => ['nullable', 'required_if:role,POKJA', 'exists:pokjas,id'],

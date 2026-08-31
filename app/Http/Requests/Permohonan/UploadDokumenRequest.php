@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Permohonan;
 
+use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class UploadDokumenRequest extends FormRequest
                     }
                 },
             ],
-            'keterangan' => ['nullable', 'string', 'max:500'],
+            'keterangan' => ['nullable', 'string', 'max:500', new NoHtmlContent()],
         ];
     }
 
