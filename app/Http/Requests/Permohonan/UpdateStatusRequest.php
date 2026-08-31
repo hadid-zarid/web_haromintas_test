@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Permohonan;
 
+use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStatusRequest extends FormRequest
@@ -15,7 +16,7 @@ class UpdateStatusRequest extends FormRequest
     {
         return [
             'status_id' => ['required', 'integer', 'exists:status_regulasi,status_id'],
-            'catatan' => ['nullable', 'string', 'max:2000'],
+            'catatan' => ['nullable', 'string', 'max:2000', new NoHtmlContent()],
             'surat_file' => [
                 'nullable',
                 'file',

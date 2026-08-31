@@ -49,6 +49,7 @@ const MapDokumenCard = ({
   slot,
   doc,
   isUploaded,
+  isOptional,
   isLockedForUpload,
   canUpload,
   authInfo,
@@ -135,11 +136,13 @@ const MapDokumenCard = ({
           <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider border shadow-2xs shrink-0 ${
             isUploaded 
               ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+              : isOptional
+              ? 'bg-purple-50 text-purple-700 border-purple-200'
               : isLockedForUpload
               ? 'bg-amber-50 text-amber-800 border-amber-200'
               : 'bg-slate-100 text-slate-600 border-slate-200'
           }`}>
-            {isUploaded ? '✓ Tersedia' : isLockedForUpload ? '🔒 Terkunci' : '○ Belum Ada'}
+            {isUploaded ? '✓ Tersedia' : isOptional ? 'Opsional' : isLockedForUpload ? '🔒 Terkunci' : '○ Belum Ada'}
           </span>
         </div>
       </div>
@@ -182,7 +185,11 @@ const MapDokumenCard = ({
           </div>
         ) : (
           <div className="p-3 rounded-2xl bg-slate-50/80 border border-dashed border-slate-200 text-center text-slate-400 text-[10.5px] font-medium min-h-[58px] flex items-center justify-center">
-            {isLockedForUpload ? 'Menunggu kelengkapan Tahap 1-5' : 'Klik untuk mengunggah dokumen'}
+            {isLockedForUpload
+              ? 'Menunggu kelengkapan Tahap 1-5'
+              : isOptional
+              ? 'Tidak wajib — unggah jika tersedia'
+              : 'Klik untuk mengunggah dokumen'}
           </div>
         )}
       </div>
@@ -330,10 +337,11 @@ export const PeraturanDetailPage = ({
   const uploadedHarmonisasiCount = harmonisasiSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
   const isHarmonisasiComplete = uploadedHarmonisasiCount === 5;
 
-  const fasilitasiSlots = [6, 7];
-  const uploadedFasilitasiCount = fasilitasiSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
-  const isFasilitasiComplete = uploadedFasilitasiCount === 2;
-  const totalUploadedCount = Object.keys(uploadedDocsMap).length;
+  const requiredFasilitasiSlots = [7];
+  const uploadedFasilitasiCount = requiredFasilitasiSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
+  const isFasilitasiComplete = uploadedFasilitasiCount === requiredFasilitasiSlots.length;
+  const requiredDocumentSlots = [...harmonisasiSlots, ...requiredFasilitasiSlots];
+  const requiredUploadedCount = requiredDocumentSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
 
   // Open Upload Modal
   const openUploadModal = (slot) => {
@@ -403,7 +411,7 @@ export const PeraturanDetailPage = ({
     if (slotId >= 1 && slotId <= 5) {
       return {
         roleName: 'Kewenangan: Tim Kerja Kanwil',
-        authorityDesc: 'Dikelola oleh Tim Kerja Kanwil Kemenkumham Riau & Pemda',
+        authorityDesc: 'Dikelola oleh Tim Kerja Kanwil Kemenkum Provinsi Riau & Pemda',
         badgeClass: 'bg-blue-50/80 border-blue-200/80 text-blue-900',
         dotColor: 'bg-blue-600',
         lockNotice: 'Wewenang Tim Kerja Kanwil',
@@ -478,7 +486,7 @@ export const PeraturanDetailPage = ({
                 </span>
 
                 <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  {totalUploadedCount}/7 Dokumen Lengkap
+                  {requiredUploadedCount}/6 Dokumen Wajib
                 </span>
               </div>
 
@@ -579,7 +587,7 @@ export const PeraturanDetailPage = ({
                 isFasilitasiComplete ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-purple-50 text-purple-700 border-purple-200'
               }`}>
                 {isFasilitasiComplete ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <span className="w-2 h-2 rounded-full bg-purple-600" />}
-                <span>Tahap II (Biro Hukum): <strong>{uploadedFasilitasiCount}/2 Lengkap</strong></span>
+                <span>Tahap II (Biro Hukum): <strong>{uploadedFasilitasiCount}/1 Wajib</strong> • Slot #6 Opsional</span>
               </div>
             </div>
           </div>
@@ -589,6 +597,7 @@ export const PeraturanDetailPage = ({
             {jenisDokumens.map((slot) => {
               const doc = uploadedDocsMap[slot.jenis_dokumen_id];
               const isUploaded = Boolean(doc);
+              const isOptional = slot.jenis_dokumen_id === 6;
               const isFasilitasiSlot = slot.jenis_dokumen_id === 6 || slot.jenis_dokumen_id === 7;
               const isLockedForUpload = isFasilitasiSlot && !isHarmonisasiComplete;
               const canUpload = canUploadSlot(slot.jenis_dokumen_id) && !isLockedForUpload;
@@ -600,6 +609,7 @@ export const PeraturanDetailPage = ({
                   slot={slot}
                   doc={doc}
                   isUploaded={isUploaded}
+                  isOptional={isOptional}
                   isLockedForUpload={isLockedForUpload}
                   canUpload={canUpload}
                   authInfo={authInfo}
@@ -787,6 +797,7 @@ export const PeraturanDetailPage = ({
                   <h3 className="text-sm font-extrabold text-white">{activeUploadSlot.nama_dokumen}</h3>
                   <p className="text-[10px] text-slate-300 font-medium">
                     Slot #{activeUploadSlot.urutan} • {getSlotAuthority(activeUploadSlot.jenis_dokumen_id).roleName}
+                    {activeUploadSlot.jenis_dokumen_id === 6 ? ' • Opsional' : ''}
                   </p>
                 </div>
               </div>

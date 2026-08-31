@@ -31,7 +31,7 @@ export const useAuth = () => {
   } else if (authUser?.role === 'ADMIN') {
     unit = 'Administrator Sistem Kanwil Riau';
   } else if (authUser?.role === 'PIMPINAN') {
-    unit = 'Pimpinan Kanwil Kemenkumham Riau';
+    unit = 'Pimpinan Kanwil Kemenkum Provinsi Riau';
   }
 
   const user = authUser ? {

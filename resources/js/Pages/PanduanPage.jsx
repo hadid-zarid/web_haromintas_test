@@ -48,7 +48,7 @@ export const PanduanPage = () => {
       accentColor: 'text-blue-700 bg-blue-50 border-blue-200',
       steps: [
         {
-          title: 'Tim Kerja 1 / 2 / 3 Kanwil Kemenkumham Riau',
+          title: 'Tim Kerja 1 / 2 / 3 Kanwil Kemenkum Provinsi Riau',
           desc: 'Menginput permohonan baru, melaksanakan rapat pleno harmonisasi, dan mengunggah Dokumen 1 hingga 5 untuk wilayah kabupaten/kota binaan masing-masing.',
           tag: 'Pengelola Berkas Tahap I',
           icon: UserCheck,
@@ -82,7 +82,7 @@ export const PanduanPage = () => {
       steps: [
         {
           title: '1. Buka Menu Daftar Permohonan',
-          desc: 'Pilih menu "Daftar Permohonan" di sidebar kiri, lalu klik tombol "+ Tambah Permohonan Baru" di sudut kanan atas.',
+          desc: 'Pilih menu "Daftar Permohonan" di sidebar kiri, lalu klik tombol "Tambah Permohonan Baru" di sudut kanan atas.',
           tag: 'Langkah 1',
           icon: SlidersHorizontal,
           highlight: 'bg-slate-50 border-slate-200 text-slate-900',
@@ -148,15 +148,15 @@ export const PanduanPage = () => {
       steps: [
         {
           title: '1. Verifikasi Berkas dari Kanwil',
-          desc: 'Biro Hukum memeriksa riwayat rapat pleno dan keabsahan Dokumen 1 hingga 5 yang telah disahkan oleh Kanwil Kemenkumham Riau.',
+          desc: 'Biro Hukum memeriksa riwayat rapat pleno dan keabsahan Dokumen 1 hingga 5 yang telah disahkan oleh Kanwil Kemenkum Provinsi Riau.',
           tag: 'Pemeriksaan',
           icon: ShieldCheck,
           highlight: 'bg-purple-50/70 border-purple-200 text-purple-950',
         },
         {
-          title: '2. Unggah Matriks Hasil Fasilitasi (Slot 6)',
-          desc: 'Biro Hukum mengunggah catatan evaluasi dan penyesuaian materi muatan pasal pada Slot 6.',
-          tag: 'Telaah Fasilitasi',
+          title: '2. Unggah Matriks Hasil Fasilitasi (Slot 6 — Opsional)',
+          desc: 'Biro Hukum dapat mengunggah catatan evaluasi dan penyesuaian materi muatan pasal pada Slot 6 jika tersedia. Slot ini tidak wajib dan tidak menghambat penyelesaian fasilitasi.',
+          tag: 'Dokumen Opsional',
           icon: Folder,
           highlight: 'bg-purple-50/70 border-purple-200 text-purple-950',
         },
@@ -168,7 +168,7 @@ export const PanduanPage = () => {
           highlight: 'bg-emerald-50/70 border-emerald-200 text-emerald-950',
         },
       ],
-      tip: 'Catatan: Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil.',
+      tip: 'Catatan: Slot 6 bersifat opsional. Slot 7 tetap menjadi dokumen utama hasil fasilitasi. Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil.',
     },
     {
       id: 5,
@@ -270,7 +270,7 @@ export const PanduanPage = () => {
   return (
     <AppLayout
       title="Buku Panduan & SOP Interaktif"
-      subtitle="Panduan langkah demi langkah pengoperasian sistem HARMONITAS Kanwil Kemenkumham Riau & Biro Hukum Prov. Riau."
+      subtitle="Panduan langkah demi langkah pengoperasian sistem HARMONITAS Kanwil Kemenkum Provinsi Riau & Biro Hukum Prov. Riau."
     >
       <Head title="Buku Panduan - HARMONITAS" />
 

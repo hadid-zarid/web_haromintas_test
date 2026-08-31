@@ -13,12 +13,13 @@ import { FileText, Scale, Sparkles, ShieldCheck, CheckCircle2 } from "lucide-rea
 export const HarmonitasLoader = ({
   variant = "scanner",
   title = "Memproses Naskah Regulasi...",
-  subtitle = "Sistem Harmonisasi & Fasilitasi Peraturan Perundang-undangan Kanwil Kemenkumham Riau",
+  subtitle = "Sistem Harmonisasi & Fasilitasi Peraturan Perundang-undangan Kanwil Kemenkum Provinsi Riau",
   steps = [
-    "Memindai struktur konsiderans & klausul regulasi...",
-    "Memeriksa kesesuaian hierarki hukum UU No. 12/2011...",
-    "Validasi asas keterbukaan & kepastian hukum daerah...",
-    "Sinkronisasi database JDIH & Kanwil Kemenkumham Riau...",
+    "Menghubungkan ke layanan HARMONITAS...",
+    "Memvalidasi sesi autentikasi pengguna...",
+    "Memuat struktur dokumen 7 slot permohonan...",
+    "Sinkronisasi database JDIH & Kanwil Kemenkum Provinsi Riau...",
+    "Menyiapkan ruang kerja digital...",
   ],
   size = "md",
   className = "",

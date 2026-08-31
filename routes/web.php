@@ -90,6 +90,31 @@ Route::middleware('auth')->group(function () {
     // API - Generate Surat DOCX
     Route::match(['get', 'post'], '/api/generate-surat-docx', function (Request $request) {
         $type = strtolower($request->input('type', 'perda'));
+        $templatePerda = base_path('SURAT SELESAI PERDA.docx');
+        $templatePerkada = base_path('SURAT SELESAI PERKADA.docx');
+
+        // Always ensure PERKADA template is perfectly synced from PERDA template with correct legal basis
+        if ($type === 'perkada' && file_exists($templatePerda)) {
+            $zipP = new ZipArchive();
+            if ($zipP->open($templatePerda) === true) {
+                $xmlP = $zipP->getFromName('word/document.xml');
+                $zipP->close();
+
+                $xmlP = str_replace(
+                    'Pasal 58 Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
+                    'Pasal 97D Undang-Undang Nomor 13 Tahun 2022 tentang Perubahan Kedua Atas Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
+                    $xmlP
+                );
+
+                copy($templatePerda, $templatePerkada);
+                $zipPk = new ZipArchive();
+                if ($zipPk->open($templatePerkada) === true) {
+                    $zipPk->addFromString('word/document.xml', $xmlP);
+                    $zipPk->close();
+                }
+            }
+        }
+
         $filename = $type === 'perda' ? 'SURAT SELESAI PERDA.docx' : 'SURAT SELESAI PERKADA.docx';
         $templatePath = base_path($filename);
 
@@ -99,16 +124,19 @@ Route::middleware('auth')->group(function () {
             ], 404);
         }
 
-        $nomorSurat = $request->input('nomor_surat', '1489');
-        $tanggalSurat = $request->input('tanggal_surat', date('d F Y'));
-        $hal = $request->input('hal', 'Penyampaian Hasil Pengharmonisasian, Pembulatan, dan Pemantapan Konsepsi');
-        $jabatanPemrakarsa = $request->input('jabatan_pemrakarsa', 'Wali Kota Pekanbaru');
-        $ibukota = $request->input('ibukota', 'Pekanbaru');
-        $nomorSuratP = $request->input('nomor_surat_p', '180/HK/2024/045');
-        $tanggalSuratP = $request->input('tanggal_surat_p', '12 Juli 2024');
-        $jenisPeraturan = $request->input('jenis_peraturan', $type === 'perda' ? 'Peraturan Daerah' : 'Peraturan Wali Kota');
-        $asalPemrakarsa = $request->input('asal_pemrakarsa', 'Kota Pekanbaru');
-        $judulPeraturan = $request->input('judul_peraturan', 'Pajak Daerah dan Retribusi Daerah');
+        $rawNomorSurat = (string) $request->input('nomor_surat', '1489');
+        $nomorSurat = preg_replace('/^W\.4-PP\.04\.02-/i', '', trim($rawNomorSurat));
+        $tanggalSurat = (string) $request->input('tanggal_surat', date('d F Y'));
+        $hal = (string) $request->input('hal', 'Penyampaian Hasil Pengharmonisasian, Pembulatan, dan Pemantapan Konsepsi');
+        $jabatanPemrakarsa = (string) $request->input('jabatan_pemrakarsa', 'Wali Kota Pekanbaru');
+        $ibukota = (string) $request->input('ibukota', 'Pekanbaru');
+        $nomorSuratP = (string) $request->input('nomor_surat_p', '180/HK/2024/045');
+        $tanggalSuratP = (string) $request->input('tanggal_surat_p', '12 Juli 2024');
+        $jenisPeraturan = (string) $request->input('jenis_peraturan', $type === 'perda' ? 'Peraturan Daerah' : 'Peraturan Wali Kota');
+        $asalPemrakarsa = (string) $request->input('asal_pemrakarsa', 'Kota Pekanbaru');
+        $judulPeraturan = (string) $request->input('judul_peraturan', 'Pajak Daerah dan Retribusi Daerah');
+        $jabatanKakanwil = (string) $request->input('jabatan_kakanwil', 'Kepala Kantor Wilayah');
+        $namaKakanwil = (string) $request->input('nama_kakanwil', 'Rudy Hendra Pakpahan');
 
         $tempDir = storage_path('app/temp');
         if (! file_exists($tempDir)) {
@@ -146,6 +174,8 @@ Route::middleware('auth')->group(function () {
                 'JENIS_PERATURAN' => $jenisPeraturan,
                 'ASAL_PEMRAKARSA' => $asalPemrakarsa,
                 'JUDUL_PERATURAN' => $judulPeraturan,
+                'JABATAN_KAKANWIL' => $jabatanKakanwil,
+                'NAMA_KAKANWIL' => $namaKakanwil,
             ];
 
             // 1. Hapus tag fldSimple agar tidak dianggap sebagai Word Field kosong

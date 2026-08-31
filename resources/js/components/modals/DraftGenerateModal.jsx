@@ -17,19 +17,15 @@ import {
   User,
   Eye,
   SlidersHorizontal,
-  Sparkles,
   ShieldCheck,
   Scale,
-  RefreshCw
+  RefreshCw,
+  Check
 } from 'lucide-react';
 
 /*
 |--------------------------------------------------------------------------
 | HELPER: FORMAT TANGGAL INDONESIA LENGKAP
-|--------------------------------------------------------------------------
-| Mengubah string date (YYYY-MM-DD) atau Date object menjadi format 
-| tanggal Indonesia lengkap.
-| Contoh: 2026-08-29 -> 29 Agustus 2026
 |--------------------------------------------------------------------------
 */
 const formatIndonesianDate = (dateInput) => {
@@ -401,7 +397,9 @@ export const DraftGenerateModal = ({
         tanggal_surat_p: formData.tanggalSuratP,
         jenis_peraturan: formData.jenisPeraturan,
         asal_pemrakarsa: formData.asalPemrakarsa,
-        judul_peraturan: formData.judulPeraturan
+        judul_peraturan: formData.judulPeraturan,
+        jabatan_kakanwil: formData.jabatanKakanwil,
+        nama_kakanwil: formData.namaKakanwil
       };
 
       for (const [key, value] of Object.entries(payload)) {
@@ -450,9 +448,9 @@ export const DraftGenerateModal = ({
     const fullText = `
 KEMENTERIAN HUKUM REPUBLIK INDONESIA
 KANTOR WILAYAH RIAU
-Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
-Telepon: (0761) 23846 - 0811-6904-422
-Laman: https://riau.kemenkum.go.id/ Pos-el: subbidfpphdriaubedelau@gmail.com
+Jl. Jend. Sudirman No. 233, Kec. Pekanbaru Kota, Kota Pekanbaru
+Telepon: (0761) 853000
+Laman: https://riau.kemenkum.go.id/ Pos-el: harmonitas.kanwil@kemenkum.go.id
 
 Nomor : ${formData.nomorSurat}                                                                      ${formData.tanggalSurat}
 Sifat : Penting
@@ -475,21 +473,24 @@ Tembusan:
     `.trim();
 
     navigator.clipboard.writeText(fullText);
-    showToast('Teks resmi sesuai template berhasil disalin ke clipboard!', 'success');
+    showToast('Teks naskah resmi berhasil disalin ke clipboard!', 'success');
   };
 
   const content = (
     <div className="space-y-5">
-      {/* HEADER TOOLBAR */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 bg-[#F5F5F0] border border-[#E2E2DC] rounded-xl">
-        <div className="flex items-center gap-1.5 p-1 bg-white border border-[#E2E2DC] rounded-xl shadow-xs">
+      {/* HEADER TOOLBAR DENGAN WARNA RESMI HARMONITAS (#2B3056) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+        
+        {/* Format Selector Pills */}
+        <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
           <button
             type="button"
             onClick={() => handleChangeType('perda')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${letterType === 'perda'
-              ? 'bg-[#1A1A5E] text-white shadow-xs'
-              : 'text-[#3D3D3A]/70 hover:text-[#1A1A5E] hover:bg-slate-50'
-              }`}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+              letterType === 'perda'
+                ? 'bg-[#2B3056] text-white shadow-xs'
+                : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-50'
+            }`}
           >
             <FileText className="w-3.5 h-3.5" />
             <span>Surat Selesai PERDA</span>
@@ -498,40 +499,44 @@ Tembusan:
           <button
             type="button"
             onClick={() => handleChangeType('perkada')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${letterType === 'perkada'
-              ? 'bg-[#1A1A5E] text-white shadow-xs'
-              : 'text-[#3D3D3A]/70 hover:text-[#1A1A5E] hover:bg-slate-50'
-              }`}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+              letterType === 'perkada'
+                ? 'bg-[#2B3056] text-white shadow-xs'
+                : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-50'
+            }`}
           >
             <FileOutput className="w-3.5 h-3.5" />
             <span>Surat Selesai PERKADA</span>
           </button>
         </div>
 
+        {/* View Tab & Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-          <div className="flex items-center gap-1 p-1 bg-white border border-[#E2E2DC] rounded-xl">
+          <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-xl">
             <button
               type="button"
               onClick={() => setActiveTab('form')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'form'
-                ? 'bg-[#FFC800] text-[#1A1A5E] font-black'
-                : 'text-[#3D3D3A]/70 hover:text-[#1A1A5E]'
-                }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTab === 'form'
+                  ? 'bg-[#2B3056] text-white'
+                  : 'text-slate-600 hover:text-[#2B3056]'
+              }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Sesuaikan Variabel</span>
+              <span>Sesuaikan Data</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'preview'
-                ? 'bg-[#1A1A5E] text-white font-black'
-                : 'text-[#3D3D3A]/70 hover:text-[#1A1A5E]'
-                }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTab === 'preview'
+                  ? 'bg-[#2B3056] text-white'
+                  : 'text-slate-600 hover:text-[#2B3056]'
+              }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>Pratinjau Template Asli</span>
+              <span>Pratinjau Naskah</span>
             </button>
           </div>
 
@@ -540,12 +545,12 @@ Tembusan:
               type="button"
               onClick={handleDownloadDocx}
               disabled={isDownloading}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#2B579A] hover:bg-[#1E3E6D] text-white text-xs font-black shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50"
               title="Unduh Surat dalam Format Microsoft Word (.docx)"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-[#FFD82B]" />
               <span className="hidden sm:inline">
-                {isDownloading ? 'Proses...' : 'Download Word (.docx)'}
+                {isDownloading ? 'Memproses...' : 'Unduh Word (.docx)'}
               </span>
               <span className="sm:hidden">Word</span>
             </button>
@@ -553,11 +558,11 @@ Tembusan:
             <button
               type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#FFD54F] to-[#FFB300] hover:from-[#FFE082] hover:to-[#FFC107] text-[#1A1A5E] text-xs font-black shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#2B3056] text-xs font-bold shadow-xs transition-all cursor-pointer"
               title="Cetak atau Simpan Dokumen sebagai File PDF"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Cetak / Simpan PDF</span>
+              <span className="hidden sm:inline">Cetak / PDF</span>
               <span className="sm:hidden">PDF</span>
             </button>
           </div>
@@ -567,21 +572,22 @@ Tembusan:
       {/* TAB FORM INPUT */}
       {activeTab === 'form' && (
         <div className="space-y-4">
-          <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl">
-            <div className="flex items-center gap-2 mb-1.5 text-[#1A1A5E]">
-              <Sparkles className="w-4 h-4 text-[#FFC800]" />
-              <span className="text-xs font-black uppercase tracking-wider">
-                Pilih dari Permohonan Aktif (Otomatis Mengisi Variabel)
+          {/* Quick Auto-Fill Selector */}
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5">
+            <div className="flex items-center gap-2 text-[#2B3056]">
+              <ShieldCheck className="w-4 h-4 text-[#B3912D]" />
+              <span className="text-xs font-bold uppercase tracking-wider">
+                Pilih dari Permohonan Aktif (Otomatis Mengisi Seluruh Kolom)
               </span>
             </div>
 
             <select
               value={selectedRegId}
               onChange={handleRegDropdownChange}
-              className="w-full text-xs font-semibold p-2.5 bg-white border border-blue-200 rounded-lg focus:outline-none focus:border-[#1A1A5E]"
+              className="w-full text-xs font-medium p-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056] text-slate-800"
             >
               <option value="">
-                -- Pilih permohonan terdaftar atau edit variabel di bawah --
+                -- Pilih berkas permohonan terdaftar untuk mengisi formulir secara otomatis --
               </option>
               {peraturanList.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -594,21 +600,20 @@ Tembusan:
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* NOMOR SURAT KELUAR KANWIL */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Nomor Surat Keluar Kanwil
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Nomor Surat Keluar Kanwil <span className="text-rose-500">*</span>
               </label>
 
               <div className="flex items-center gap-1.5">
-                <div className="flex items-center flex-1 rounded-xl border border-[#D5D5CE] bg-white overflow-hidden focus-within:border-[#1A1A5E] focus-within:ring-1 focus-within:ring-[#1A1A5E] transition-all">
+                <div className="flex items-center flex-1 rounded-xl border border-slate-200 bg-white overflow-hidden focus-within:border-[#2B3056] focus-within:ring-1 focus-within:ring-[#2B3056] transition-all">
                   <input
                     type="text"
                     value={formData.nomorSurat}
                     onChange={(e) =>
                       setFormData({ ...formData, nomorSurat: e.target.value })
                     }
-                    className="w-full px-3 py-2 text-xs font-mono font-bold text-[#1A1A5E] bg-transparent focus:outline-none"
-                    placeholder="Contoh: W.4-PP.04.02-1489"
+                    className="w-full px-3 py-2.5 text-xs font-mono font-bold text-[#2B3056] bg-transparent focus:outline-none"
+                    placeholder="Contoh: 1489"
                   />
                 </div>
 
@@ -616,26 +621,22 @@ Tembusan:
                 <button
                   type="button"
                   onClick={handleGenerateRandomNumber}
-                  className="p-2.5 rounded-xl bg-[#F5F5F0] border border-[#D5D5CE] hover:bg-[#EAEAE0] text-[#1A1A5E] transition-colors shrink-0"
-                  title="Acak Nomor Surat"
+                  className="p-2.5 rounded-xl bg-slate-100 border border-slate-200 hover:bg-slate-200 text-[#2B3056] transition-colors shrink-0 cursor-pointer"
+                  title="Generate Nomor Acak"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <p className="mt-1 text-[10px] text-[#3D3D3A]/60 font-medium">
-                Sistem akan memformat nomor surat keluar secara otomatis.
+              <p className="mt-1 text-[10px] text-slate-500 font-medium">
+                Nomor surat akan dicetak lengkap dengan format tata naskah dinas.
               </p>
             </div>
 
-            {/* TANGGAL SURAT - TANGGAL, BULAN & TAHUN LENGKAP */}
+            {/* TANGGAL SURAT */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Tanggal Surat
-                <span className="text-xs font-semibold text-[#3D3D3A]/60 ml-1">
-                  (Tanggal, Bulan &amp; Tahun)
-                </span>
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Tanggal Surat Keluar <span className="text-rose-500">*</span>
               </label>
 
               <input
@@ -649,13 +650,13 @@ Tembusan:
                     tanggalSurat: formatIndonesianDate(val)
                   });
                 }}
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
               />
 
               {formData.tanggalSurat && (
-                <p className="mt-1 text-[10px] text-[#3D3D3A]/70 font-semibold">
-                  Akan tertulis:{' '}
-                  <span className="text-[#1A1A5E] font-black">
+                <p className="mt-1 text-[10px] text-slate-500">
+                  Tertulis pada naskah:{' '}
+                  <span className="text-[#2B3056] font-bold">
                     {formData.tanggalSurat}
                   </span>
                 </p>
@@ -664,9 +665,8 @@ Tembusan:
 
             {/* HAL / PERIHAL */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Hal (Perihal Surat)
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Hal (Perihal Surat) <span className="text-rose-500">*</span>
               </label>
               <textarea
                 rows={2}
@@ -674,15 +674,14 @@ Tembusan:
                 onChange={(e) =>
                   setFormData({ ...formData, hal: e.target.value })
                 }
-                className="flat-input w-full p-2 text-xs font-medium resize-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056] resize-none"
               />
             </div>
 
             {/* JABATAN PEMRAKARSA */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Jabatan Pemrakarsa (Tujuan Surat)
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Jabatan Pemrakarsa (Tujuan Surat) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -693,16 +692,15 @@ Tembusan:
                     jabatanPemrakarsa: e.target.value
                   })
                 }
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="Wali Kota Pekanbaru / Bupati Kampar"
               />
             </div>
 
             {/* IBUKOTA */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Ibu Kota / Tempat Tujuan (di ...)
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Ibu Kota Tempat Tujuan (di ...) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -710,14 +708,14 @@ Tembusan:
                 onChange={(e) =>
                   setFormData({ ...formData, ibukota: e.target.value })
                 }
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="Pekanbaru / Bangkinang"
               />
             </div>
 
             {/* NOMOR SURAT PEMDA */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
                 Nomor Surat Permohonan Pemda
               </label>
               <input
@@ -726,14 +724,14 @@ Tembusan:
                 onChange={(e) =>
                   setFormData({ ...formData, nomorSuratP: e.target.value })
                 }
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="180/HK/2024/045"
               />
             </div>
 
             {/* TANGGAL SURAT PEMDA */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
                 Tanggal Surat Permohonan Pemda
               </label>
               <input
@@ -744,25 +742,16 @@ Tembusan:
                   setInputDateVal(val);
                   setFormData({
                     ...formData,
-                    tanggalSurat: formatIndonesianDate(val)
+                    tanggalSuratP: formatIndonesianDate(val)
                   });
                 }}
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
               />
-
-              {formData.tanggalSurat && (
-                <p className="mt-1 text-[10px] text-[#3D3D3A]/70 font-semibold">
-                  Akan tertulis:{' '}
-                  <span className="text-[#1A1A5E] font-black">
-                    {formData.tanggalSurat}
-                  </span>
-                </p>
-              )}
             </div>
 
             {/* JENIS PERATURAN */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
                 Jenis Peraturan
               </label>
               <input
@@ -771,14 +760,14 @@ Tembusan:
                 onChange={(e) =>
                   setFormData({ ...formData, jenisPeraturan: e.target.value })
                 }
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="Peraturan Daerah / Peraturan Wali Kota"
               />
             </div>
 
             {/* ASAL PEMRAKARSA */}
             <div>
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
                 Asal Pemrakarsa (Daerah)
               </label>
               <input
@@ -787,16 +776,15 @@ Tembusan:
                 onChange={(e) =>
                   setFormData({ ...formData, asalPemrakarsa: e.target.value })
                 }
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="Kota Pekanbaru / Kabupaten Kampar"
               />
             </div>
 
             {/* JUDUL PERATURAN */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-black text-[#1A1A5E] mb-1">
-                Judul Materi Peraturan (tentang ...)
-                <span className="text-red-500"> *</span>
+              <label className="block text-xs font-bold text-[#2B3056] mb-1">
+                Judul Materi Peraturan (tentang ...) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -810,7 +798,7 @@ Tembusan:
                     hal: newHal
                   });
                 }}
-                className="flat-input w-full p-2 text-xs font-medium"
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
                 placeholder="Pajak Daerah dan Retribusi Daerah"
               />
             </div>
@@ -820,10 +808,10 @@ Tembusan:
             <button
               type="button"
               onClick={() => setActiveTab('preview')}
-              className="flat-btn bg-[#1A1A5E] text-white px-5 py-2.5 text-xs font-black rounded-xl hover:bg-[#2E3A87]"
+              className="inline-flex items-center gap-2 bg-[#2B3056] hover:bg-[#3A4070] text-white px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
             >
-              <Eye className="w-4 h-4 text-[#FFC800]" />
-              Lihat Pratinjau Lembar Surat
+              <Eye className="w-4 h-4 text-[#FFD82B]" />
+              <span>Lihat Pratinjau Lembar Surat</span>
             </button>
           </div>
         </div>
@@ -833,8 +821,9 @@ Tembusan:
       {activeTab === 'preview' && (
         <div className="space-y-4">
           <div
-            className={`bg-[#525659] p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center ${isModal ? 'max-h-[62vh] overflow-y-auto' : 'min-h-[750px] py-8'
-              }`}
+            className={`bg-slate-700/80 p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center ${
+              isModal ? 'max-h-[62vh] overflow-y-auto' : 'min-h-[750px] py-8'
+            }`}
           >
             <div
               ref={printAreaRef}
@@ -846,12 +835,12 @@ Tembusan:
                 color: '#000000'
               }}
             >
-              {/* KOP SURAT */}
+              {/* KOP SURAT RESMI KANWIL KEMENKUM PROVINSI RIAU */}
               <div className="border-b-2 border-black pb-2 mb-4">
                 <table className="w-full border-collapse">
                   <tbody>
                     <tr>
-                      <td className="w-24 align-middle pr-4 py-0">
+                      <td className="w-24 align-middle pr-4 py-0 shrink-0">
                         <LogoPengayoman
                           className="w-20 h-24 rounded-none shadow-none"
                           bgColor="#0B1A38"
@@ -859,24 +848,24 @@ Tembusan:
                         />
                       </td>
                       <td className="align-middle text-center text-black py-0">
-                        <p className="text-[12pt] font-normal tracking-wide uppercase m-0 leading-tight">
+                        <p className="text-[11.5pt] font-normal tracking-wide uppercase m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           KEMENTERIAN HUKUM REPUBLIK INDONESIA
                         </p>
-                        <p className="text-[13pt] font-bold tracking-wide uppercase m-0 mt-0.5 leading-tight">
+                        <p className="text-[12.5pt] font-bold tracking-wide uppercase m-0 mt-0.5 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           KANTOR WILAYAH RIAU
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 mt-1 leading-tight">
-                          Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
+                        <p className="text-[9pt] font-normal text-black m-0 mt-1 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          Jl. Jend. Sudirman No. 233, Kec. Pekanbaru Kota, Kota Pekanbaru, Riau
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight">
-                          Telepon: (0761) 23846 - 0811-6904-422
+                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          Telepon: (0761) 853000
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight">
+                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           Laman:{' '}
                           <span className="text-blue-700 underline">
                             https://riau.kemenkum.go.id/
                           </span>{' '}
-                          Pos-el: subbidfpphdriaubedelau@gmail.com
+                          Pos-el: harmonitas.kanwil@kemenkum.go.id
                         </p>
                       </td>
                     </tr>
@@ -885,44 +874,71 @@ Tembusan:
               </div>
 
               {/* INFORMASI NOMOR, TANGGAL, SIFAT, HAL */}
-              <table className="w-full text-[11pt] mb-5 border-collapse">
+              <table
+                className="w-full text-[11pt] mb-4 border-collapse"
+                style={{
+                  fontFamily: 'Arial, sans-serif',
+                  tableLayout: 'fixed'
+                }}
+              >
+                <colgroup>
+                  <col style={{ width: '60px' }} />
+                  <col style={{ width: '15px' }} />
+                  <col style={{ width: '56%' }} />
+                  <col style={{ width: 'auto' }} />
+                </colgroup>
                 <tbody>
                   <tr>
-                    <td className="w-16 align-top py-0.5">Nomor</td>
-                    <td className="w-4 align-top py-0.5">:</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Nomor</td>
+                    <td className="align-top py-0.5">:</td>
                     <td className="align-top py-0.5">
-                      {formData.nomorSurat}
+                      {formData.nomorSurat.startsWith('W.4-PP.04.02-')
+                        ? formData.nomorSurat
+                        : `W.4-PP.04.02-${formData.nomorSurat}`}
                     </td>
                     <td className="text-right align-top py-0.5 whitespace-nowrap">
                       {formData.tanggalSurat}
                     </td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5">Sifat</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Sifat</td>
                     <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5" colSpan={2}>
-                      Penting
-                    </td>
+                    <td className="align-top py-0.5">Penting</td>
+                    <td className="align-top py-0.5"></td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5">Hal</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Hal</td>
                     <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5 text-justify" colSpan={2}>
+                    <td
+                      className="align-top py-0.5 text-justify"
+                      style={{
+                        textAlign: 'justify',
+                        textJustify: 'inter-word'
+                      }}
+                    >
                       {formData.hal}
+                    </td>
+                    <td className="align-top py-0.5"></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* TUJUAN SURAT (YTH & DI) */}
+              <table className="w-full text-[11pt] mb-4 border-collapse" style={{ fontFamily: 'Arial, sans-serif' }}>
+                <tbody>
+                  <tr>
+                    <td className="w-12 align-top py-0.5">Yth</td>
+                    <td className="align-top py-0.5">
+                      <div>{formData.jabatanPemrakarsa}</div>
+                      <div>di {formData.ibukota}</div>
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              {/* TUJUAN SURAT */}
-              <div className="my-5 text-[11pt] leading-snug">
-                <div>Yth {formData.jabatanPemrakarsa}</div>
-                <div>di {formData.ibukota}</div>
-              </div>
-
               {/* ISI SURAT */}
-              <div className="space-y-4 text-justify text-[11pt] leading-relaxed">
-                <p className="indent-9">
+              <div className="space-y-3.5 text-justify text-[11pt]" style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
+                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
                   Menindaklanjuti surat permohonan {formData.jabatanPemrakarsa} Nomor{' '}
                   {formData.nomorSuratP} Tanggal {formData.tanggalSuratP} perihal Mohon
                   Harmonisasi Rancangan {formData.jenisPeraturan}{' '}
@@ -940,20 +956,21 @@ Tembusan:
                   ditindaklanjuti ke tahapan selanjutnya
                 </p>
 
-                <p className="indent-9">
+                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
                   Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan
                   terima kasih.
                 </p>
               </div>
 
-              {/* TANDA TANGAN */}
+              {/* TANDA TANGAN KAKANWIL */}
               <div
-                className="mt-10 flex justify-end signature-container"
+                className="mt-8 flex justify-end signature-container"
                 style={{
-                  marginTop: '40px',
+                  marginTop: '32px',
                   display: 'flex',
                   justifyContent: 'flex-end',
-                  width: '100%'
+                  width: '100%',
+                  fontFamily: 'Arial, sans-serif'
                 }}
               >
                 <div
@@ -965,7 +982,7 @@ Tembusan:
                   }}
                 >
                   <p
-                    className="mb-14"
+                    className="mb-14 font-normal"
                     style={{ marginBottom: '56px', margin: '0 0 56px 0' }}
                   >
                     {formData.jabatanKakanwil}
@@ -977,11 +994,11 @@ Tembusan:
               </div>
 
               {/* TEMBUSAN */}
-              <div className="mt-8 pt-4 text-[10pt]">
-                <p className="font-normal mb-1">Tembusan:</p>
-                <ol className="list-decimal pl-5 space-y-0.5 text-neutral-900">
+              <div className="mt-6 pt-2 text-[10pt]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                <p className="font-normal mb-1 m-0">Tembusan:</p>
+                <ol className="list-decimal pl-5 space-y-0.5 text-neutral-900 m-0">
                   {formData.tembusan.map((item, idx) => (
-                    <li key={idx}>{item}</li>
+                    <li key={idx} className="pl-0.5">{item}</li>
                   ))}
                 </ol>
               </div>
@@ -989,12 +1006,11 @@ Tembusan:
           </div>
 
           {/* ACTION BAR */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-[#F5F5F0] border border-[#E2E2DC] rounded-xl">
-            <div className="flex items-center gap-2 text-xs text-[#3D3D3A]/80 font-bold">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div className="flex items-center gap-2 text-xs text-slate-700 font-bold">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>
-                Kop surat, logo pengayoman biru-kuning, dan tata letak 100% persis
-                gambar template Anda
+                Tata naskah dinas resmi Kanwil Kemenkum Provinsi Riau siap diunduh.
               </span>
             </div>
 
@@ -1002,7 +1018,7 @@ Tembusan:
               <button
                 type="button"
                 onClick={handleCopyText}
-                className="flat-btn bg-white border border-[#E2E2DC] text-[#1A1A5E] px-3.5 py-2 text-xs rounded-xl hover:bg-slate-50 font-bold"
+                className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-[#2B3056] px-3.5 py-2 text-xs rounded-xl hover:bg-slate-100 font-bold transition-all shadow-xs cursor-pointer"
                 title="Salin teks naskah ke clipboard"
               >
                 <Copy className="w-3.5 h-3.5 text-slate-600" />
@@ -1013,22 +1029,22 @@ Tembusan:
                 type="button"
                 onClick={handleDownloadDocx}
                 disabled={isDownloading}
-                className="flat-btn bg-blue-900 text-white px-4 py-2 text-xs rounded-xl hover:bg-blue-950 font-black shadow-xs disabled:opacity-50 cursor-pointer"
+                className="inline-flex items-center gap-1.5 bg-[#2B3056] hover:bg-[#3A4070] text-white px-4 py-2 text-xs rounded-xl font-bold shadow-xs disabled:opacity-50 cursor-pointer transition-all"
               >
-                <Download className="w-3.5 h-3.5 text-[#FFC800]" />
+                <Download className="w-3.5 h-3.5 text-[#FFD82B]" />
                 <span>
                   {isDownloading
-                    ? 'Memproses Word...'
-                    : 'Download Word Asli (.docx)'}
+                    ? 'Memproses...'
+                    : 'Download Word (.docx)'}
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={handlePrint}
-                className="flat-btn bg-gradient-to-r from-[#FFD54F] to-[#FFB300] text-[#1A1A5E] px-4 py-2 text-xs rounded-xl hover:shadow-md font-black cursor-pointer"
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 text-[#2B3056] px-4 py-2 text-xs rounded-xl hover:shadow-md font-bold cursor-pointer transition-all"
               >
-                <Printer className="w-3.5 h-3.5 text-[#1A1A5E]" />
+                <Printer className="w-3.5 h-3.5" />
                 <span>Cetak / Simpan PDF</span>
               </button>
             </div>
@@ -1047,10 +1063,11 @@ Tembusan:
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Generator ${letterType === 'perda'
-        ? 'Surat Selesai PERDA'
-        : 'Surat Selesai PERKADA'
-        }`}
+      title={`Generator ${
+        letterType === 'perda'
+          ? 'Surat Selesai PERDA'
+          : 'Surat Selesai PERKADA'
+      }`}
       size="5xl"
     >
       {content}

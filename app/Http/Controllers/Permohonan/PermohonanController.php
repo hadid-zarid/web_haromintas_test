@@ -17,6 +17,7 @@ use App\Models\StatusRegulasi;
 use App\Models\TimKerja;
 use App\Models\User;
 use App\Services\NotifikasiService;
+use App\Services\PermohonanWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -498,15 +499,15 @@ class PermohonanController extends Controller
             ->pluck('jenis_dokumen_id')
             ->toArray();
 
-        $isHarmonisasiComplete = empty(array_diff([1, 2, 3, 4, 5], $allUploadedSlots));
-        $isFasilitasiComplete = empty(array_diff([1, 2, 3, 4, 5, 6, 7], $allUploadedSlots));
+        $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($allUploadedSlots);
+        $isFasilitasiComplete = PermohonanWorkflowService::isFasilitasiComplete($allUploadedSlots);
 
         if ($isFasilitasiComplete) {
-            // Jika seluruh 7 slot dokumen lengkap -> Status beralih ke SELESAI (4)
+            // Slot 6 bersifat opsional. Slot 1-5 dan Slot 7 lengkap -> Status beralih ke SELESAI (4)
             if ($rancangan->status_id !== 4) {
                 $rancangan->update([
                     'status_id' => 4,
-                    'keterangan' => 'Seluruh rangkaian dokumen harmonisasi dan fasilitasi (7 slot) telah lengkap dan disahkan tuntas.',
+                    'keterangan' => 'Seluruh dokumen wajib harmonisasi dan Surat Hasil Fasilitasi telah lengkap dan disahkan tuntas.',
                 ]);
             }
         } elseif ($isHarmonisasiComplete) {
@@ -663,7 +664,7 @@ class PermohonanController extends Controller
             $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
             NotifikasiService::notifyPimpinan(
                 $rancangan,
-                'Produk Hukum Daerah Selesai & Sah',
+                'Produk Hukum Daerah Selesai',
                 "Harmonisasi & fasilitasi '{$rancangan->judul_rancangan}' ({$kabName}) telah disetujui tuntas oleh Biro Hukum Provinsi Riau."
             );
         } elseif ($newStatusId === 5 && $rancangan->tim_kerja_id) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -37,7 +38,7 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user') ? $this->route('user')->user_id : $this->input('user_id', $this->input('id'));
 
         return [
-            'nama' => ['required', 'string', 'max:150'],
+            'nama' => ['required', 'string', 'max:150', new NoHtmlContent()],
             'email' => ['required', 'string', 'email', 'max:150', Rule::unique('user', 'email')->ignore($userId, 'user_id')],
             'password' => [
                 'nullable',
