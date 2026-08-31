@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,6 +39,15 @@ class PasswordResetController extends Controller
             'email.required' => 'Alamat email kedinasan wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
         ]);
+
+        $throttleKey = 'reset-password|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'email' => 'Terlalu banyak permintaan pemulihan kata sandi. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.',
+            ]);
+        }
 
         $user = User::where('email', $request->email)->first();
 
@@ -83,7 +93,10 @@ class PasswordResetController extends Controller
             ]);
         }
 
-        $successMsg = "Tautan pemulihan kata sandi telah dikirim ke email <strong>{$user->email}</strong>. Silakan periksa kotak masuk atau folder spam Anda.";
+        RateLimiter::hit($throttleKey, 300); // 5 minutes cooldown for subsequent attempts after limit reached
+
+        $safeEmail = e($user->email);
+        $successMsg = "Tautan pemulihan kata sandi telah dikirim ke email <strong>{$safeEmail}</strong>. Silakan periksa kotak masuk atau folder spam Anda.";
         if ($isLogMailer) {
             $successMsg .= "<br><div class='mt-2 p-2.5 bg-amber-100/80 border border-amber-300 rounded-xl text-[11px] text-amber-950 leading-relaxed'><strong>[Mode Pengembang Lokal]</strong> Pengiriman email fisik SMTP belum dihubungkan di .env. Anda dapat mengeklik tautan langsung berikut untuk menguji:<br><a href='{$resetUrl}' class='inline-block mt-1.5 px-3 py-1 bg-[#1A1A5E] text-white font-black rounded-lg hover:bg-[#2C3154] transition-all text-xs no-underline'>Buka Form Reset Password Baru &rarr;</a></div>";
         }

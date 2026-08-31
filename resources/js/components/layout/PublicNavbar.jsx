@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
-import { Globe2, LogIn, Mail, Menu, Phone, X } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Globe2, LogIn, Mail, Menu, Phone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
 import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 
 export const PublicNavbar = () => {
+  const { auth } = usePage().props || {};
+  const user = auth?.user;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -124,28 +126,51 @@ export const PublicNavbar = () => {
               ))}
             </nav>
 
-            {/* Login CTA Button with Kemenkumham Gold Gradient */}
+            {/* Login / Dashboard CTA Button with Kemenkumham Gold Gradient */}
             <div className="hidden items-center gap-3 lg:flex">
-              <Link
-                href="/login"
-                className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
-                  isScrolled ? 'h-9 px-4 text-[11px]' : 'h-10 px-5 text-xs'
-                }`}
-              >
-                <LogIn className="h-3.5 w-3.5" />
-                Masuk Petugas
-              </Link>
+              {user ? (
+                <Link
+                  href="/home"
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
+                    isScrolled ? 'h-9 px-4 text-[11px]' : 'h-10 px-5 text-xs'
+                  }`}
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span>Ke Dashboard</span>
+                  <ArrowRight className="h-3.5 w-3.5 opacity-70" />
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
+                    isScrolled ? 'h-9 px-4 text-[11px]' : 'h-10 px-5 text-xs'
+                  }`}
+                >
+                  <LogIn className="h-3.5 w-3.5" />
+                  Masuk Petugas
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Buttons */}
             <div className="flex items-center gap-2 lg:hidden">
-              <Link
-                href="/login"
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] px-3 text-[11px] font-bold text-[#2B3056] shadow-2xs"
-              >
-                <LogIn className="h-3 w-3" />
-                Masuk
-              </Link>
+              {user ? (
+                <Link
+                  href="/home"
+                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] px-3 text-[11px] font-bold text-[#2B3056] shadow-2xs"
+                >
+                  <LayoutDashboard className="h-3 w-3" />
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] px-3 text-[11px] font-bold text-[#2B3056] shadow-2xs"
+                >
+                  <LogIn className="h-3 w-3" />
+                  Masuk
+                </Link>
+              )}
 
               <button
                 type="button"

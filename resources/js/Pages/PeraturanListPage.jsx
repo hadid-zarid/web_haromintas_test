@@ -802,7 +802,7 @@ export const PeraturanListPage = ({
                 {/* Upload Draf Awal / Berkas Permohonan */}
                 <div>
                   <label className="block text-xs font-bold text-[#2B3056] mb-1">
-                    Unggah Draf Awal Ranperda (Opsional)
+                    Unggah Draf Awal Ranperda atau Ranperkada (Opsional)
                   </label>
                   <div
                     onClick={() => addFileInputRef.current?.click()}

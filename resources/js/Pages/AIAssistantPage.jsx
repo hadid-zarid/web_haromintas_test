@@ -108,7 +108,7 @@ const AIAssistantPage = () => {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-[#2B3056]">
-                    Pemeriksaan & Telaah Dokumen
+                    Pemeriksaan & Analisa Dokumen
                   </h2>
                   <p className="text-xs text-slate-500 font-normal">
                     Unggah naskah peraturan (PDF/DOCX) untuk pemindaian otomatis kesesuaian format
@@ -187,7 +187,7 @@ const AIAssistantPage = () => {
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4 text-[#2B3056]" />
-                            <span>Mulai Telaah Dokumen</span>
+                            <span>Mulai Analisa Dokumen</span>
                           </>
                         )}
                       </button>
@@ -206,7 +206,7 @@ const AIAssistantPage = () => {
                   </div>
                   <div>
                     <h2 className="text-sm font-bold text-[#2B3056]">
-                      Hasil Telaah & Rekomendasi
+                      Hasil Analisa & Rekomendasi
                     </h2>
                     <p className="text-xs text-slate-500 font-normal">
                       Ringkasan parameter kesesuaian naskah hukum
@@ -240,7 +240,7 @@ const AIAssistantPage = () => {
                       "Memverifikasi konsiderans 'Menimbang' & dasar hukum 'Mengingat'...",
                       "Menganalisis keselarasan vertikal dengan UU No. 12/2011 & PP terkait...",
                       "Memeriksa asas kepastian hukum & kerapian bahasa perancangan...",
-                      "Menyusun rekomendasi telaah hukum Kanwil Riau...",
+                      "Menyusun rekomendasi Analisa hukum Kanwil Riau...",
                     ]}
                   />
                 </div>
@@ -250,10 +250,10 @@ const AIAssistantPage = () => {
                     <FileText className="w-6 h-6" />
                   </div>
                   <h3 className="text-sm font-bold text-[#2B3056]">
-                    Belum Ada Hasil Telaah
+                    Belum Ada Hasil Analisa
                   </h3>
                   <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                    Unggah berkas rancangan peraturan dan tekan tombol <b>Mulai Telaah</b> untuk melihat catatan evaluasi.
+                    Unggah berkas rancangan peraturan dan tekan tombol <b>Mulai Analisa</b> untuk melihat catatan evaluasi.
                   </p>
                 </div>
               ) : (
@@ -341,13 +341,13 @@ const AIAssistantPage = () => {
                   <Sparkles className="w-5 h-5 text-[#FFD82B]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Telaah Cerdas HARMONITAS</h3>
+                  <h3 className="text-sm font-bold text-white">Analisa Cerdas HARMONITAS</h3>
                   <p className="text-[11px] text-slate-300 font-medium">Pemeriksaan Regulasi Berbantuan Sistem</p>
                 </div>
               </div>
 
               <p className="text-xs text-slate-200 leading-relaxed font-normal">
-                Sistem membantu mendeteksi potensi ketidaksesuaian penulisan, struktur pasal, dan format regulasi untuk mempercepat proses telaah oleh perancang peraturan perundang-undangan.
+                Sistem membantu mendeteksi potensi ketidaksesuaian penulisan, struktur pasal, dan format regulasi untuk mempercepat proses Analisa oleh perancang peraturan perundang-undangan.
               </p>
 
               <div className="mt-4 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-slate-300 font-normal">
@@ -359,7 +359,7 @@ const AIAssistantPage = () => {
             {/* Workflow steps */}
             <section className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#2B3056] mb-3">
-                Alur Kerja Telaah
+                Alur Kerja Analisa
               </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">

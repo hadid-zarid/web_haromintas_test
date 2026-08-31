@@ -21,28 +21,33 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
   const authUser = props?.auth?.user;
   const isAdmin = authUser?.role === 'ADMIN';
 
-  const navItems = [
-    {
-      label: "Beranda",
-      path: "/home",
-      icon: Home,
-    },
-    {
-      label: "Daftar Permohonan",
-      path: "/peraturan",
-      icon: FileText,
-    },
-    {
-      label: "Draft Generate Surat",
-      path: "/draft-generate",
-      icon: FileOutput,
-    },
-    {
-      label: "Buku Panduan",
-      path: "/panduan",
-      icon: BookOpen,
-    },
-  ];
+    const isTimKerja = authUser?.role === 'TIM_KERJA';
+
+    const baseNavItems = [
+        {
+            label: "Beranda",
+            path: "/home",
+            icon: Home,
+        },
+        {
+            label: "Daftar Permohonan",
+            path: "/peraturan",
+            icon: FileText,
+        },
+        {
+            label: "Draft Generate Surat",
+            path: "/draft-generate",
+            icon: FileOutput,
+            show: isTimKerja,
+        },
+        {
+            label: "Buku Panduan",
+            path: "/panduan",
+            icon: BookOpen,
+        },
+    ];
+
+    const navItems = baseNavItems.filter((item) => item.show !== false);
 
   const isAiActive = currentPath.startsWith("/ai");
   const isManageAccountsActive = currentPath.startsWith("/admin/users");
@@ -65,10 +70,9 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
           text-white
           flex flex-col justify-between
           transition-transform duration-200 ease-in-out font-sans
-          ${
-            isMobileOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
+          ${isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
           }`}
       >
         {/* Top Section */}
@@ -114,17 +118,15 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   key={item.path}
                   href={item.path}
                   onClick={() => setIsMobileOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${isActive
+                    ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
-                      className={`w-4 h-4 shrink-0 ${
-                        isActive ? "text-[#2B3056]" : "text-white/80"
-                      }`}
+                      className={`w-4 h-4 shrink-0 ${isActive ? "text-[#2B3056]" : "text-white/80"
+                        }`}
                     />
                     <span className="tracking-wide">{item.label}</span>
                   </div>
@@ -142,19 +144,15 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             <Link
               href="/ai"
               onClick={() => setIsMobileOpen(false)}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                isAiActive
-                  ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
-                  : "text-white/80 hover:bg-white/10 hover:text-white"
-              }`}
+              className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${isAiActive
+                ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
+                : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
             >
               <div className="flex items-center gap-3">
                 <Bot className={`w-4 h-4 shrink-0 ${isAiActive ? "text-[#2B3056]" : "text-[#FFD82B]"}`} />
-                <span className="tracking-wide">Telaah AI</span>
+                <span className="tracking-wide">HARMONITAS AI</span>
               </div>
-              <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${isAiActive ? "bg-[#2B3056] text-[#FFD82B]" : "bg-[#FFD82B] text-[#2B3056]"}`}>
-                Baru
-              </span>
             </Link>
           </div>
 
@@ -169,11 +167,10 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
               <Link
                 href="/admin/users"
                 onClick={() => setIsMobileOpen(false)}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                  isManageAccountsActive
-                    ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                }`}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${isManageAccountsActive
+                  ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Users className="w-4 h-4 shrink-0" />

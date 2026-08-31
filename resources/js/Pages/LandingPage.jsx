@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman.png';
@@ -185,6 +185,8 @@ const CustomCursor = () => {
 };
 
 export const LandingPage = () => {
+  const { auth } = usePage().props || {};
+  const user = auth?.user;
   const [hoveredCardIndex, setHoveredCardIndex] = React.useState(null);
   const [activeServiceTab, setActiveServiceTab] = React.useState(0);
   const [activeAiClauseTab, setActiveAiClauseTab] = React.useState(0);
@@ -561,15 +563,15 @@ export const LandingPage = () => {
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
             <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-              
+
               {/* Left Column: Hero Content with Reveal Animation */}
               <div className="lg:col-span-7">
                 <Reveal direction="up" delay={0} className="space-y-5">
                   <span className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2B3056] shadow-2xs backdrop-blur-md">
                     <span className="flex h-4 w-4 items-center justify-center shrink-0">
-                      <img 
-                        src={logoPengayoman} 
-                        alt="Logo Pengayoman" 
+                      <img
+                        src={logoPengayoman}
+                        alt="Logo Pengayoman"
                         className="h-full w-full object-contain"
                       />
                     </span>
@@ -636,10 +638,10 @@ export const LandingPage = () => {
                   {/* Call to Action Buttons */}
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Link
-                      href="/login"
+                      href={user ? "/home" : "/login"}
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-6 text-xs font-bold text-[#2B3056] shadow-sm transition duration-200 hover:-translate-y-0.5 cursor-pointer"
                     >
-                      <span>Masuk ke Dashboard</span>
+                      <span>{user ? 'Buka Dashboard' : 'Masuk ke Dashboard'}</span>
                       <ArrowRight className="h-4 w-4" />
                     </Link>
 
@@ -666,7 +668,7 @@ export const LandingPage = () => {
               <div className="lg:col-span-5 relative flex items-center justify-center min-h-[380px] sm:min-h-[440px] lg:min-h-[480px]">
                 <Reveal direction="right" delay={150} className="w-full flex items-center justify-center">
                   {/* Ambient Soft Glow Behind Illustration */}
-                  <div 
+                  <div
                     className="absolute w-[360px] h-[360px] sm:w-[440px] sm:h-[440px] rounded-full pointer-events-none opacity-55 blur-3xl"
                     style={{
                       background: 'radial-gradient(circle, rgba(255, 216, 43, 0.20) 0%, rgba(43, 48, 86, 0.05) 55%, transparent 75%)'
@@ -711,91 +713,124 @@ export const LandingPage = () => {
         </section>
 
         {/* =========================================================================
-            SECTION 2: KEUNGGULAN LAYANAN (Soft Gradient Background)
-            ========================================================================= */}
-        <section id="tentang" className="scroll-mt-28 bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
+    SECTION 2: KEUNGGULAN LAYANAN (CARD RINGKAS & FLIP DETAIL)
+    ========================================================================= */}
+        <section id="tentang" className="scroll-mt-28 bg-white py-12 sm:py-16 border-b border-slate-200 overflow-hidden">
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
+
+            {/* SECTION HEADER */}
             <Reveal direction="up" delay={0}>
               <div className="mx-auto max-w-3xl text-center">
-                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#B3912D]">
-                  <span className="h-px w-6 bg-[#FFC800]" />
+                <span className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#2B3056]/10 border border-[#2B3056]/15 text-[10px] font-black uppercase tracking-widest text-[#2B3056]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#FFC800] animate-ping" />
                   Keunggulan Layanan
-                  <span className="h-px w-6 bg-[#FFC800]" />
                 </span>
-                <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
+                <h2 className="mt-2.5 text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#2B3056]">
                   Mendukung Proses yang Lebih Terarah
                 </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
-                  HARMONITAS membantu kolaborasi harmonisasi regulasi daerah menjadi lebih cepat, teratur, terpusat, dan mudah dipantau.
+                <p className="mx-auto mt-2 max-w-xl text-xs font-medium text-slate-600 leading-relaxed">
+                  Arahkan kursor ke kartu di bawah untuk melihat rincian detail keunggulan layanan HARMONITAS.
                 </p>
               </div>
             </Reveal>
 
-            <div 
-              className="mt-12 grid gap-6 md:grid-cols-3 relative"
-              onMouseLeave={() => setHoveredCardIndex(null)}
-            >
+            {/* 3D FLIP BENEFIT CARDS (UKURAN LEBIH PENDEK) */}
+            <div className="mt-8 grid gap-6 md:grid-cols-3 relative">
               {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon;
-                const deckClasses = getCardDeckClasses(idx);
 
                 return (
-                  <Reveal key={benefit.title} direction="up" delay={idx * 160 + 60} className="h-full">
-                    <article
-                      onMouseEnter={() => setHoveredCardIndex(idx)}
-                      className={`group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50/40 to-white p-7 sm:p-8 shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] h-full flex flex-col justify-between cursor-pointer ${deckClasses}`}
-                    >
-                      {/* Top Gradient Stripe */}
-                      <span className="absolute inset-x-6 top-0 h-1 rounded-b-md bg-gradient-to-r from-[#FFC800] via-[#FFD82B] to-[#2B3056]" />
+                  <Reveal key={benefit.title} direction="up" delay={idx * 150 + 50} className="h-full">
 
-                      {/* Watermark Number */}
-                      <span className="absolute -right-2 -bottom-4 text-7xl font-black text-slate-100/80 select-none pointer-events-none group-hover:text-slate-200/90 transition-colors">
-                        {benefit.number}
-                      </span>
+                    {/* Outer Container (Height Dipangkas Menjadi 210px) */}
+                    <div className="group h-[210px] w-full cursor-pointer [perspective:1000px]">
 
-                      <div>
-                        <div className="relative z-10 flex items-start justify-between">
-                          <span className={`flex h-13 w-13 items-center justify-center rounded-2xl bg-[#2B3056] text-[#FFD82B] shadow-md transition-all duration-300 ${
-                            hoveredCardIndex === idx ? 'scale-110 shadow-lg ring-2 ring-[#FFD82B]/60' : 'group-hover:scale-105'
-                          }`}>
-                            <Icon className="h-6 w-6" />
+                      {/* Inner Wrapper */}
+                      <div className="relative h-full w-full rounded-2xl transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)_scale(1.03)] shadow-xs hover:shadow-xl">
+
+                        {/* ================= SISI DEPAN (FRONT - SUPER RINGKAS) ================= */}
+                        <div className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 [backface-visibility:hidden]">
+                          {/* Top Accent Line */}
+                          <span className="absolute inset-x-0 top-0 h-1.5 bg-[#2B3056]" />
+
+                          {/* Watermark Number */}
+                          <span className="absolute -right-2 -bottom-4 text-7xl font-black text-slate-100 select-none pointer-events-none">
+                            {benefit.number}
                           </span>
-                          <span className={`inline-flex items-center rounded-md border border-slate-200 bg-white/90 px-3 py-1 text-[10px] font-bold text-slate-700 shadow-2xs backdrop-blur-xs transition-colors ${
-                            hoveredCardIndex === idx ? 'border-[#2B3056]/30 text-[#2B3056] bg-slate-50' : ''
-                          }`}>
-                            {benefit.tag}
-                          </span>
+
+                          {/* Icon & Tag */}
+                          <div className="relative z-10 flex items-center justify-between">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-xs">
+                              <Icon className="h-5 w-5" />
+                            </span>
+                            <span className="inline-flex items-center rounded-md border border-[#2B3056]/20 bg-[#2B3056]/5 px-2 py-0.5 text-[9px] font-black uppercase text-[#2B3056]">
+                              {benefit.tag}
+                            </span>
+                          </div>
+
+                          {/* Judul Singkat */}
+                          <div className="relative z-10 my-auto text-center px-1">
+                            <h3 className="text-base font-black text-[#2B3056] leading-snug">
+                              {benefit.title}
+                            </h3>
+                          </div>
+
+                          {/* Bottom Hint */}
+                          <div className="relative z-10 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-[#2B3056]">
+                            <span className="text-slate-400 font-medium">
+                              Layanan #{benefit.number}
+                            </span>
+                            <span className="flex items-center gap-0.5 text-[#2B3056] font-extrabold">
+                              Buka Detail <ChevronRight className="h-3 w-3 text-[#FFC800]" />
+                            </span>
+                          </div>
                         </div>
 
-                        <div className="relative z-10 mt-6 space-y-2">
-                          <h3 className={`text-lg font-bold transition-colors ${
-                            hoveredCardIndex === idx ? 'text-[#3A4070]' : 'text-[#2B3056] group-hover:text-[#3A4070]'
-                          }`}>
-                            {benefit.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed">
-                            {benefit.description}
-                          </p>
-                        </div>
-                      </div>
+                        {/* ================= SISI BELAKANG (BACK - DETAIL DESKRIPSI) ================= */}
+                        <div className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-2xl border border-[#2B3056] bg-[#2B3056] text-white p-5 [backface-visibility:hidden] [transform:rotateY(180deg)] shadow-xl">
+                          {/* Top Accent Line Gold */}
+                          <span className="absolute inset-x-0 top-0 h-1 bg-[#FFD82B]" />
 
-                      <div className="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#2B3056]">
-                        <span className="inline-flex items-center gap-1.5 text-slate-500 font-medium">
-                          Standar Prosedur Operasional
-                        </span>
-                        <span className={`flex h-6 w-6 items-center justify-center rounded-md transition-all duration-300 ${
-                          hoveredCardIndex === idx 
-                            ? 'bg-[#FFD82B] text-[#2B3056] translate-x-1 shadow-xs' 
-                            : 'bg-slate-50 text-[#2B3056] group-hover:bg-[#FFD82B]'
-                        }`}>
-                          <ChevronRight className="h-3.5 w-3.5" />
-                        </span>
+                          <div className="relative z-10 space-y-1.5">
+                            <div className="flex items-center justify-between border-b border-white/15 pb-1.5">
+                              <span className="text-[9px] font-black uppercase tracking-wider text-[#FFD82B]">
+                                {benefit.tag}
+                              </span>
+                              <span className="text-[10px] font-mono font-bold text-slate-300">
+                                #{benefit.number}
+                              </span>
+                            </div>
+
+                            <h4 className="text-xs font-black text-white leading-tight">
+                              {benefit.title}
+                            </h4>
+
+                            {/* Deskripsi */}
+                            <p className="text-[11px] text-slate-200 font-medium leading-normal line-clamp-4">
+                              {benefit.description}
+                            </p>
+                          </div>
+
+                          {/* Back Bottom Content */}
+                          <div className="relative z-10 pt-2 border-t border-white/15 flex items-center justify-between text-[10px] font-bold">
+                            <span className="text-slate-300 font-medium text-[9px]">
+                              SOP Resmi
+                            </span>
+                            <span className="inline-flex items-center gap-0.5 rounded bg-[#FFD82B] px-2 py-0.5 text-[#2B3056] text-[10px] font-black">
+                              <span>Terstruktur</span>
+                              <ChevronRight className="h-3 w-3" />
+                            </span>
+                          </div>
+                        </div>
+
                       </div>
-                    </article>
+                    </div>
+
                   </Reveal>
                 );
               })}
             </div>
+
           </div>
         </section>
 
@@ -804,7 +839,7 @@ export const LandingPage = () => {
             ========================================================================= */}
         <section className="border-b border-slate-200 bg-slate-50/60 py-16 sm:py-20 overflow-hidden">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8">
-            
+
             {/* Left Column: Interactive 4-Stage Workflow Selector */}
             <div className="lg:col-span-6">
               <Reveal direction="left" delay={50} className="space-y-4">
@@ -830,27 +865,24 @@ export const LandingPage = () => {
                         key={item.step}
                         onClick={() => setActiveServiceTab(idx)}
                         onMouseEnter={() => setActiveServiceTab(idx)}
-                        className={`group relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 transition-all duration-300 cursor-pointer ${
-                          isActive
-                            ? 'bg-white border-[#2B3056]/50 shadow-md ring-2 ring-[#FFD82B]/60 -translate-y-0.5'
-                            : 'bg-white/80 border-slate-200/90 hover:bg-white hover:border-slate-300 hover:shadow-2xs'
-                        }`}
+                        className={`group relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 transition-all duration-300 cursor-pointer ${isActive
+                          ? 'bg-white border-[#2B3056]/50 shadow-md ring-2 ring-[#FFD82B]/60 -translate-y-0.5'
+                          : 'bg-white/80 border-slate-200/90 hover:bg-white hover:border-slate-300 hover:shadow-2xs'
+                          }`}
                       >
                         {/* Active Indicator Left Stripe */}
                         <span
-                          className={`absolute left-0 inset-y-0 w-1.5 bg-gradient-to-b from-[#FFD82B] via-[#FFC800] to-[#2B3056] transition-opacity duration-300 ${
-                            isActive ? 'opacity-100' : 'opacity-0'
-                          }`}
+                          className={`absolute left-0 inset-y-0 w-1.5 bg-gradient-to-b from-[#FFD82B] via-[#FFC800] to-[#2B3056] transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'
+                            }`}
                         />
 
                         <div className="flex items-center gap-3.5 min-w-0 pl-1">
                           {/* Step Number Badge */}
                           <span
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-xs transition-all duration-300 ${
-                              isActive
-                                ? 'bg-[#2B3056] text-[#FFD82B] shadow-sm scale-105'
-                                : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
-                            }`}
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-xs transition-all duration-300 ${isActive
+                              ? 'bg-[#2B3056] text-[#FFD82B] shadow-sm scale-105'
+                              : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                              }`}
                           >
                             <Icon className="h-5 w-5" />
                           </span>
@@ -858,9 +890,8 @@ export const LandingPage = () => {
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <span
-                                className={`text-xs sm:text-sm font-bold transition-colors leading-tight ${
-                                  isActive ? 'text-[#2B3056]' : 'text-slate-700 group-hover:text-[#2B3056]'
-                                }`}
+                                className={`text-xs sm:text-sm font-bold transition-colors leading-tight ${isActive ? 'text-[#2B3056]' : 'text-slate-700 group-hover:text-[#2B3056]'
+                                  }`}
                               >
                                 {item.label}
                               </span>
@@ -873,20 +904,18 @@ export const LandingPage = () => {
 
                         <div className="flex items-center gap-2 shrink-0 ml-2">
                           <span
-                            className={`rounded-md px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase transition-colors ${
-                              isActive
-                                ? 'bg-[#2B3056] text-[#FFD82B]'
-                                : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
-                            }`}
+                            className={`rounded-md px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase transition-colors ${isActive
+                              ? 'bg-[#2B3056] text-[#FFD82B]'
+                              : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                              }`}
                           >
                             {item.badge}
                           </span>
                           <span
-                            className={`flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-200 ${
-                              isActive
-                                ? 'bg-[#FFD82B] text-[#2B3056] translate-x-0.5'
-                                : 'text-slate-400 group-hover:text-slate-600'
-                            }`}
+                            className={`flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-200 ${isActive
+                              ? 'bg-[#FFD82B] text-[#2B3056] translate-x-0.5'
+                              : 'text-slate-400 group-hover:text-slate-600'
+                              }`}
                           >
                             <ChevronRight className="h-4 w-4" />
                           </span>
@@ -902,7 +931,7 @@ export const LandingPage = () => {
             <div className="lg:col-span-6 relative">
               <Reveal direction="right" delay={150}>
                 {/* Ambient Soft Glow Behind Window */}
-                <div 
+                <div
                   className="absolute -inset-4 rounded-3xl pointer-events-none opacity-40 blur-2xl -z-10"
                   style={{
                     background: 'radial-gradient(circle, rgba(255, 216, 43, 0.25) 0%, rgba(43, 48, 86, 0.08) 60%, transparent 80%)'
@@ -910,7 +939,7 @@ export const LandingPage = () => {
                 />
 
                 <div className="mx-auto max-w-[520px] rounded-3xl border border-slate-200/90 bg-white shadow-2xl overflow-hidden transition-all duration-300">
-                  
+
                   {/* Window Header Chrome (macOS Style) */}
                   <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100/90 px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -1018,12 +1047,12 @@ export const LandingPage = () => {
             ========================================================================= */}
         <section className="bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8">
-            
+
             {/* Left Column: Interactive AI Legal Clause Inspector & Diff Studio */}
             <div className="order-2 lg:order-1 lg:col-span-6 relative">
               <Reveal direction="left" delay={100}>
                 {/* Soft Warm Glow Behind Mockup */}
-                <div 
+                <div
                   className="absolute -inset-4 rounded-3xl pointer-events-none opacity-35 blur-2xl -z-10"
                   style={{
                     background: 'radial-gradient(circle, rgba(255, 200, 0, 0.20) 0%, rgba(43, 48, 86, 0.08) 60%, transparent 80%)'
@@ -1031,7 +1060,7 @@ export const LandingPage = () => {
                 />
 
                 <div className="mx-auto max-w-[520px] rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xl space-y-4">
-                  
+
                   {/* Top Window Bar */}
                   <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                     <div className="flex items-center gap-2">
@@ -1055,11 +1084,10 @@ export const LandingPage = () => {
                       <button
                         key={c.tabLabel}
                         onClick={() => setActiveAiClauseTab(idx)}
-                        className={`rounded-xl px-3 py-1.5 text-[10.5px] font-bold transition-all whitespace-nowrap cursor-pointer ${
-                          activeAiClauseTab === idx
-                            ? 'bg-[#2B3056] text-[#FFD82B] shadow-xs'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-                        }`}
+                        className={`rounded-xl px-3 py-1.5 text-[10.5px] font-bold transition-all whitespace-nowrap cursor-pointer ${activeAiClauseTab === idx
+                          ? 'bg-[#2B3056] text-[#FFD82B] shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                          }`}
                       >
                         {c.tabLabel}
                       </button>
@@ -1190,7 +1218,7 @@ export const LandingPage = () => {
                     );
                   })}
                 </div>
-                
+
                 <div className="pt-2">
                   <Link
                     href="/login"
@@ -1208,147 +1236,191 @@ export const LandingPage = () => {
         </section>
 
         {/* =========================================================================
-            SECTION 5: WILAYAH TIM KERJA
-            ========================================================================= */}
+    SECTION 5: WILAYAH TIM KERJA (WITH 3D FLIP CARD ANIMATION)
+    ========================================================================= */}
         <section
           id="wilayah"
-          className="scroll-mt-28 bg-slate-50/60 py-16 sm:py-20 border-b border-slate-200 overflow-hidden"
+          className="scroll-mt-28 bg-slate-50/70 py-16 sm:py-24 border-b border-slate-200 overflow-hidden relative"
         >
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Ambient Background Blur */}
+          <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-[#2B3056]/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#FFC800]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+
+            {/* SECTION HEADER */}
             <Reveal direction="up" delay={0}>
               <div className="mx-auto max-w-3xl text-center">
-                <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#B3912D]">
-                  <span className="h-px w-6 bg-[#FFC800]" />
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#2B3056]/10 border border-[#2B3056]/15 text-[10px] font-black uppercase tracking-widest text-[#2B3056]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#FFC800] animate-ping" />
                   Pembagian Wilayah Kerja
-                  <span className="h-px w-6 bg-[#FFC800]" />
                 </span>
-                <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
-                  Cakupan Tim Kerja Kanwil Riau
+
+                <h2 className="mt-4 text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#2B3056]">
+                  Cakupan Tim Kerja Kanwil Kemenkumham Riau
                 </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-normal text-slate-600 leading-relaxed">
-                  Pelayanan harmonisasi untuk Pemerintah Provinsi dan seluruh 12 Kabupaten/Kota di Riau dibagi secara terstruktur dalam tiga Tim Kerja.
+
+                <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm font-medium text-slate-600 leading-relaxed">
+                  Layanan harmonisasi untuk Pemerintah Provinsi dan seluruh 12 Kabupaten/Kota di Riau terbagi dalam 3 Tim Kerja Fasilitasi. Arahkan kursor ke kartu untuk melihat rincian wilayah.
                 </p>
               </div>
             </Reveal>
 
-            {/* Top Territory Stats Ribbon */}
+            {/* TOP STATS RIBBON */}
             <Reveal direction="up" delay={80}>
-              <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+              <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+                {/* Stat Item 1 */}
+                <div className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-md hover:border-[#2B3056]/30 transition-all duration-300 hover:-translate-y-1">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-xs group-hover:scale-105 transition-transform duration-300">
                     <Landmark className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-extrabold text-[#2B3056]">1 Provinsi & 12 Kab/Kota</p>
+                    <p className="text-sm font-black text-[#2B3056]">1 Provinsi &amp; 12 Kab/Kota</p>
                     <p className="text-[11px] text-slate-500 font-medium">Cakupan Wilayah Administratif</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                {/* Stat Item 2 */}
+                <div className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-md hover:border-[#2B3056]/30 transition-all duration-300 hover:-translate-y-1">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-xs group-hover:scale-105 transition-transform duration-300">
                     <UsersRound className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-extrabold text-[#2B3056]">3 Tim Kerja Harmonisasi</p>
+                    <p className="text-sm font-black text-[#2B3056]">3 Tim Kerja Harmonisasi</p>
                     <p className="text-[11px] text-slate-500 font-medium">Perancang Peraturan Kanwil Riau</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+                {/* Stat Item 3 */}
+                <div className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-md hover:border-[#2B3056]/30 transition-all duration-300 hover:-translate-y-1">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-xs group-hover:scale-105 transition-transform duration-300">
                     <CheckCircle2 className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-extrabold text-[#2B3056]">136+ Regulasi Tuntas</p>
-                    <p className="text-[11px] text-slate-500 font-medium">Standar Layanan SOP Resmi</p>
+                    <p className="text-sm font-black text-[#2B3056]">136+ Regulasi Tuntas</p>
+                    <p className="text-[11px] text-slate-500 font-medium">Sesuai Standar Layanan SOP Resmi</p>
                   </div>
                 </div>
+
               </div>
             </Reveal>
 
-            {/* 3 Rich Interactive Tim Kerja Cards */}
-            <div className="mt-8 grid gap-6 lg:grid-cols-3">
+            {/* 3D FLIP TIM KERJA CARDS (100% TAILWIND INLINE) */}
+            <div className="mt-10 grid gap-8 lg:grid-cols-3">
               {teamWorkAreas.map((team, idx) => (
-                <Reveal key={team.name} direction="up" delay={idx * 160 + 60} className="h-full">
-                  <article
-                    className="group relative overflow-hidden flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#2B3056]/35 hover:shadow-2xl h-full cursor-pointer"
-                  >
-                    {/* Top Gradient Stripe */}
-                    <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${team.accentColor}`} />
+                <Reveal key={team.name} direction="up" delay={idx * 150 + 100} className="h-full">
 
-                    {/* Roman Numeral Watermark */}
-                    <span className="absolute right-4 bottom-2 text-8xl font-black text-slate-100/70 select-none pointer-events-none group-hover:text-slate-200/80 transition-colors">
-                      {team.roman}
-                    </span>
+                  {/* Outer Perspective Container */}
+                  <div className="group h-[420px] w-full cursor-pointer [perspective:1000px]">
 
-                    <div className="relative z-10">
-                      {/* Card Header Bar */}
-                      <div className="flex items-start justify-between border-b border-slate-100 pb-5">
-                        <div className="flex items-center gap-3.5">
-                          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2B3056] text-[#FFD82B] shadow-md font-extrabold text-base group-hover:scale-105 transition-transform">
+                    {/* Inner Flip Wrapper */}
+                    <div className="relative h-full w-full rounded-3xl transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)_rotateZ(180deg)]">
+
+                      {/* ================= SISI DEPAN (FRONT) ================= */}
+                      <div className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-md [backface-visibility:hidden]">
+                        {/* Top Accent Line */}
+                        <span className="absolute inset-x-0 top-0 h-2 bg-[#2B3056]" />
+
+                        {/* Watermark Angka Romawi */}
+                        <span className="absolute -right-2 -bottom-6 text-9xl font-black text-slate-100 select-none pointer-events-none">
+                          {team.roman}
+                        </span>
+
+                        <div className="relative z-10 flex flex-col items-center text-center mt-2">
+                          {/* Badge Angka Romawi */}
+                          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2B3056] text-[#FFD82B] font-black text-2xl shadow-md mb-4">
                             {team.roman}
                           </span>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-base font-bold text-[#2B3056]">{team.name}</h3>
-                            </div>
-                            <p className="text-[11px] font-medium text-slate-500 mt-0.5">
-                              {team.tagline}
-                            </p>
+
+                          <h3 className="text-xl font-black text-[#2B3056]">
+                            {team.name}
+                          </h3>
+                          <p className="text-xs font-semibold text-slate-500 mt-1">
+                            {team.tagline}
+                          </p>
+
+                          <span className="mt-6 inline-block rounded-lg border border-[#2B3056]/20 bg-[#2B3056]/5 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-[#2B3056]">
+                            {team.totalRanperda}
+                          </span>
+                        </div>
+
+                        {/* Bottom Hint */}
+                        <div className="relative z-10 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1.5 text-[#2B3056] bg-[#2B3056]/5 px-2.5 py-1 rounded-full border border-[#2B3056]/10">
+                            <span className="h-2 w-2 rounded-full bg-[#FFC800] animate-pulse" />
+                            Tim Aktif
+                          </span>
+
+                          <span className="text-[#2B3056] font-bold text-xs flex items-center gap-1">
+                            Arahkan Kursor <ChevronRight className="h-3.5 w-3.5 text-[#FFC800]" />
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* ================= SISI BELAKANG (BACK) ================= */}
+                      <div className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-3xl border border-[#2B3056] bg-[#2B3056] text-white p-6 shadow-2xl [backface-visibility:hidden] [transform:rotateY(180deg)_rotateZ(180deg)]">
+                        <div className="relative z-10 space-y-3">
+                          <div className="flex items-center justify-between border-b border-white/15 pb-3">
+                            <h4 className="text-sm font-black text-[#FFD82B] uppercase tracking-wider">
+                              Wilayah Kerja {team.roman}
+                            </h4>
+                            <span className="text-[10px] font-bold text-slate-300">
+                              {team.wilayah.length} Daerah
+                            </span>
+                          </div>
+
+                          {/* List Daerah */}
+                          <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                            {team.wilayah.map((w) => (
+                              <div
+                                key={w.name}
+                                className="flex items-center justify-between gap-2 rounded-xl bg-white/10 border border-white/10 px-3 py-2 text-xs font-semibold text-slate-100"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#FFD82B] text-[#2B3056]">
+                                    {w.isGov ? (
+                                      <Landmark className="h-3 w-3" />
+                                    ) : w.isCapital || w.isCity ? (
+                                      <Building2 className="h-3 w-3" />
+                                    ) : (
+                                      <MapPin className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                  <span className="truncate font-bold text-white">{w.name}</span>
+                                </div>
+
+                                <span className="text-[9px] font-extrabold text-[#FFD82B] shrink-0 bg-white/10 px-2 py-0.5 rounded border border-white/10">
+                                  {w.type}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
 
-                        <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-[#2B3056]">
-                          {team.totalRanperda}
-                        </span>
-                      </div>
+                        {/* Tombol Aksi Sisi Belakang */}
+                        <div className="relative z-10 pt-3 border-t border-white/15 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-300 font-medium">
+                            Kanwil Kemenkumham Riau
+                          </span>
 
-                      {/* District Interactive Chips Grid */}
-                      <div className="mt-5 space-y-2">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Wilayah Administrasi yang Dilayani:
-                        </p>
-                        <div className="space-y-1.5 pt-1">
-                          {team.wilayah.map((w) => (
-                            <div
-                              key={w.name}
-                              className="group/chip flex items-center justify-between gap-2 rounded-xl bg-slate-50 border border-slate-200/70 px-3 py-2 text-xs font-semibold text-slate-700 transition-all hover:bg-white hover:border-[#2B3056]/30 hover:shadow-2xs"
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
-                                  w.isGov ? 'bg-[#2B3056] text-[#FFD82B]' : w.isCapital ? 'bg-amber-100 text-amber-800' : 'bg-white border border-slate-200 text-slate-600'
-                                }`}>
-                                  {w.isGov ? <Landmark className="h-3 w-3" /> : w.isCapital || w.isCity ? <Building2 className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-                                </span>
-                                <span className="truncate">{w.name}</span>
-                              </div>
-                              <span className="text-[9.5px] font-bold text-slate-400 group-hover/chip:text-[#2B3056] shrink-0 bg-white border border-slate-200/60 px-1.5 py-0.2 rounded">
-                                {w.type}
-                              </span>
-                            </div>
-                          ))}
+                          <Link
+                            href="/login"
+                            className="inline-flex items-center gap-1.5 bg-[#FFD82B] text-[#2B3056] px-3 py-1.5 rounded-lg font-black text-xs hover:bg-white transition-colors"
+                          >
+                            <span>Masuk Tim</span>
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </Link>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Card Footer */}
-                    <div className="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
-                      <span className="inline-flex items-center gap-1.5 text-emerald-600">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Aktif Melayani
-                      </span>
-                      <Link
-                        href="/login"
-                        className="inline-flex items-center gap-1 text-[#2B3056] group-hover:text-[#3A4070] font-bold text-xs hover:underline"
-                      >
-                        <span>Masuk Tim Kerja</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-[#FFC800] group-hover:translate-x-1 transition-transform" />
-                      </Link>
                     </div>
-                  </article>
+                  </div>
+
                 </Reveal>
               ))}
             </div>
+
           </div>
         </section>
 
@@ -1357,7 +1429,7 @@ export const LandingPage = () => {
             ========================================================================= */}
         <section id="alur" className="scroll-mt-28 bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
-            
+
             {/* Header Section */}
             <Reveal direction="up" delay={0}>
               <div className="mx-auto max-w-3xl text-center">
@@ -1391,11 +1463,10 @@ export const LandingPage = () => {
                   <Reveal key={step.step} direction="up" delay={index * 120 + 50}>
                     <article
                       onClick={() => setActiveWorkflowStep(index)}
-                      className={`group relative flex flex-col justify-between rounded-3xl border p-5 sm:p-6 transition-all duration-300 cursor-pointer h-full ${
-                        isActive
-                          ? 'bg-gradient-to-b from-white to-slate-50/80 border-[#2B3056] shadow-xl ring-2 ring-[#FFD82B]/80 -translate-y-1.5'
-                          : 'bg-white border-slate-200/90 shadow-2xs hover:border-[#2B3056]/30 hover:shadow-md hover:-translate-y-0.5'
-                      }`}
+                      className={`group relative flex flex-col justify-between rounded-3xl border p-5 sm:p-6 transition-all duration-300 cursor-pointer h-full ${isActive
+                        ? 'bg-gradient-to-b from-white to-slate-50/80 border-[#2B3056] shadow-xl ring-2 ring-[#FFD82B]/80 -translate-y-1.5'
+                        : 'bg-white border-slate-200/90 shadow-2xs hover:border-[#2B3056]/30 hover:shadow-md hover:-translate-y-0.5'
+                        }`}
                     >
                       {/* Top Glowing Active Bar */}
                       {isActive && (
@@ -1406,21 +1477,19 @@ export const LandingPage = () => {
                         {/* Step Header */}
                         <div className="relative flex items-center justify-between">
                           <span
-                            className={`flex h-11 w-11 items-center justify-center rounded-2xl text-xs font-black shadow-md transition-transform ${
-                              isActive
-                                ? 'bg-[#2B3056] text-[#FFD82B] ring-4 ring-[#FFD82B]/30 scale-105'
-                                : 'bg-slate-100 text-slate-700 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B]'
-                            }`}
+                            className={`flex h-11 w-11 items-center justify-center rounded-2xl text-xs font-black shadow-md transition-transform ${isActive
+                              ? 'bg-[#2B3056] text-[#FFD82B] ring-4 ring-[#FFD82B]/30 scale-105'
+                              : 'bg-slate-100 text-slate-700 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B]'
+                              }`}
                           >
                             {step.step}
                           </span>
 
                           <span
-                            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
-                              isActive
-                                ? 'bg-[#2B3056] text-[#FFD82B]'
-                                : 'bg-slate-50 border border-slate-200/80 text-slate-500 group-hover:text-[#2B3056]'
-                            }`}
+                            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${isActive
+                              ? 'bg-[#2B3056] text-[#FFD82B]'
+                              : 'bg-slate-50 border border-slate-200/80 text-slate-500 group-hover:text-[#2B3056]'
+                              }`}
                           >
                             <Icon className="h-4.5 w-4.5" />
                           </span>
@@ -1448,9 +1517,8 @@ export const LandingPage = () => {
                           <span className="text-[#B3912D] truncate max-w-[140px]">
                             {step.deliverable}
                           </span>
-                          <span className={`text-[9px] uppercase px-1.5 py-0.2 rounded font-extrabold ${
-                            isActive ? 'bg-[#2B3056] text-[#FFD82B]' : 'bg-slate-100 text-slate-500'
-                          }`}>
+                          <span className={`text-[9px] uppercase px-1.5 py-0.2 rounded font-extrabold ${isActive ? 'bg-[#2B3056] text-[#FFD82B]' : 'bg-slate-100 text-slate-500'
+                            }`}>
                             {isActive ? 'Aktif' : 'Pilih'}
                           </span>
                         </div>
@@ -1464,9 +1532,9 @@ export const LandingPage = () => {
             {/* Interactive Live SOP Stage Simulator / Document Inspector Panel */}
             <Reveal direction="up" delay={200}>
               <div className="rounded-3xl border border-slate-200/90 bg-gradient-to-b from-slate-900 via-[#1E223D] to-[#2B3056] p-6 sm:p-8 text-white shadow-2xl overflow-hidden relative">
-                
+
                 {/* Background Ambient Aura */}
-                <div 
+                <div
                   className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full pointer-events-none opacity-25 blur-3xl -z-0"
                   style={{
                     background: 'radial-gradient(circle, #FFD82B 0%, #2B3056 70%, transparent 100%)'
@@ -1500,7 +1568,7 @@ export const LandingPage = () => {
 
                 {/* Simulator Content Grid */}
                 <div className="relative z-10 mt-6 grid gap-6 lg:grid-cols-12 items-center">
-                  
+
                   {/* Left Column: Key Execution Checklist */}
                   <div className="lg:col-span-7 space-y-4">
                     <div>
@@ -1594,13 +1662,13 @@ export const LandingPage = () => {
                 <div aria-hidden="true" className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-b from-[#FFC800] via-[#FFD82B] to-[#FFC800]" />
 
                 {/* Soft Radial Ambient Glow */}
-                <div 
+                <div
                   className="absolute -right-16 -top-16 w-80 h-80 rounded-full pointer-events-none opacity-20 blur-3xl"
                   style={{ background: 'radial-gradient(circle, #FFD82B 0%, transparent 70%)' }}
                 />
 
                 <div className="relative z-10 grid gap-8 lg:grid-cols-12 lg:items-center">
-                  
+
                   {/* Left Column: Headline & Action Buttons */}
                   <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
                     <span className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-widest text-[#FFD82B] backdrop-blur-xs">
@@ -1722,7 +1790,7 @@ export const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal direction="up" delay={50}>
             <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-12 text-xs">
-              
+
               {/* Brand & Identity Column */}
               <div className="md:col-span-5 space-y-4">
                 <div className="flex items-center gap-3.5">
@@ -1761,7 +1829,14 @@ export const LandingPage = () => {
                   <li><a href="#wilayah" className="hover:text-[#FFD82B] transition">Wilayah Tim Kerja</a></li>
                   <li><a href="#alur" className="hover:text-[#FFD82B] transition">Alur Kerja SOP</a></li>
                   <li><Link href="/panduan" className="hover:text-[#FFD82B] transition">Panduan Sistem</Link></li>
-                  <li><Link href="/login" className="hover:text-[#FFD82B] transition font-bold text-white">Masuk Petugas</Link></li>
+                  <li>
+                    <Link
+                      href={user ? "/home" : "/login"}
+                      className="hover:text-[#FFD82B] transition font-bold text-white"
+                    >
+                      {user ? 'Dashboard Utama' : 'Masuk Petugas'}
+                    </Link>
+                  </li>
                 </ul>
               </div>
 

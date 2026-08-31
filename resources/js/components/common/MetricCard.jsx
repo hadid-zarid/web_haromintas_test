@@ -8,6 +8,11 @@ export const MetricCard = ({ title, value, icon: Icon, variant = 'total', subtex
       iconBg: 'bg-[#2B3056]/10 text-[#2B3056]',
       badgeBg: 'bg-slate-100 text-slate-700',
     },
+    draft: {
+      topBorder: 'bg-slate-500',
+      iconBg: 'bg-slate-500/10 text-slate-700 border border-slate-200/60',
+      badgeBg: 'bg-slate-50 text-slate-800',
+    },
     harmonisasi: {
       topBorder: 'bg-amber-400',
       iconBg: 'bg-amber-500/10 text-amber-700 border border-amber-200/60',

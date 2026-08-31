@@ -27,6 +27,12 @@ Route::get('/panduan', function () {
     return Inertia::render('PanduanPage');
 })->name('panduan');
 
+Route::get('/error-preview/{status?}', function ($status = 404) {
+    return Inertia::render('ErrorPage', [
+        'status' => (int) $status,
+    ]);
+})->name('error.preview');
+
 // ==========================================
 // 2. GUEST AUTH ROUTES (LOGIN, FORGOT PASSWORD & GOOGLE SSO)
 // ==========================================
@@ -69,7 +75,7 @@ Route::middleware('auth')->group(function () {
     // Draft Generate Surat
     Route::get('/draft-generate', function () {
         return Inertia::render('DraftGeneratePage');
-    })->name('draft.generate');
+    })->name('draft.generate')->middleware('role:TIM_KERJA');
 
     // Notifikasi Sistem
     Route::get('/notifikasi', [\App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');

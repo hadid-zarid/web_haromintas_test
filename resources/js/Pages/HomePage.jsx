@@ -288,9 +288,9 @@ export const HomePage = ({
         </div>
 
         {/* =========================================================================
-            2. REFINED 4 METRIC CARDS
+            2. REFINED 5 METRIC CARDS
             ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <MetricCard
             title="Total Permohonan"
             value={metrics.total || 0}
@@ -298,6 +298,15 @@ export const HomePage = ({
             variant="total"
             subtext="Seluruh permohonan terdaftar"
             onClick={() => router.visit('/peraturan')}
+          />
+
+          <MetricCard
+            title="Draf Awal"
+            value={metrics.draft || 0}
+            icon={FileText}
+            variant="draft"
+            subtext="Pra-Harmonisasi"
+            onClick={() => router.visit('/peraturan?status_id=1')}
           />
 
           <MetricCard
