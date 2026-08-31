@@ -579,11 +579,11 @@ export const LandingPage = () => {
                   </span>
 
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2B3056] leading-[1.15]">
-                    Harmonisasi Regulasi Daerah yang Lebih Tertata
+                    Harmonisasi dan fasilitasi ranperda dan ranperkada tuntas
                   </h1>
 
                   <p className="text-xs sm:text-sm font-normal text-slate-600 leading-relaxed max-w-2xl pt-1">
-                    Kelola pengajuan, telaah, pembahasan, validasi, dan arsip Ranperda serta Ranperkada dalam satu layanan digital resmi yang terintegrasi.
+                    Mewujudkan sinergi terintegrasi untuk regulasidaerah yang berkualitas, efektif Dan berdaya guna.
                   </p>
 
                   {/* 4 Feature Micro-Cards in 2x2 Bento Grid with Interactive Hover & Animations */}
