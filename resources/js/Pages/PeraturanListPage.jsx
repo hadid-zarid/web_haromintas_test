@@ -691,8 +691,9 @@ export const PeraturanListPage = ({
                           ? "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-2xs"
                           : "opacity-40 text-slate-400 bg-slate-100 cursor-not-allowed border border-slate-200"
                       }`}
-                      dangerouslySetInnerHTML={{ __html: displayLabel }}
-                    />
+                    >
+                      {displayLabel}
+                    </button>
                   );
                 })}
               </div>

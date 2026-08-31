@@ -154,9 +154,9 @@ export const PanduanPage = () => {
           highlight: 'bg-purple-50/70 border-purple-200 text-purple-950',
         },
         {
-          title: '2. Unggah Matriks Hasil Fasilitasi (Slot 6)',
-          desc: 'Biro Hukum mengunggah catatan evaluasi dan penyesuaian materi muatan pasal pada Slot 6.',
-          tag: 'Telaah Fasilitasi',
+          title: '2. Unggah Matriks Hasil Fasilitasi (Slot 6 — Opsional)',
+          desc: 'Biro Hukum dapat mengunggah catatan evaluasi dan penyesuaian materi muatan pasal pada Slot 6 jika tersedia. Slot ini tidak wajib dan tidak menghambat penyelesaian fasilitasi.',
+          tag: 'Dokumen Opsional',
           icon: Folder,
           highlight: 'bg-purple-50/70 border-purple-200 text-purple-950',
         },
@@ -168,7 +168,7 @@ export const PanduanPage = () => {
           highlight: 'bg-emerald-50/70 border-emerald-200 text-emerald-950',
         },
       ],
-      tip: 'Catatan: Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil.',
+      tip: 'Catatan: Slot 6 bersifat opsional. Slot 7 tetap menjadi dokumen utama hasil fasilitasi. Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil.',
     },
     {
       id: 5,
