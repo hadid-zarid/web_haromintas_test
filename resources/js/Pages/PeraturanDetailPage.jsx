@@ -403,7 +403,7 @@ export const PeraturanDetailPage = ({
     if (slotId >= 1 && slotId <= 5) {
       return {
         roleName: 'Kewenangan: Tim Kerja Kanwil',
-        authorityDesc: 'Dikelola oleh Tim Kerja Kanwil Kemenkumham Riau & Pemda',
+        authorityDesc: 'Dikelola oleh Tim Kerja Kanwil Kemenkum Provinsi Riau & Pemda',
         badgeClass: 'bg-blue-50/80 border-blue-200/80 text-blue-900',
         dotColor: 'bg-blue-600',
         lockNotice: 'Wewenang Tim Kerja Kanwil',

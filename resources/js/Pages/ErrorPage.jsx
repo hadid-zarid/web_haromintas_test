@@ -61,7 +61,7 @@ const ERROR_CONFIGS = {
     solutions: [
       'Pastikan Anda telah masuk (login) dengan akun yang memiliki peran sesuai.',
       'Fitur Draft Generate Surat hanya dapat diakses oleh role Tim Kerja.',
-      'Hubungi Administrator Kanwil Kemenkumham Riau jika memerlukan eskalasi peran.'
+      'Hubungi Administrator Kanwil Kemenkum Provinsi Riau jika memerlukan eskalasi peran.'
     ]
   },
   401: {
@@ -76,7 +76,7 @@ const ERROR_CONFIGS = {
     iconBg: 'bg-blue-100 text-blue-700 border-blue-200',
     solutions: [
       'Klik tombol Masuk / Login untuk melanjutkan autentikasi.',
-      'Gunakan kredensial resmi Kanwil Kemenkumham atau SSO Google yang terdaftar.',
+      'Gunakan kredensial resmi Kanwil Kemenkum Provinsi Riau atau SSO Google yang terdaftar.',
       'Jika lupa kata sandi, gunakan layanan Reset Password.'
     ]
   },
@@ -133,7 +133,7 @@ const ERROR_CONFIGS = {
     badge: 'Sistem Dalam Pemeliharaan',
     title: 'Layanan Sedang Ditingkatkan',
     description:
-      'Platform HARMONITAS Kanwil Kemenkumham Riau sedang dalam proses pemeliharaan rutin atau peningkatan kapasitas infrastruktur server.',
+      'Platform HARMONITAS Kanwil Kemenkum Provinsi Riau sedang dalam proses pemeliharaan rutin atau peningkatan kapasitas infrastruktur server.',
     icon: Flame,
     badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
     iconColor: 'text-amber-600',

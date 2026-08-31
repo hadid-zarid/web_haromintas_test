@@ -705,6 +705,74 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: pulse-soft 3s ease-in-out infinite;
 }
 
+/* Custom Interactive Cursor Styling */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #2B3056;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease, transform 0.15s ease-out;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(43, 48, 86, 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              background-color 0.25s ease,
+              transform 0.08s ease-out;
+  backdrop-filter: blur(1px);
+}
+
+.custom-cursor-ring.is-hovered {
+  width: 46px;
+  height: 46px;
+  border-color: #FFC800;
+  background-color: rgba(255, 216, 43, 0.12);
+}
+
+.custom-cursor-ring.is-clicked {
+  transform: translate(-50%, -50%) scale(0.85);
+  background-color: rgba(43, 48, 86, 0.2);
+}
+
+/* Scan Bar Animation for AI Mockup */
+@keyframes scanningLine {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-scan-line {
+  animation: scanningLine 3s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

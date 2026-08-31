@@ -128,22 +128,19 @@ export const LoginPage = ({ demoUsers = [] }) => {
 
         {/* Flash Notifications */}
         {flash?.success && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-semibold">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold text-center">
             <p>{flash.success}</p>
           </div>
         )}
 
         {flash?.info && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-blue-50 border border-blue-200 flex items-start gap-3 text-blue-800 text-xs font-semibold">
-            <Sparkles className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold text-center">
             <p>{flash.info}</p>
           </div>
         )}
 
         {flash?.error && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-semibold">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold text-center">
             <p>{flash.error}</p>
           </div>
         )}
@@ -337,7 +334,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
         {/* Card Footer */}
         <div className="px-6 py-3.5 bg-slate-50/90 border-t border-slate-200 text-center text-[10px] text-slate-500 font-medium flex items-center justify-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Sistem Informasi Terenkripsi • Kanwil Kemenkumham Provinsi Riau</span>
+          <span>Sistem Informasi Terenkripsi • Kanwil Kemenkum Provinsi Riau</span>
         </div>
       </div>
     </div>

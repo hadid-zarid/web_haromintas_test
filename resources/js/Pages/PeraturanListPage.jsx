@@ -275,7 +275,7 @@ export const PeraturanListPage = ({
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           >
             <PlusCircle className="w-4 h-4 text-[#FFD82B]" />
-            <span>+ Tambah Permohonan Baru</span>
+            <span>Tambah Permohonan Baru</span>
           </button>
         ) : null
       }
@@ -712,7 +712,7 @@ export const PeraturanListPage = ({
                   <div>
                     <h3 className="text-sm font-extrabold text-white">Tambah Permohonan Regulasi Baru</h3>
                     <p className="text-[10px] text-slate-300 font-medium">
-                      Pengajuan berkas Ranperda / Ranperkada ke Kanwil Kemenkumham Riau
+                      Pengajuan berkas Ranperda / Ranperkada ke Kanwil Kemenkum Provinsi Riau
                     </p>
                   </div>
                 </div>

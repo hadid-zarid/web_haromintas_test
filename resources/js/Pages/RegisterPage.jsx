@@ -232,7 +232,7 @@ export const RegisterPage = ({ pokjas = [], wilayahs = [] }) => {
                   {data.role === 'POKJA' && <CheckCircle2 className="w-4 h-4 text-[#1A1A5E]" />}
                 </div>
                 <p className="text-xs font-black text-[#1A1A5E] mt-1.5">
-                  Kanwil Kemenkumham Riau
+                  Kanwil Kemenkum Provinsi Riau
                 </p>
                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">
                   Untuk perancang peraturan zonasi Pokja 1, 2, dan 3.
@@ -312,7 +312,7 @@ export const RegisterPage = ({ pokjas = [], wilayahs = [] }) => {
                     required
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
-                    placeholder="nama.pegawai@riau.go.id atau @kemenkumham.go.id"
+                    placeholder="nama.pegawai@riau.go.id atau @kemenkum.go.id"
                     className={`w-full pl-10 pr-4 py-2.5 bg-[#F8F8F5] border rounded-xl text-xs font-bold text-[#1A1A5E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFC800] ${
                       errors.email ? 'border-rose-400 bg-rose-50/50' : 'border-[#E2E2DC]'
                     }`}
@@ -419,7 +419,7 @@ export const RegisterPage = ({ pokjas = [], wilayahs = [] }) => {
         {/* Footer */}
         <div className="px-6 py-3.5 bg-[#F8F8F5] border-t border-[#E2E2DC] text-center text-[10px] text-slate-500 font-bold flex items-center justify-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Verifikasi Akun Terenkripsi • Kanwil Kemenkumham Riau</span>
+          <span>Verifikasi Akun Terenkripsi • Kanwil Kemenkum Provinsi Riau</span>
         </div>
       </div>
     </div>
