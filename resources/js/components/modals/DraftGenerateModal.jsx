@@ -401,7 +401,9 @@ export const DraftGenerateModal = ({
         tanggal_surat_p: formData.tanggalSuratP,
         jenis_peraturan: formData.jenisPeraturan,
         asal_pemrakarsa: formData.asalPemrakarsa,
-        judul_peraturan: formData.judulPeraturan
+        judul_peraturan: formData.judulPeraturan,
+        jabatan_kakanwil: formData.jabatanKakanwil,
+        nama_kakanwil: formData.namaKakanwil
       };
 
       for (const [key, value] of Object.entries(payload)) {
@@ -847,11 +849,11 @@ Tembusan:
               }}
             >
               {/* KOP SURAT */}
-              <div className="border-b-2 border-black pb-2 mb-4">
+              <div className="border-b-[1.5px] border-black pb-2 mb-4">
                 <table className="w-full border-collapse">
                   <tbody>
                     <tr>
-                      <td className="w-24 align-middle pr-4 py-0">
+                      <td className="w-24 align-middle pr-4 py-0 shrink-0">
                         <LogoPengayoman
                           className="w-20 h-24 rounded-none shadow-none"
                           bgColor="#0B1A38"
@@ -859,19 +861,19 @@ Tembusan:
                         />
                       </td>
                       <td className="align-middle text-center text-black py-0">
-                        <p className="text-[12pt] font-normal tracking-wide uppercase m-0 leading-tight">
+                        <p className="text-[11.5pt] font-normal tracking-wide uppercase m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           KEMENTERIAN HUKUM REPUBLIK INDONESIA
                         </p>
-                        <p className="text-[13pt] font-bold tracking-wide uppercase m-0 mt-0.5 leading-tight">
+                        <p className="text-[12.5pt] font-bold tracking-wide uppercase m-0 mt-0.5 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           KANTOR WILAYAH RIAU
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 mt-1 leading-tight">
+                        <p className="text-[9pt] font-normal text-black m-0 mt-1 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight">
+                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           Telepon: (0761) 23846 - 0811-6904-422
                         </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight">
+                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
                           Laman:{' '}
                           <span className="text-blue-700 underline">
                             https://riau.kemenkum.go.id/
@@ -885,44 +887,71 @@ Tembusan:
               </div>
 
               {/* INFORMASI NOMOR, TANGGAL, SIFAT, HAL */}
-              <table className="w-full text-[11pt] mb-5 border-collapse">
+              <table
+                className="w-full text-[11pt] mb-4 border-collapse"
+                style={{
+                  fontFamily: 'Arial, sans-serif',
+                  tableLayout: 'fixed'
+                }}
+              >
+                <colgroup>
+                  <col style={{ width: '60px' }} />
+                  <col style={{ width: '15px' }} />
+                  <col style={{ width: '56%' }} />
+                  <col style={{ width: 'auto' }} />
+                </colgroup>
                 <tbody>
                   <tr>
-                    <td className="w-16 align-top py-0.5">Nomor</td>
-                    <td className="w-4 align-top py-0.5">:</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Nomor</td>
+                    <td className="align-top py-0.5">:</td>
                     <td className="align-top py-0.5">
-                      {formData.nomorSurat}
+                      {formData.nomorSurat.startsWith('W.4-PP.04.02-')
+                        ? formData.nomorSurat
+                        : `W.4-PP.04.02-${formData.nomorSurat}`}
                     </td>
                     <td className="text-right align-top py-0.5 whitespace-nowrap">
                       {formData.tanggalSurat}
                     </td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5">Sifat</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Sifat</td>
                     <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5" colSpan={2}>
-                      Penting
-                    </td>
+                    <td className="align-top py-0.5">Penting</td>
+                    <td className="align-top py-0.5"></td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5">Hal</td>
+                    <td className="align-top py-0.5 whitespace-nowrap">Hal</td>
                     <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5 text-justify" colSpan={2}>
+                    <td
+                      className="align-top py-0.5 text-justify"
+                      style={{
+                        textAlign: 'justify',
+                        textJustify: 'inter-word'
+                      }}
+                    >
                       {formData.hal}
+                    </td>
+                    <td className="align-top py-0.5"></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* TUJUAN SURAT (YTH & DI) */}
+              <table className="w-full text-[11pt] mb-4 border-collapse" style={{ fontFamily: 'Arial, sans-serif' }}>
+                <tbody>
+                  <tr>
+                    <td className="w-12 align-top py-0.5">Yth</td>
+                    <td className="align-top py-0.5">
+                      <div>{formData.jabatanPemrakarsa}</div>
+                      <div>di {formData.ibukota}</div>
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              {/* TUJUAN SURAT */}
-              <div className="my-5 text-[11pt] leading-snug">
-                <div>Yth {formData.jabatanPemrakarsa}</div>
-                <div>di {formData.ibukota}</div>
-              </div>
-
               {/* ISI SURAT */}
-              <div className="space-y-4 text-justify text-[11pt] leading-relaxed">
-                <p className="indent-9">
+              <div className="space-y-3.5 text-justify text-[11pt]" style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
+                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
                   Menindaklanjuti surat permohonan {formData.jabatanPemrakarsa} Nomor{' '}
                   {formData.nomorSuratP} Tanggal {formData.tanggalSuratP} perihal Mohon
                   Harmonisasi Rancangan {formData.jenisPeraturan}{' '}
@@ -940,7 +969,7 @@ Tembusan:
                   ditindaklanjuti ke tahapan selanjutnya
                 </p>
 
-                <p className="indent-9">
+                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
                   Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan
                   terima kasih.
                 </p>
@@ -948,12 +977,13 @@ Tembusan:
 
               {/* TANDA TANGAN */}
               <div
-                className="mt-10 flex justify-end signature-container"
+                className="mt-8 flex justify-end signature-container"
                 style={{
-                  marginTop: '40px',
+                  marginTop: '32px',
                   display: 'flex',
                   justifyContent: 'flex-end',
-                  width: '100%'
+                  width: '100%',
+                  fontFamily: 'Arial, sans-serif'
                 }}
               >
                 <div
@@ -965,7 +995,7 @@ Tembusan:
                   }}
                 >
                   <p
-                    className="mb-14"
+                    className="mb-14 font-normal"
                     style={{ marginBottom: '56px', margin: '0 0 56px 0' }}
                   >
                     {formData.jabatanKakanwil}
@@ -977,11 +1007,11 @@ Tembusan:
               </div>
 
               {/* TEMBUSAN */}
-              <div className="mt-8 pt-4 text-[10pt]">
-                <p className="font-normal mb-1">Tembusan:</p>
-                <ol className="list-decimal pl-5 space-y-0.5 text-neutral-900">
+              <div className="mt-6 pt-2 text-[10pt]" style={{ fontFamily: 'Arial, sans-serif' }}>
+                <p className="font-normal mb-1 m-0">Tembusan:</p>
+                <ol className="list-decimal pl-5 space-y-0.5 text-neutral-900 m-0">
                   {formData.tembusan.map((item, idx) => (
-                    <li key={idx}>{item}</li>
+                    <li key={idx} className="pl-0.5">{item}</li>
                   ))}
                 </ol>
               </div>
