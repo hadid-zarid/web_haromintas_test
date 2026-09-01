@@ -350,10 +350,10 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen w-full bg-white text-slate-800 antialiased font-sans">
       <Head title="HARMONITAS - Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas" />
-      
+
       {/* Fluid Interactive Custom Cursor */}
       <CustomCursor />
-      
+
       <PublicNavbar />
 
       <main>
@@ -382,7 +382,7 @@ export const LandingPage = () => {
               {/* Left Column: Hero Content */}
               <div className="lg:col-span-7">
                 <Reveal direction="up" delay={0} className="space-y-6">
-                  
+
                   {/* Institutional Badge */}
                   <span className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-[#2B3056] shadow-xs">
                     <span className="flex h-5 w-5 items-center justify-center shrink-0">
@@ -397,12 +397,12 @@ export const LandingPage = () => {
 
                   {/* Main Headline */}
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2B3056] leading-[1.18]">
-                    Harmonisasi Regulasi Daerah yang Lebih Tertata
+                    Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
                   </h1>
 
                   {/* Subtitle / Lead Paragraph */}
                   <p className="text-base sm:text-lg font-normal text-slate-700 leading-relaxed max-w-2xl">
-                    Sistem informasi resmi untuk memfasilitasi permohonan, rapat pleno harmonisasi, telaah naskah, fasilitasi regulasi, dan arsip digital Ranperda serta Ranperkada di Provinsi Riau.
+                    Mewujudkan sinergi terintegrasi untuk regulasi daerah yang berkualitas, efektif, dan berdaya guna.
                   </p>
 
                   {/* 4 Feature Cards (Bento Grid) */}
@@ -470,7 +470,7 @@ export const LandingPage = () => {
               {/* Right Column: 3D Mascot Illustration with Smooth Floating Micro-Animations */}
               <div className="lg:col-span-5 relative flex items-center justify-center min-h-[360px] sm:min-h-[420px] lg:min-h-[460px]">
                 <Reveal direction="right" delay={150} className="w-full flex flex-col items-center justify-center">
-                  
+
                   {/* Floating Badges with Dynamic CSS Floating Animations */}
                   <div className="animate-float-badge1 absolute top-4 left-2 sm:-left-2 z-20 flex h-13 w-13 items-center justify-center rounded-2xl border border-slate-200 bg-white text-[#2B3056] shadow-lg">
                     <Scale className="h-6 w-6 text-[#2B3056]" />
@@ -530,7 +530,7 @@ export const LandingPage = () => {
                 return (
                   <Reveal key={benefit.title} direction="up" delay={idx * 120 + 50} className="h-full">
                     <div className="interactive-card flex flex-col justify-between h-full rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-xs hover:shadow-lg hover:border-[#2B3056]/30 transition-all duration-200">
-                      
+
                       <div>
                         {/* Top Row: Icon, Tag & Number */}
                         <div className="flex items-center justify-between gap-2">
@@ -708,7 +708,7 @@ export const LandingPage = () => {
 
             {/* 2 Focused Cards with Authentic Visual Mockup Previews */}
             <div className="grid gap-8 lg:grid-cols-2">
-              
+
               {/* Card 1: Asisten AI Pra-Harmonisasi with Document Inspection Mockup */}
               <Reveal direction="left" delay={80} className="h-full">
                 <div className="interactive-card flex flex-col justify-between h-full rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs hover:shadow-md transition-all duration-200">
@@ -732,39 +732,51 @@ export const LandingPage = () => {
                       Membantu perancang mendeteksi potensi ketidaksesuaian kaidah legal drafting, struktur penomoran pasal/ayat, dan format konsiderans sebelum pelaksanaan rapat pleno.
                     </p>
 
-                    {/* Authentic Document Scanner Mockup Box */}
+                    {/* Authentic Document Scanner Mockup Box with Simple Scan Animation */}
                     <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4 relative overflow-hidden">
-                      <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/80">
-                        <span className="font-bold text-[#2B3056] flex items-center gap-1.5">
-                          <FileText className="h-3.5 w-3.5 text-[#B3912D]" />
-                          Pratinjau Telaah Naskah Digital
-                        </span>
-                        <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
-                          Hasil: 100% Sesuai
-                        </span>
+                      {/* Animated Scanning Laser Beam */}
+                      <div className="pointer-events-none absolute inset-x-0 -top-2 z-10 animate-scan-line">
+                        <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#FFC800] to-transparent shadow-[0_0_10px_rgba(255,200,0,0.85)]" />
+                        <div className="h-9 w-full bg-gradient-to-b from-[#FFD82B]/15 via-[#FFD82B]/5 to-transparent" />
                       </div>
 
-                      <div className="mt-3 space-y-2 text-xs">
-                        <div className="flex items-center justify-between text-slate-700">
-                          <span className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
-                            Kaidah Penulisan Legal Drafting
+                      <div className="relative z-0">
+                        <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/80">
+                          <span className="font-bold text-[#2B3056] flex items-center gap-1.5">
+                            <FileText className="h-3.5 w-3.5 text-[#B3912D]" />
+                            Pratinjau Telaah Naskah Digital
                           </span>
-                          <span className="font-bold text-slate-800 text-[11px]">Terpenuhi</span>
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                            </span>
+                            Hasil: 100% Sesuai
+                          </span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-700">
-                          <span className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
-                            Struktur Hierarki Pasal &amp; Ayat
-                          </span>
-                          <span className="font-bold text-slate-800 text-[11px]">Valid</span>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-700">
-                          <span className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
-                            Kesesuaian Konsiderans Mengingat
-                          </span>
-                          <span className="font-bold text-slate-800 text-[11px]">UU 12/2011</span>
+
+                        <div className="mt-3 space-y-2 text-xs">
+                          <div className="flex items-center justify-between text-slate-700">
+                            <span className="flex items-center gap-1.5">
+                              <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
+                              Kaidah Penulisan Legal Drafting
+                            </span>
+                            <span className="font-bold text-slate-800 text-[11px]">Terpenuhi</span>
+                          </div>
+                          <div className="flex items-center justify-between text-slate-700">
+                            <span className="flex items-center gap-1.5">
+                              <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
+                              Struktur Hierarki Pasal &amp; Ayat
+                            </span>
+                            <span className="font-bold text-slate-800 text-[11px]">Valid</span>
+                          </div>
+                          <div className="flex items-center justify-between text-slate-700">
+                            <span className="flex items-center gap-1.5">
+                              <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
+                              Kesesuaian Konsiderans Mengingat
+                            </span>
+                            <span className="font-bold text-slate-800 text-[11px]">UU 12/2011</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -920,7 +932,7 @@ export const LandingPage = () => {
               {teamWorkAreas.map((team, idx) => (
                 <Reveal key={team.name} direction="up" delay={idx * 100 + 100} className="h-full">
                   <div className="interactive-card flex flex-col justify-between h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-xs hover:border-[#2B3056]/30 hover:shadow-md transition-all duration-200">
-                    
+
                     <div>
                       {/* Header */}
                       <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
@@ -979,15 +991,14 @@ export const LandingPage = () => {
                               </div>
 
                               <span
-                                className={`text-xs font-bold shrink-0 px-2 py-0.5 rounded-md ${
-                                  w.isGov
+                                className={`text-xs font-bold shrink-0 px-2 py-0.5 rounded-md ${w.isGov
                                     ? 'bg-amber-100 text-amber-900 border border-amber-300'
                                     : w.isCapital
-                                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
-                                    : w.isCity
-                                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                    : 'bg-slate-200/80 text-slate-700'
-                                }`}
+                                      ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                      : w.isCity
+                                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                        : 'bg-slate-200/80 text-slate-700'
+                                  }`}
                               >
                                 {w.type}
                               </span>
@@ -1060,7 +1071,7 @@ export const LandingPage = () => {
                       <p className="text-xs font-bold uppercase tracking-wider text-[#FFD82B]">
                         Informasi Layanan:
                       </p>
-                      
+
                       <div className="space-y-2.5 text-xs text-slate-200">
                         <div className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-[#FFD82B] shrink-0" />

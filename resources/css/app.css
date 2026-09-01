@@ -754,7 +754,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Scan Bar Animation for AI Mockup */
 @keyframes scanningLine {
   0% {
-    top: 0%;
+    top: -10%;
     opacity: 0;
   }
   15% {
@@ -764,13 +764,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     opacity: 1;
   }
   100% {
-    top: 100%;
+    top: 105%;
     opacity: 0;
   }
 }
 
 .animate-scan-line {
-  animation: scanningLine 3s ease-in-out infinite;
+  animation: scanningLine 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: top, opacity;
 }
 
 /* =========================================================
