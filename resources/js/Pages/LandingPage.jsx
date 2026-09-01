@@ -734,9 +734,6 @@ export const LandingPage = () => {
 
                     {/* Authentic Document Scanner Mockup Box */}
                     <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4 relative overflow-hidden">
-                      {/* Scanning Line Animation */}
-                      <div className="animate-scan-line absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#FFC800] to-transparent pointer-events-none opacity-60" />
-                      
                       <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/80">
                         <span className="font-bold text-[#2B3056] flex items-center gap-1.5">
                           <FileText className="h-3.5 w-3.5 text-[#B3912D]" />
