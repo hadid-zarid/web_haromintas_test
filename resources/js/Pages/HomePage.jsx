@@ -627,7 +627,7 @@ export const HomePage = ({
                 <span>Tren Selesai Harmonisasi dan Fasilitasi ({new Date().getFullYear()})</span>
               </h2>
               <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                Diagram batang vertikal rekapitulasi jumlah berkas masuk, diproses dalam harmonisasi/fasilitasi, dan selesai tuntas
+                Diagram batang vertikal rekapitulasi permohonan masuk, draf awal, proses harmonisasi, proses fasilitasi, dan selesai tuntas
               </p>
             </div>
 
@@ -675,7 +675,7 @@ export const HomePage = ({
               <BarChart 
                 data={displayedTrendData} 
                 margin={{ top: 15, right: 20, left: -10, bottom: 5 }}
-                barGap={4}
+                barGap={3}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                 <XAxis 
@@ -696,9 +696,11 @@ export const HomePage = ({
                   iconType="circle" 
                   iconSize={8} 
                 />
-                <Bar dataKey="Total Masuk" fill="#2B3056" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="Diproses" fill="#3A4070" radius={[6, 6, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="Selesai" fill="#10B981" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                <Bar dataKey="Total Permohonan" fill="#2B3056" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                <Bar dataKey="Draf Awal" fill="#64748B" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                <Bar dataKey="Proses Harmonisasi" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                <Bar dataKey="Proses Fasilitasi" fill="#3B82F6" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                <Bar dataKey="Selesai" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={18} />
               </BarChart>
             </ResponsiveContainer>
           </div>

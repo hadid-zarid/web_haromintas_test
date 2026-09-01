@@ -213,9 +213,11 @@ class HomeController extends Controller
             $trendData[] = [
                 'month_num' => $m,
                 'bulan' => $months[$m],
-                'Total Masuk' => $monthData->count(),
+                'Total Permohonan' => $monthData->count(),
+                'Draf Awal' => $monthData->where('status_id', 1)->count(),
+                'Proses Harmonisasi' => $monthData->where('status_id', 2)->count(),
+                'Proses Fasilitasi' => $monthData->where('status_id', 3)->count(),
                 'Selesai' => $monthData->where('status_id', 4)->count(),
-                'Diproses' => $monthData->whereIn('status_id', [1, 2, 3, 5])->count(),
             ];
         }
 
