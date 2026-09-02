@@ -139,7 +139,7 @@ class NotifikasiService
         try {
             $actionUrl = url("/peraturan/{$rancangan->rancangan_id}");
             
-            Mail::to($user->email)->send(
+            Mail::to($user->email)->queue(
                 new NotifikasiWorkflowMail(
                     user: $user,
                     rancangan: $rancangan,
@@ -150,10 +150,10 @@ class NotifikasiService
                 )
             );
 
-            Log::info("[NotifikasiService] Email notifikasi alur kerja berhasil dikirim ke: {$user->email} (Rancangan ID: {$rancangan->rancangan_id})");
+            Log::info("[NotifikasiService] Email notifikasi alur kerja dimasukkan ke antrean background untuk: {$user->email} (Rancangan ID: {$rancangan->rancangan_id})");
         } catch (\Throwable $e) {
             // Log peringatan tanpa melempar exception fatal
-            Log::warning("[NotifikasiService] Gagal mengirim email notifikasi ke {$user->email}: " . $e->getMessage());
+            Log::warning("[NotifikasiService] Gagal memproses antrean email notifikasi ke {$user->email}: " . $e->getMessage());
         }
     }
 }
