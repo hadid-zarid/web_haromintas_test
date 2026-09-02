@@ -216,7 +216,7 @@ export const HomePage = ({
           badge: 'Berkas',
           badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60 font-bold',
           title: `${userName} memperbarui berkas`,
-          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || p.judul_rancangan || 'Pembaruan data regulasi daerah.'),
+          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || p.judul_rancangan || 'Pembaruan data permohonan harmonisasi.'),
         };
     }
   };
