@@ -37,7 +37,8 @@ import {
   Scale,
   Folder,
   FolderOpen,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 
 /**
@@ -272,7 +273,64 @@ export const PeraturanDetailPage = ({
   const [activeUploadDoc, setActiveUploadDoc] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [statusAction, setStatusAction] = useState(null); // 'APPROVE' or 'REVISE'
+  const [activityPage, setActivityPage] = useState(1);
+  const ACTIVITIES_PER_PAGE = 5;
+  const totalActivityPages = Math.ceil((auditLogs?.length || 0) / ACTIVITIES_PER_PAGE) || 1;
+  const paginatedLogs = (auditLogs || []).slice((activityPage - 1) * ACTIVITIES_PER_PAGE, activityPage * ACTIVITIES_PER_PAGE);
+
+  // Helper Deskripsi Aksi Audit Log yang Jelas & Tidak Ambigu
+  const renderLogContent = (log) => {
+    switch (log.action) {
+      case 'CREATE_PERMOHONAN':
+        return (
+          <span>Mendaftarkan permohonan regulasi baru: <strong>{log.payload?.judul_rancangan || permohonan.judul_rancangan}</strong> (Tahap: Draf Awal).</span>
+        );
+      case 'UPLOAD_DOKUMEN':
+        return (
+          <span>Mengunggah naskah <strong>{log.payload?.nama_dokumen || 'Dokumen'}</strong> ({log.payload?.file_name}) versi {log.payload?.versi || 1}.</span>
+        );
+      case 'APPROVE_FASILITASI':
+        return (
+          <span>Mengesahkan hasil fasilitasi regulasi sebagai <strong>Selesai (Tuntas)</strong>{log.payload?.surat_terlampir ? ` dengan lampiran Surat: '${log.payload.surat_terlampir}'` : '.'}</span>
+        );
+      case 'REJECT_FASILITASI':
+        return (
+          <span>Mengembalikan berkas fasilitasi (Perlu Perbaikan). Catatan: &quot;{log.payload?.catatan || 'Perlu perbaikan naskah regulasi.'}&quot;</span>
+        );
+      case 'CHANGE_PERATURAN_STATUS':
+        if (log.payload?.from_status_name && log.payload?.to_status_name) {
+          return (
+            <span>Mengubah status berkas dari <strong>{log.payload.from_status_name}</strong> menjadi <strong>{log.payload.to_status_name}</strong>.</span>
+          );
+        }
+        return (
+          <span>Memperbarui status berkas ke <strong>{log.payload?.to_status_name || 'Draf Awal (Pra-Harmonisasi)'}</strong>.</span>
+        );
+      case 'UPDATE_PERMOHONAN':
+        return <span>Memperbarui data dan informasi rancangan regulasi.</span>;
+      default:
+        return (
+          <span>{log.payload?.catatan || log.payload?.nama_dokumen ? `Pembaruan berkas: ${log.payload?.catatan || log.payload?.nama_dokumen}` : `Memperbarui status berkas ke ${log.payload?.to_status_name || 'Draf Awal (Pra-Harmonisasi)'}.`}</span>
+        );
+    }
+  };
+
+  const getLogIcon = (action) => {
+    switch (action) {
+      case 'CREATE_PERMOHONAN':
+        return <PlusCircle className="w-4 h-4 text-emerald-600" />;
+      case 'UPLOAD_DOKUMEN':
+        return <Upload className="w-4 h-4 text-blue-600" />;
+      case 'APPROVE_FASILITASI':
+        return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
+      case 'REJECT_FASILITASI':
+        return <XCircle className="w-4 h-4 text-rose-600" />;
+      case 'CHANGE_PERATURAN_STATUS':
+        return <RefreshCw className="w-4 h-4 text-amber-600" />;
+      default:
+        return <CheckCircle className="w-4 h-4 text-[#2B3056]" />;
+    }
+  };
 
   const fileInputRef = useRef(null);
   const suratDecisionInputRef = useRef(null);
@@ -635,34 +693,26 @@ export const PeraturanDetailPage = ({
           </div>
 
           <div className="space-y-3">
-            {auditLogs && auditLogs.length > 0 ? (
-              auditLogs.map((log, idx) => (
+            {paginatedLogs && paginatedLogs.length > 0 ? (
+              paginatedLogs.map((log, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200/70 text-xs"
+                  className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/70 text-xs hover:bg-white hover:border-[#2B3056]/30 transition-all shadow-2xs"
                 >
                   <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-[#2B3056] flex items-center justify-center shrink-0 shadow-2xs mt-0.5 font-bold">
-                    {log.action?.includes('UPLOAD') ? <Upload className="w-4 h-4 text-blue-600" /> : <CheckCircle className="w-4 h-4 text-emerald-600" />}
+                    {getLogIcon(log.action)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-bold text-[#2B3056]">
+                      <p className="font-bold text-[#2B3056] text-xs">
                         {log.user?.nama || 'Petugas Sistem'}
                       </p>
-                      <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                      <span className="text-[10px] text-slate-400 font-medium shrink-0 font-mono">
                         {log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                      {log.action === 'UPLOAD_DOKUMEN' ? (
-                        <span>Mengunggah berkas <strong>{log.payload?.nama_dokumen || 'Dokumen'}</strong> ({log.payload?.file_name}) versi {log.payload?.versi || 1}.</span>
-                      ) : log.action === 'APPROVE_FASILITASI' ? (
-                        <span>Mengesahkan hasil fasilitasi regulasi sebagai <strong>Selesai (Tuntas)</strong>.</span>
-                      ) : log.action === 'REJECT_FASILITASI' ? (
-                        <span>Mengembalikan berkas fasilitasi dengan catatan perbaikan: "{log.payload?.catatan}".</span>
-                      ) : (
-                        <span>Memperbarui status berkas ke <strong>{log.payload?.to_status_name || 'Status Baru'}</strong>.</span>
-                      )}
+                    <p className="text-[11.5px] text-slate-600 mt-1 leading-relaxed">
+                      {renderLogContent(log)}
                     </p>
                   </div>
                 </div>
@@ -673,6 +723,38 @@ export const PeraturanDetailPage = ({
               </p>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalActivityPages > 1 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
+              <span className="text-[11px] font-medium text-slate-500">
+                Menampilkan {(activityPage - 1) * ACTIVITIES_PER_PAGE + 1} - {Math.min(activityPage * ACTIVITIES_PER_PAGE, auditLogs.length)} dari {auditLogs.length} catatan aktivitas
+              </span>
+              <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                <button
+                  type="button"
+                  disabled={activityPage <= 1}
+                  onClick={() => setActivityPage(p => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-[#2B3056] text-[11px] transition flex items-center gap-1 shadow-2xs cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Sebelumnya</span>
+                </button>
+                <span className="px-2.5 py-1 font-mono font-bold text-[11px] text-[#2B3056] bg-slate-50 rounded-lg border border-slate-200">
+                  {activityPage} / {totalActivityPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={activityPage >= totalActivityPages}
+                  onClick={() => setActivityPage(p => Math.min(totalActivityPages, p + 1))}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-bold text-[#2B3056] text-[11px] transition flex items-center gap-1 shadow-2xs cursor-pointer"
+                >
+                  <span>Selanjutnya</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

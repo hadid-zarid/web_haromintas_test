@@ -382,7 +382,7 @@ export const HomePage = ({
                     >
                       <div className="flex items-center justify-between text-xs font-bold">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className={`px-2 py-0.5 rounded-md text-[9.5px] font-extrabold uppercase border ${item.badge}`}>
+                          <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase border ${item.badge}`}>
                             {item.label}
                           </span>
                           <span className="text-[11px] text-slate-500 font-medium hidden sm:inline truncate">
@@ -390,8 +390,7 @@ export const HomePage = ({
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 ml-2">
-                          <span className="text-[11px] text-slate-400 font-bold">{percentage}%</span>
-                          <span className="font-mono font-extrabold text-[#2B3056] px-2 py-0.5 bg-white border border-slate-200 rounded-md text-xs shadow-2xs">
+                          <span className="font-mono font-extrabold text-[#2B3056] px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs shadow-2xs group-hover:border-[#2B3056]/30 group-hover:bg-slate-50 transition-colors">
                             {item.count} Berkas
                           </span>
                         </div>
