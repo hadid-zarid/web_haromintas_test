@@ -98,6 +98,8 @@ export const HomePage = ({
   trendData = [],
   recentActivities = [],
   totalBerkas = 0,
+  selectedYear = new Date().getFullYear(),
+  availableYears = [],
   userScope = {},
 }) => {
   const { user, isTimKerja, isBiroHukum, isAdmin, isPimpinan } = useAuth();
@@ -275,8 +277,31 @@ export const HomePage = ({
               </p>
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Actions & Year Filter */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 sm:pt-0">
+              {availableYears.length > 1 ? (
+                <div className="inline-flex items-center rounded-xl bg-slate-100 p-1 mr-1 border border-slate-200 shadow-2xs">
+                  {availableYears.map(y => (
+                    <button
+                      key={y}
+                      onClick={() => router.visit(`/home?tahun=${y}`)}
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                        y === selectedYear
+                          ? 'bg-white text-[#2B3056] shadow-sm ring-1 ring-slate-200/50'
+                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                      }`}
+                    >
+                      {y}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs mr-1">
+                  <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                  <span>Tahun {selectedYear}</span>
+                </div>
+              )}
+
               <Link
                 href="/panduan"
                 className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 transition-colors shadow-2xs cursor-pointer"

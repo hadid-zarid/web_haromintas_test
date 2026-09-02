@@ -23,6 +23,18 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
+        // Get available years from DB
+        $availableYears = RancanganRegulasi::selectRaw('YEAR(COALESCE(tanggal_dibuat, created_at)) as tahun')
+            ->groupBy('tahun')
+            ->orderByDesc('tahun')
+            ->pluck('tahun')
+            ->toArray();
+        if (empty($availableYears)) {
+            $availableYears = [(int) date('Y')];
+        }
+
+        $selectedYear = (int) $request->query('tahun', date('Y'));
+
         $query = RancanganRegulasi::with([
             'jenisRegulasi',
             'kabupaten.timKerja',
@@ -37,6 +49,9 @@ class HomeController extends Controller
         if ($isTim) {
             $query->where('tim_kerja_id', $user->tim_kerja_id);
         }
+
+        // Apply year filter
+        $query->whereRaw('YEAR(COALESCE(tanggal_dibuat, created_at)) = ?', [$selectedYear]);
 
         $allData = $query->get();
 
@@ -199,7 +214,7 @@ class HomeController extends Controller
             9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
         ];
 
-        $currentYear = (int) date('Y');
+        $currentYear = $selectedYear;
         $currentMonth = (int) date('n');
 
         $trendData = [];
@@ -243,6 +258,8 @@ class HomeController extends Controller
             'trendData' => $trendData,
             'recentActivities' => $recentActivities,
             'totalBerkas' => $total,
+            'selectedYear' => $selectedYear,
+            'availableYears' => $availableYears,
             'userScope' => [
                 'isTimKerja' => $isTim,
                 'timKerjaNama' => $user->timKerja?->nama_tim_kerja ?? null,
