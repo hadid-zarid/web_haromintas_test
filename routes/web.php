@@ -93,25 +93,58 @@ Route::middleware('auth')->group(function () {
         $templatePerda = base_path('SURAT SELESAI PERDA.docx');
         $templatePerkada = base_path('SURAT SELESAI PERKADA.docx');
 
+        // Helper closure to read XML from zip/docx file
+        $readXmlFromZip = function ($zipFilePath) {
+            if (class_exists('ZipArchive')) {
+                $zip = new \ZipArchive();
+                if ($zip->open($zipFilePath) === true) {
+                    $xml = $zip->getFromName('word/document.xml');
+                    $zip->close();
+                    return $xml !== false ? $xml : null;
+                }
+            }
+            try {
+                $phar = new \PharData($zipFilePath);
+                if (isset($phar['word/document.xml'])) {
+                    return file_get_contents($phar['word/document.xml']->getPathname());
+                }
+            } catch (\Throwable $e) {
+                \Log::error('Failed to read XML from zip using PharData: ' . $e->getMessage());
+            }
+            return null;
+        };
+
+        // Helper closure to write XML into zip/docx file
+        $writeXmlToZip = function ($zipFilePath, $xmlContent) {
+            if (class_exists('ZipArchive')) {
+                $zip = new \ZipArchive();
+                if ($zip->open($zipFilePath) === true) {
+                    $zip->addFromString('word/document.xml', $xmlContent);
+                    $zip->close();
+                    return true;
+                }
+            }
+            try {
+                $phar = new \PharData($zipFilePath);
+                $phar->addFromString('word/document.xml', $xmlContent);
+                return true;
+            } catch (\Throwable $e) {
+                \Log::error('Failed to write XML to zip using PharData: ' . $e->getMessage());
+            }
+            return false;
+        };
+
         // Always ensure PERKADA template is perfectly synced from PERDA template with correct legal basis
         if ($type === 'perkada' && file_exists($templatePerda)) {
-            $zipP = new ZipArchive();
-            if ($zipP->open($templatePerda) === true) {
-                $xmlP = $zipP->getFromName('word/document.xml');
-                $zipP->close();
-
+            $xmlP = $readXmlFromZip($templatePerda);
+            if ($xmlP) {
                 $xmlP = str_replace(
                     'Pasal 58 Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
                     'Pasal 97D Undang-Undang Nomor 13 Tahun 2022 tentang Perubahan Kedua Atas Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
                     $xmlP
                 );
-
                 copy($templatePerda, $templatePerkada);
-                $zipPk = new ZipArchive();
-                if ($zipPk->open($templatePerkada) === true) {
-                    $zipPk->addFromString('word/document.xml', $xmlP);
-                    $zipPk->close();
-                }
+                $writeXmlToZip($templatePerkada, $xmlP);
             }
         }
 
@@ -150,53 +183,55 @@ Route::middleware('auth')->group(function () {
             ], 500);
         }
 
-        $zip = new \ZipArchive();
-        if ($zip->open($tempFile) === true) {
-            $xml = $zip->getFromName('word/document.xml');
-            if ($xml === false) {
-                $zip->close();
-                if (file_exists($tempFile)) {
-                    unlink($tempFile);
-                }
-                return response()->json([
-                    'error' => 'Gagal membaca document.xml dari template Word.',
-                ], 500);
+        $xml = $readXmlFromZip($tempFile);
+        if ($xml === null) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
             }
+            return response()->json([
+                'error' => 'Gagal membaca document.xml dari template Word.',
+            ], 500);
+        }
 
-            $replacements = [
-                'NOMOR_SURAT' => $nomorSurat,
-                'TANGGAL_SURAT' => $tanggalSurat,
-                'HAL' => $hal,
-                'JABATAN_PEMRAKARSA' => $jabatanPemrakarsa,
-                'IBUKOTA' => $ibukota,
-                'NOMOR_SURAT_P' => $nomorSuratP,
-                'TANGGAL_SURAT_P' => $tanggalSuratP,
-                'JENIS_PERATURAN' => $jenisPeraturan,
-                'ASAL_PEMRAKARSA' => $asalPemrakarsa,
-                'JUDUL_PERATURAN' => $judulPeraturan,
-                'JABATAN_KAKANWIL' => $jabatanKakanwil,
-                'NAMA_KAKANWIL' => $namaKakanwil,
-            ];
+        $replacements = [
+            'NOMOR_SURAT' => $nomorSurat,
+            'TANGGAL_SURAT' => $tanggalSurat,
+            'HAL' => $hal,
+            'JABATAN_PEMRAKARSA' => $jabatanPemrakarsa,
+            'IBUKOTA' => $ibukota,
+            'NOMOR_SURAT_P' => $nomorSuratP,
+            'TANGGAL_SURAT_P' => $tanggalSuratP,
+            'JENIS_PERATURAN' => $jenisPeraturan,
+            'ASAL_PEMRAKARSA' => $asalPemrakarsa,
+            'JUDUL_PERATURAN' => $judulPeraturan,
+            'JABATAN_KAKANWIL' => $jabatanKakanwil,
+            'NAMA_KAKANWIL' => $namaKakanwil,
+        ];
 
-            // 1. Hapus tag fldSimple agar tidak dianggap sebagai Word Field kosong
-            $xml = preg_replace('/<\/?w:fldSimple[^>]*>/i', '', $xml);
+        // 1. Hapus tag fldSimple agar tidak dianggap sebagai Word Field kosong
+        $xml = preg_replace('/<\/?w:fldSimple[^>]*>/i', '', $xml);
 
-            // 2. Hapus marker fldChar (begin, separate, end) agar Word memperlakukan teks sebagai teks polos permanen
-            $xml = preg_replace('/<w:fldChar[^>]*\/>/i', '', $xml);
+        // 2. Hapus marker fldChar (begin, separate, end) agar Word memperlakukan teks sebagai teks polos permanen
+        $xml = preg_replace('/<w:fldChar[^>]*\/>/i', '', $xml);
 
-            // 3. Hapus tag instruksi MERGEFIELD
-            $xml = preg_replace('/<w:instrText[^>]*>.*?<\/w:instrText>/i', '', $xml);
+        // 3. Hapus tag instruksi MERGEFIELD
+        $xml = preg_replace('/<w:instrText[^>]*>.*?<\/w:instrText>/i', '', $xml);
 
-            // 4. Ganti placeholder «KEY» dan {{KEY}} dengan nilai input dari form
-            foreach ($replacements as $key => $val) {
-                $safeVal = htmlspecialchars($val, ENT_XML1, 'UTF-8');
-                $xml = str_replace("«{$key}»", $safeVal, $xml);
-                $xml = str_replace("{{{$key}}}", $safeVal, $xml);
-            }
+        // 4. Ganti placeholder «KEY» dan {{KEY}} dengan nilai input dari form
+        foreach ($replacements as $key => $val) {
+            $safeVal = htmlspecialchars($val, ENT_XML1, 'UTF-8');
+            $xml = str_replace("«{$key}»", $safeVal, $xml);
+            $xml = str_replace("{{{$key}}}", $safeVal, $xml);
+        }
 
-            $zip->addFromString('word/document.xml', $xml);
-            $zip->close();
+        // 5. Ganti nomor surat hardcoded (seperti 3375) jika ada
+        $safeNomor = htmlspecialchars($nomorSurat, ENT_XML1, 'UTF-8');
+        $xml = preg_replace('/(W\.4-PP\.04\.02-)[0-9A-Za-z\-_]+/i', '${1}' . $safeNomor, $xml);
+        $xml = str_replace('>3375<', '>' . $safeNomor . '<', $xml);
 
+        $written = $writeXmlToZip($tempFile, $xml);
+
+        if ($written && file_exists($tempFile)) {
             $downloadName = 'Surat_Selesai_' . strtoupper($type) . '_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $nomorSurat) . '.docx';
 
             return response()->download($tempFile, $downloadName, [

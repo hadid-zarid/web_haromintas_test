@@ -300,12 +300,13 @@ export const DraftGenerateModal = ({
               box-sizing: border-box;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
             }
             html, body {
               margin: 0 !important;
               padding: 0 !important;
               background: #ffffff !important;
-              font-family: Arial, Helvetica, sans-serif !important;
+              font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
               font-size: 11pt !important;
               color: #000000 !important;
               width: 100% !important;
@@ -316,11 +317,14 @@ export const DraftGenerateModal = ({
               margin: 0 !important;
               padding: 0 !important;
               background: #ffffff !important;
+              font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
+            }
+            table, td, th, p, div, span, ol, li {
+              font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important;
             }
             table {
               width: 100% !important;
               border-collapse: collapse !important;
-              font-family: Arial, sans-serif !important;
             }
             td {
               vertical-align: top !important;
@@ -339,7 +343,6 @@ export const DraftGenerateModal = ({
               text-align: justify !important;
               text-justify: inter-word !important;
               line-height: 1.35 !important;
-              font-family: Arial, sans-serif !important;
             }
             ol {
               margin: 0 !important;
@@ -370,42 +373,50 @@ export const DraftGenerateModal = ({
     }, 450);
   };
 
-  const handleDownloadDocx = () => {
+  const handleDownloadDocx = async () => {
     setIsDownloading(true);
     showToast('Mengunduh dokumen Word (.docx) sesuai template asli...', 'info');
 
+    const payload = {
+      type: letterType,
+      nomor_surat: formData.nomorSurat,
+      tanggal_surat: formData.tanggalSurat,
+      hal: formData.hal,
+      jabatan_pemrakarsa: formData.jabatanPemrakarsa,
+      ibukota: formData.ibukota,
+      nomor_surat_p: formData.nomorSuratP,
+      tanggal_surat_p: formData.tanggalSuratP,
+      jenis_peraturan: formData.jenisPeraturan,
+      asal_pemrakarsa: formData.asalPemrakarsa,
+      judul_peraturan: formData.judulPeraturan,
+      jabatan_kakanwil: formData.jabatanKakanwil,
+      nama_kakanwil: formData.namaKakanwil
+    };
+
     try {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/api/generate-surat-docx';
+      const response = await fetch('/api/generate-surat-docx', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/json'
+        },
+        body: JSON.stringify(payload)
+      });
 
-      const payload = {
-        type: letterType,
-        nomor_surat: formData.nomorSurat,
-        tanggal_surat: formData.tanggalSurat,
-        hal: formData.hal,
-        jabatan_pemrakarsa: formData.jabatanPemrakarsa,
-        ibukota: formData.ibukota,
-        nomor_surat_p: formData.nomorSuratP,
-        tanggal_surat_p: formData.tanggalSuratP,
-        jenis_peraturan: formData.jenisPeraturan,
-        asal_pemrakarsa: formData.asalPemrakarsa,
-        judul_peraturan: formData.judulPeraturan,
-        jabatan_kakanwil: formData.jabatanKakanwil,
-        nama_kakanwil: formData.namaKakanwil
-      };
-
-      for (const [key, value] of Object.entries(payload)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || errJson.message || `Gagal mengunduh (${response.status})`);
       }
 
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Surat_Selesai_${letterType.toUpperCase()}_${formData.nomorSurat.replace(/[^a-zA-Z0-9_\-]/g, '_')}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
 
       if (onSaveHistory) {
         onSaveHistory({
@@ -419,14 +430,44 @@ export const DraftGenerateModal = ({
         });
       }
 
-      setTimeout(() => {
-        setIsDownloading(false);
-        showToast('Dokumen Word resmi (.docx) berhasil diunduh!', 'success');
-      }, 1200);
+      showToast('Dokumen Word resmi (.docx) berhasil diunduh!', 'success');
     } catch (err) {
-      console.error(err);
+      console.error('AJAX download failed, falling back to form submit:', err);
+
+      try {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/generate-surat-docx';
+
+        for (const [key, value] of Object.entries(payload)) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        if (onSaveHistory) {
+          onSaveHistory({
+            id: `DRAFT-${Date.now()}`,
+            nomorSurat: formData.nomorSurat,
+            jenis: letterType === 'perda' ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA',
+            judul: `Rancangan ${formData.jenisPeraturan} ${formData.asalPemrakarsa} tentang ${formData.judulPeraturan}`,
+            kabupaten: formData.asalPemrakarsa,
+            tanggal: formData.tanggalSurat,
+            createdAt: new Date().toISOString()
+          });
+        }
+        showToast('Dokumen Word resmi (.docx) sedang diunduh!', 'success');
+      } catch (fallbackErr) {
+        showToast(err.message || 'Gagal memproses file Word. Silakan coba lagi.', 'error');
+      }
+    } finally {
       setIsDownloading(false);
-      showToast('Gagal memproses file Word. Silakan coba lagi.', 'error');
     }
   };
 
@@ -822,7 +863,7 @@ Tembusan:
               ref={printAreaRef}
               className="bg-white text-black w-full max-w-[760px] p-8 sm:p-12 shadow-2xl rounded-xs min-h-[920px] select-text"
               style={{
-                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                 fontSize: '11pt',
                 lineHeight: '1.25',
                 color: '#000000'
@@ -846,19 +887,19 @@ Tembusan:
                         />
                       </td>
                       <td className="align-middle text-center text-black" style={{ verticalAlign: 'middle', textAlign: 'center', padding: 0 }}>
-                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', fontWeight: 'normal', textTransform: 'uppercase', lineHeight: '1.2', margin: '0' }}>
+                        <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '11pt', fontWeight: 'normal', textTransform: 'uppercase', lineHeight: '1.2', margin: '0' }}>
                           KEMENTERIAN HUKUM REPUBLIK INDONESIA
                         </div>
-                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11.5pt', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '1.2', margin: '2px 0 0 0' }}>
+                        <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '11.5pt', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '1.2', margin: '2px 0 0 0' }}>
                           KANTOR WILAYAH RIAU
                         </div>
-                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '3px 0 0 0' }}>
+                        <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '3px 0 0 0' }}>
                           Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
                         </div>
-                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
+                        <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
                           Telepon: (0761) 23846 - 0811-6904-422
                         </div>
-                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
+                        <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
                           Laman: <span style={{ textDecoration: 'underline', color: '#1d4ed8' }}>https://riau.kemenkum.go.id/</span> &nbsp;Pos-el: subbidfpphdriaubedelau@gmail.com
                         </div>
                       </td>
@@ -872,7 +913,7 @@ Tembusan:
                 className="w-full mb-4 border-collapse"
                 style={{
                   width: '100%',
-                  fontFamily: 'Arial, sans-serif',
+                  fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                   fontSize: '11pt',
                   marginBottom: '16px',
                   tableLayout: 'fixed',
@@ -923,7 +964,7 @@ Tembusan:
               </table>
 
               {/* TUJUAN SURAT (YTH & DI) */}
-              <table className="w-full mb-4 border-collapse" style={{ width: '100%', fontFamily: 'Arial, sans-serif', fontSize: '11pt', marginBottom: '16px', borderCollapse: 'collapse' }}>
+              <table className="w-full mb-4 border-collapse" style={{ width: '100%', fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '11pt', marginBottom: '16px', borderCollapse: 'collapse' }}>
                 <tbody>
                   <tr>
                     <td style={{ width: '45px', verticalAlign: 'top', padding: '1px 0' }}>Yth</td>
@@ -936,7 +977,7 @@ Tembusan:
               </table>
 
               {/* ISI SURAT */}
-              <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', lineHeight: '1.35', textAlign: 'justify' }}>
+              <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '11pt', lineHeight: '1.35', textAlign: 'justify' }}>
                 <p style={{ textIndent: '38px', margin: '0 0 12px 0', textAlign: 'justify', textJustify: 'inter-word', lineHeight: '1.35' }}>
                   Menindaklanjuti surat permohonan {formData.jabatanPemrakarsa} Nomor{' '}
                   {formData.nomorSuratP} Tanggal {formData.tanggalSuratP} perihal Mohon
@@ -968,7 +1009,7 @@ Tembusan:
                   display: 'flex',
                   justifyContent: 'flex-end',
                   width: '100%',
-                  fontFamily: 'Arial, sans-serif',
+                  fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                   fontSize: '11pt'
                 }}
               >
@@ -991,7 +1032,7 @@ Tembusan:
               </div>
 
               {/* TEMBUSAN */}
-              <div style={{ marginTop: '20px', fontFamily: 'Arial, sans-serif', fontSize: '10pt' }}>
+              <div style={{ marginTop: '20px', fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '10pt' }}>
                 <div style={{ marginBottom: '4px' }}>Tembusan:</div>
                 <ol style={{ margin: 0, paddingLeft: '20px' }}>
                   {formData.tembusan.map((item, idx) => (

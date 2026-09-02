@@ -285,11 +285,10 @@ export const HomePage = ({
                     <button
                       key={y}
                       onClick={() => router.visit(`/home?tahun=${y}`)}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                        y === selectedYear
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${y === selectedYear
                           ? 'bg-white text-[#2B3056] shadow-sm ring-1 ring-slate-200/50'
                           : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                      }`}
+                        }`}
                     >
                       {y}
                     </button>
