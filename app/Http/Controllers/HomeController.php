@@ -221,8 +221,11 @@ class HomeController extends Controller
             ];
         }
 
-        // Recent Audit Logs: Tim Kerja hanya melihat log terkait cakupan kerjanya
-        $auditQuery = AuditLog::with('user')->latest('created_at');
+        // Recent Audit Logs: Fokus pada aktivitas berkas & alur kerja regulasi
+        $auditQuery = AuditLog::with('user')
+            ->where('module', '!=', 'AUTHENTICATION')
+            ->latest('created_at');
+
         if ($isTim) {
             $rancanganIds = $allData->pluck('rancangan_id')->map(fn($id) => (string) $id)->toArray();
             $auditQuery->where(function ($q) use ($rancanganIds, $user) {

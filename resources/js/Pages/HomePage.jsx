@@ -193,13 +193,30 @@ export const HomePage = ({
           title: `${userName} mengunduh berkas`,
           desc: p.nama_file || 'Unduh file fisik berkas.',
         };
+      case 'AUTH_LOGIN':
+      case 'AUTH_LOGIN_GOOGLE':
+        return {
+          icon: ShieldCheck,
+          badge: 'Masuk',
+          badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200/70 font-bold',
+          title: `${userName} masuk ke sistem`,
+          desc: `Autentikasi akun ${p.role || 'petugas'} berhasil via ${action === 'AUTH_LOGIN_GOOGLE' ? 'Google OAuth' : 'Email/Password'}.`,
+        };
+      case 'AUTH_LOGOUT':
+        return {
+          icon: History,
+          badge: 'Keluar',
+          badgeClass: 'bg-slate-100 text-slate-600 border-slate-200/70 font-bold',
+          title: `${userName} keluar dari sistem`,
+          desc: 'Sesi akun resmi telah diakhiri.',
+        };
       default:
         return {
           icon: History,
-          badge: 'Aktivitas',
-          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60',
-          title: `${userName} melakukan pembaruan`,
-          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || 'Aktivitas sistem tercatat.'),
+          badge: 'Berkas',
+          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60 font-bold',
+          title: `${userName} memperbarui berkas`,
+          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || p.judul_rancangan || 'Pembaruan data regulasi daerah.'),
         };
     }
   };
