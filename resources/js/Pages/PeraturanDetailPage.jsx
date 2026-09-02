@@ -284,7 +284,7 @@ export const PeraturanDetailPage = ({
     switch (log.action) {
       case 'CREATE_PERMOHONAN':
         return (
-          <span>Mendaftarkan permohonan regulasi baru: <strong>{log.payload?.judul_rancangan || permohonan.judul_rancangan}</strong> (Tahap: Draf Awal).</span>
+          <span>Mendaftarkan permohonan harmonisasi baru: <strong>{log.payload?.judul_rancangan || permohonan.judul_rancangan}</strong> (Tahap: Draf Awal).</span>
         );
       case 'UPLOAD_DOKUMEN':
         return (
@@ -292,11 +292,11 @@ export const PeraturanDetailPage = ({
         );
       case 'APPROVE_FASILITASI':
         return (
-          <span>Mengesahkan hasil fasilitasi regulasi sebagai <strong>Selesai (Tuntas)</strong>{log.payload?.surat_terlampir ? ` dengan lampiran Surat: '${log.payload.surat_terlampir}'` : '.'}</span>
+          <span>Mengesahkan hasil fasilitasi harmonisasi sebagai <strong>Selesai (Tuntas)</strong>{log.payload?.surat_terlampir ? ` dengan lampiran Surat: '${log.payload.surat_terlampir}'` : '.'}</span>
         );
       case 'REJECT_FASILITASI':
         return (
-          <span>Mengembalikan berkas fasilitasi (Perlu Perbaikan). Catatan: &quot;{log.payload?.catatan || 'Perlu perbaikan naskah regulasi.'}&quot;</span>
+          <span>Mengembalikan berkas fasilitasi (Perlu Perbaikan). Catatan: &quot;{log.payload?.catatan || 'Perlu perbaikan naskah harmonisasi.'}&quot;</span>
         );
       case 'CHANGE_PERATURAN_STATUS':
         if (log.payload?.from_status_name && log.payload?.to_status_name) {
@@ -308,7 +308,7 @@ export const PeraturanDetailPage = ({
           <span>Memperbarui status berkas ke <strong>{log.payload?.to_status_name || 'Draf Awal (Pra-Harmonisasi)'}</strong>.</span>
         );
       case 'UPDATE_PERMOHONAN':
-        return <span>Memperbarui data dan informasi rancangan regulasi.</span>;
+        return <span>Memperbarui data dan informasi rancangan harmonisasi.</span>;
       default:
         return (
           <span>{log.payload?.catatan || log.payload?.nama_dokumen ? `Pembaruan berkas: ${log.payload?.catatan || log.payload?.nama_dokumen}` : `Memperbarui status berkas ke ${log.payload?.to_status_name || 'Draf Awal (Pra-Harmonisasi)'}.`}</span>
