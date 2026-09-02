@@ -9,5 +9,5 @@
 @section('suggestions')
     <li>Pastikan Anda telah masuk dengan akun yang memiliki peran sesuai.</li>
     <li>Fitur Draft Generate Surat hanya dapat diakses oleh peran Tim Kerja.</li>
-    <li>Hubungi Administrator Kanwil Kemenkumham Riau jika membutuhkan bantuan hak akses.</li>
+    <li>Hubungi Administrator Kanwil Kemenkum Riau jika membutuhkan bantuan hak akses.</li>
 @endsection

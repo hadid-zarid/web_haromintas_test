@@ -191,7 +191,7 @@ export const LandingPage = () => {
       icon: FileSpreadsheet,
     },
     {
-      label: 'Alur 2 Tahap (7 Slot Dokumen)',
+      label: 'Alur 2 Tahap (7 Dokumen Berkas)',
       desc: 'Harmonisasi Kanwil & Fasilitasi Biro Hukum',
       icon: Layers3,
     },
@@ -225,7 +225,7 @@ export const LandingPage = () => {
     },
     {
       number: '02',
-      title: 'Standarisasi 7 Slot Dokumen',
+      title: 'Standarisasi 7 Dokumen Berkas',
       description:
         'Struktur berkas digital yang rapi dan terstandar mulai dari draf awal hingga penetapan keputusan akhir.',
       icon: FolderCheck,
@@ -235,7 +235,7 @@ export const LandingPage = () => {
         'Tahap II: 2 Dokumen Fasilitasi Biro Hukum Setda',
         'Pratinjau langsung di web (inline preview) & unduh aman',
       ],
-      footerNote: '7 Slot Berkas Terstandarisasi',
+      footerNote: '7 Dokumen Berkas Terstandarisasi',
     },
     {
       number: '03',
@@ -260,9 +260,9 @@ export const LandingPage = () => {
       title: 'Pendaftaran & Berkas Awal',
       actor: 'Pemda Pemohon & Tim Kerja',
       description: 'Pemerintah daerah mendaftarkan permohonan Ranperda/Ranperkada dan mengunggah berkas rancangan awal beserta naskah akademik/analisis konsepsi.',
-      slots: [
-        { slot: 'Slot 1', name: 'Draft Rancangan Awal', ext: 'PDF/DOCX' },
-        { slot: 'Slot 2', name: 'Dokumen Analisis Konsepsi', ext: 'PDF' },
+      docs: [
+        { doc: 'Dokumen 1', name: 'Draft Rancangan Awal', ext: 'PDF/DOCX' },
+        { doc: 'Dokumen 2', name: 'Dokumen Analisis Konsepsi', ext: 'PDF' },
       ],
       icon: FileSpreadsheet,
       badgeColor: 'bg-blue-50 text-blue-900 border-blue-200',
@@ -273,9 +273,9 @@ export const LandingPage = () => {
       title: 'Rapat Pleno & Draf Bersih',
       actor: 'Perancang PUU & Pemda',
       description: 'Pembahasan materi muatan pasal per pasal bersama Perancang Peraturan Kanwil Kemenkum Provinsi Riau, menghasilkan matriks perubahan dan draf bersih.',
-      slots: [
-        { slot: 'Slot 3', name: 'Matriks Perubahan Sandingan', ext: 'DOCX' },
-        { slot: 'Slot 4', name: 'Draft Bersih Hasil Harmonisasi', ext: 'PDF' },
+      docs: [
+        { doc: 'Dokumen 3', name: 'Matriks Perubahan Sandingan', ext: 'DOCX' },
+        { doc: 'Dokumen 4', name: 'Draft Bersih Hasil Harmonisasi', ext: 'PDF' },
       ],
       icon: UsersRound,
       badgeColor: 'bg-indigo-50 text-indigo-900 border-indigo-200',
@@ -286,8 +286,8 @@ export const LandingPage = () => {
       title: 'Pengesahan Surat Harmonisasi',
       actor: 'Kakanwil / Kadiv Pelayanan Hukum',
       description: 'Validasi kelengkapan berkas pleno dan pengesahan Surat Hasil Harmonisasi resmi Kanwil Kemenkum Provinsi Riau sebagai syarat lanjut ke fasilitasi.',
-      slots: [
-        { slot: 'Slot 5', name: 'Surat Hasil Harmonisasi Kanwil', ext: 'PDF RESMI' },
+      docs: [
+        { doc: 'Dokumen 5', name: 'Surat Hasil Harmonisasi Kanwil', ext: 'PDF RESMI' },
       ],
       icon: Scale,
       badgeColor: 'bg-amber-50 text-amber-900 border-amber-200',
@@ -298,9 +298,9 @@ export const LandingPage = () => {
       title: 'Fasilitasi & Keputusan Akhir',
       actor: 'Biro Hukum Setda Provinsi Riau',
       description: 'Penelaahan berkas oleh Biro Hukum Provinsi Riau, penyusunan matriks fasilitasi, dan penerbitan Surat Keputusan Fasilitasi hingga status Selesai.',
-      slots: [
-        { slot: 'Slot 6', name: 'Matriks Hasil Fasilitasi', ext: 'DOCX' },
-        { slot: 'Slot 7', name: 'Surat Keputusan Fasilitasi', ext: 'PDF RESMI' },
+      docs: [
+        { doc: 'Dokumen 6', name: 'Matriks Hasil Fasilitasi', ext: 'DOCX' },
+        { doc: 'Dokumen 7', name: 'Surat Keputusan Fasilitasi', ext: 'PDF RESMI' },
       ],
       icon: CheckCircle2,
       badgeColor: 'bg-emerald-50 text-emerald-900 border-emerald-200',
@@ -593,7 +593,7 @@ export const LandingPage = () => {
         </section>
 
         {/* =========================================================================
-            SECTION 3: ALUR PROSEDUR & 7 SLOT DOKUMEN (Enriched with Realistic Slot Cards)
+            SECTION 3: ALUR PROSEDUR & 7 DOKUMEN BERKAS (Enriched with Realistic Document Cards)
             ========================================================================= */}
         <section id="alur" className="border-b border-slate-200 bg-slate-50/60 py-16 sm:py-20 overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
@@ -603,13 +603,13 @@ export const LandingPage = () => {
               <div className="mx-auto max-w-3xl text-center">
                 <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#2B3056]/10 border border-[#2B3056]/15 text-xs font-bold uppercase tracking-wider text-[#2B3056]">
                   <Layers3 className="h-3.5 w-3.5 text-[#FFC800]" />
-                  Alur Prosedur &amp; 7 Slot Dokumen
+                  Alur Prosedur &amp; 7 Dokumen Berkas
                 </span>
                 <h2 className="mt-3.5 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#2B3056]">
                   Tahapan Harmonisasi &amp; Pengelolaan Dokumen
                 </h2>
                 <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base font-normal text-slate-600 leading-relaxed">
-                  Alur operasional terintegrasi dari pendaftaran permohonan oleh pemda hingga penetapan keputusan akhir, mencakup pengelolaan 7 slot berkas digital resmi.
+                  Alur operasional terintegrasi dari pendaftaran permohonan oleh pemda hingga penetapan keputusan akhir, mencakup pengelolaan 7 dokumen berkas digital resmi.
                 </p>
               </div>
             </Reveal>
@@ -643,20 +643,20 @@ export const LandingPage = () => {
                           {step.description}
                         </p>
 
-                        {/* Document Slots Section (Enriched with Extension Badges) */}
+                        {/* Document Section (Enriched with Extension Badges) */}
                         <div className="mt-4 pt-3.5 border-t border-slate-100 space-y-2">
                           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                             Berkas Terkait:
                           </p>
                           <div className="space-y-1.5">
-                            {step.slots.map((s, sIdx) => (
+                            {step.docs.map((s, sIdx) => (
                               <div
                                 key={sIdx}
                                 className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 border border-slate-200/80 px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-100/80 transition-colors"
                               >
                                 <div className="flex items-center gap-2 min-w-0">
                                   <span className="font-extrabold text-[#2B3056] bg-white border border-slate-200 px-1.5 py-0.5 rounded text-[10.5px] shrink-0">
-                                    {s.slot}
+                                    {s.doc}
                                   </span>
                                   <span className="font-semibold truncate text-[11.5px]">{s.name}</span>
                                 </div>
@@ -919,7 +919,7 @@ export const LandingPage = () => {
                     <FolderCheck className="h-6 w-6" />
                   </span>
                   <div>
-                    <p className="text-base sm:text-lg font-black text-[#2B3056]">7 Slot Berkas Digital</p>
+                    <p className="text-base sm:text-lg font-black text-[#2B3056]">7 Dokumen Berkas Digital</p>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium">Standar Dokumen Harmonisasi &amp; Fasilitasi</p>
                   </div>
                 </div>
@@ -1083,7 +1083,7 @@ export const LandingPage = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-[#FFD82B] shrink-0" />
-                          <span>Standarisasi 7 Slot Berkas Digital</span>
+                          <span>Standarisasi 7 Dokumen Berkas Digital</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-[#FFD82B] shrink-0" />

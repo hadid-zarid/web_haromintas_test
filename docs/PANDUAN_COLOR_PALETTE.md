@@ -43,14 +43,14 @@ Sistem warna HARMONITAS dibangun dengan perpaduan nilai:
 
 ## 4. Palet Alur Kerja & Status Regulasi (*Workflow & Status Colors*)
 
-Warna status diterapkan secara seragam pada kartu metrik dashboard, badge tabel permohonan, dan 7 slot dokumen:
+Warna status diterapkan secara seragam pada kartu metrik dashboard, badge tabel permohonan, dan 7 dokumen berkas:
 
 | Kategori / Status | Gradient / Kode Warna | Class CSS Tailwind | Deskripsi & Makna Alur |
 |---|---|---|---|
-| **Proses Harmonisasi** | `from-[#FFC837] to-[#FF8008]` *(Gradient)* | `bg-amber-100 text-amber-800 border-amber-200` | Kartu metrik proses rapat Kanwil Kemenkumham & badge permohonan tahap harmonisasi. |
+| **Proses Harmonisasi** | `from-[#FFC837] to-[#FF8008]` *(Gradient)* | `bg-amber-100 text-amber-800 border-amber-200` | Kartu metrik proses rapat Kanwil Kemenkum & badge permohonan tahap harmonisasi. |
 | **Proses Fasilitasi** | `from-[#27A169] to-[#127A4A]` *(Gradient)* | `bg-emerald-100 text-emerald-800 border-emerald-200` | Kartu metrik fasilitasi Biro Hukum Provinsi & berkas yang sedang ditelaah Pemprov. |
-| **Kewenangan Tim Kerja** | `#E0E7FF` / `#1D4ED8` *(Blue Accent)* | `bg-blue-50 text-blue-700 border-blue-200` | Badge kewenangan & identitas **Slot 1–5 (Tim Kerja Kanwil)**. |
-| **Kewenangan Biro Hukum** | `#F3E8FF` / `#7E22CE` *(Purple Accent)* | `bg-purple-50 text-purple-700 border-purple-200` | Badge kewenangan & identitas **Slot 6–7 (Biro Hukum Setda Riau)**. |
+| **Kewenangan Tim Kerja** | `#E0E7FF` / `#1D4ED8` *(Blue Accent)* | `bg-blue-50 text-blue-700 border-blue-200` | Badge kewenangan & identitas **Dokumen 1–5 (Tim Kerja Kanwil)**. |
+| **Kewenangan Biro Hukum** | `#F3E8FF` / `#7E22CE` *(Purple Accent)* | `bg-purple-50 text-purple-700 border-purple-200` | Badge kewenangan & identitas **Dokumen 6–7 (Biro Hukum Setda Riau)**. |
 | **Selesai / Tuntas** | `#D1FAE5` / `#047857` *(Emerald Accent)* | `bg-emerald-100 text-emerald-800 border-emerald-200` | Status regulasi yang telah selesai diharmonisasi dan difasilitasi. |
 | **Perlu Perbaikan / Revisi** | `#FFE4E6` / `#BE123C` *(Rose / Coral)* | `bg-rose-100 text-rose-800 border-rose-200` | Berkas yang dikembalikan untuk revisi / tombol hapus berkas. |
 | **Draf Awal / Menunggu** | `#F1F5F9` / `#475569` *(Slate Gray)* | `bg-slate-100 text-slate-700 border-slate-200` | Berkas baru masuk pra-harmonisasi. |
@@ -72,9 +72,9 @@ Warna status diterapkan secara seragam pada kartu metrik dashboard, badge tabel 
   4. *Selesai / Tuntas*: Royal Navy (`#323864`)
 - **Grafik Bottleneck & Timeline**: Kartu putih (`#FFFFFF`) bergaris `#E2E2DC` dengan bar progres sesuai warna status.
 
-### C. Modul Permohonan & 7 Slot Dokumen (`PeraturanDetailPage.jsx`):
-- **Slot 1 s.d. 5 (Tim Kerja Kanwil)**: Aksen Biru Muda (`bg-blue-50 text-blue-700 border-blue-200`).
-- **Slot 6 s.d. 7 (Biro Hukum Riau)**: Aksen Ungu Muda (`bg-purple-50 text-purple-700 border-purple-200`).
+### C. Modul Permohonan & 7 Dokumen Berkas (`PeraturanDetailPage.jsx`):
+- **Dokumen 1 s.d. 5 (Tim Kerja Kanwil)**: Aksen Biru Muda (`bg-blue-50 text-blue-700 border-blue-200`).
+- **Dokumen 6 s.d. 7 (Biro Hukum Riau)**: Aksen Ungu Muda (`bg-purple-50 text-purple-700 border-purple-200`).
 - **Dropzone Upload Berkas**:
   - *Sebelum Dipilih*: Border putus-putus abu-abu (`#D5D5CE`) berlatar `#F8F8F5`.
   - *Setelah File Terlampir*: Kartu hijau terang (`from-emerald-50 to-teal-50 border-emerald-300`) dengan badge sukses hijau.

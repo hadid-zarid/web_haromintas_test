@@ -31,7 +31,7 @@ flowchart TD
 
 1. **Setup & Konfigurasi Basis:**
    - [x] Inisialisasi Database MySQL & Laravel Eloquent Models.
-   - [ ] Konfigurasi layout utama Inertia React + Tailwind CSS dengan tema institusional (*Kanwil Kemenkumham Riau*).
+   - [ ] Konfigurasi layout utama Inertia React + Tailwind CSS dengan tema institusional (*Kanwil Kemenkum Riau*).
 2. **Autentikasi & Keamanan (Multi-Role Auth):**
    - [ ] Halaman Login yang responsif dan aman (CSRF, Rate Limiting).
    - [ ] Middleware proteksi Role: `ADMIN`, `POKJA`, `BIRO_HUKUM`, `PIMPINAN`.

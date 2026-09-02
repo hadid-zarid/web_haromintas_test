@@ -30,7 +30,7 @@ class ResetPasswordMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reset Kata Sandi Akun - HARMONITAS Kanwil Kemenkumham Riau',
+            subject: 'Reset Kata Sandi Akun - HARMONITAS Kanwil Kemenkum Riau',
         );
     }
 

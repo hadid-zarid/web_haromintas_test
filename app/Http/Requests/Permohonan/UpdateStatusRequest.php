@@ -28,8 +28,9 @@ class UpdateStatusRequest extends FormRequest
                     }
                     if ($value) {
                         $ext = strtolower($value->getClientOriginalExtension());
-                        if (! in_array($ext, ['pdf', 'doc', 'docx'])) {
-                            $fail('Format file surat hanya diperbolehkan PDF, DOC, atau DOCX.');
+                        // Surat Fasilitasi Rancangan Peraturan wajib PDF (dokumen resmi bertandatangan)
+                        if ($ext !== 'pdf') {
+                            $fail('Surat fasilitasi rancangan peraturan wajib diunggah dalam format PDF.');
                         }
                     }
                 },

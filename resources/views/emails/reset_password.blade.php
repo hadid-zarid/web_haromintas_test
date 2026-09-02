@@ -151,7 +151,7 @@
         <div class="content">
             <div class="greeting">Halo, {{ $userName }}</div>
             <p>
-                Kami menerima permintaan untuk melakukan pemulihan kata sandi (*reset password*) untuk akun kedinasan Anda di sistem <strong>HARMONITAS Kanwil Kemenkumham Riau</strong>.
+                Kami menerima permintaan untuk melakukan pemulihan kata sandi (*reset password*) untuk akun kedinasan Anda di sistem <strong>HARMONITAS Kanwil Kemenkum Riau</strong>.
             </p>
             <p>
                 Silakan klik tombol di bawah ini untuk membuat kata sandi baru Anda:
@@ -180,7 +180,7 @@
         <div class="footer">
             <span class="footer-highlight">HARMONITAS &bull; Kantor Wilayah Kementerian Hukum Provinsi Riau</span><br>
             Jl. Jenderal Sudirman No. 233, Pekanbaru, Riau 28111<br>
-            &copy; {{ date('Y') }} Kanwil Kemenkumham Riau. Hak Cipta Dilindungi.
+            &copy; {{ date('Y') }} Kanwil Kemenkum Riau. Hak Cipta Dilindungi.
         </div>
     </div>
 </body>

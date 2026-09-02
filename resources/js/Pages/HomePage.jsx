@@ -4,23 +4,23 @@ import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/layout/AppLayout';
 import MetricCard from '../components/common/MetricCard';
 import ActivityDetailModal from '../components/modals/ActivityDetailModal';
-import { 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  CartesianGrid, 
-  Legend 
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend
 } from 'recharts';
-import { 
-  FileText, 
-  Clock, 
-  Search, 
-  CheckCircle2, 
-  TrendingUp, 
-  Activity, 
+import {
+  FileText,
+  Clock,
+  Search,
+  CheckCircle2,
+  TrendingUp,
+  Activity,
   BellRing,
   Building2,
   Landmark,
@@ -103,14 +103,14 @@ export const HomePage = ({
   const { user, isTimKerja, isBiroHukum, isAdmin, isPimpinan } = useAuth();
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [wilayahSearch, setWilayahSearch] = useState('');
-  
+
   // Semester Switcher for Trend Chart (1: Jan-Jun, 2: Jul-Des)
   const currentMonthIndex = new Date().getMonth(); // 0-based
   const [semester, setSemester] = useState(currentMonthIndex >= 6 ? 2 : 1);
 
   // Filter 6 bulan untuk bar chart horizontal
-  const displayedTrendData = semester === 1 
-    ? trendData.slice(0, 6) 
+  const displayedTrendData = semester === 1
+    ? trendData.slice(0, 6)
     : trendData.slice(6, 12);
 
   // Role display name helper
@@ -217,7 +217,7 @@ export const HomePage = ({
   };
 
   // Filtered district list
-  const filteredWilayah = wilayahStats.filter((w) => 
+  const filteredWilayah = wilayahStats.filter((w) =>
     w.nama_kabupaten.toLowerCase().includes(wilayahSearch.toLowerCase())
   );
 
@@ -226,7 +226,7 @@ export const HomePage = ({
       <Head title="Dashboard - HARMONITAS" />
 
       <div className="space-y-6">
-        
+
         {/* =========================================================================
             1. EXECUTIVE CONTEXT HEADER
             ========================================================================= */}
@@ -252,7 +252,7 @@ export const HomePage = ({
               </h1>
 
               <p className="text-xs text-slate-500 font-normal max-w-2xl leading-relaxed">
-                {userScope.isTimKerja 
+                {userScope.isTimKerja
                   ? `Ruang kendali harmonisasi regulasi untuk cakupan ${userScope.timKerjaNama || 'Tim Kerja'}.`
                   : 'Pusat pemantauan dan kendali terpadu seluruh tahapan harmonisasi regulasi daerah di Provinsi Riau.'}
               </p>
@@ -342,22 +342,22 @@ export const HomePage = ({
             3. MIDDLE WORKSPACE: 2-COLUMN BALANCED GRID
             ========================================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* =======================================================================
               LEFT COLUMN (7 COLS): PROGRES ALUR & SEBARAN WILAYAH
               ======================================================================= */}
           <div className="lg:col-span-7 space-y-6">
-            
+
             {/* Card 1: Distribusi Tahapan Alur Harmonisasi */}
             <div className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
                   <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
                     <Layers className="h-4 w-4 text-[#B3912D]" />
-                    <span>Distribusi Tahapan Alur Regulasi</span>
+                    <span>Distribusi Tahapan Alur Harmonisasi</span>
                   </h2>
                   <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {userScope.isTimKerja 
+                    {userScope.isTimKerja
                       ? `Cakupan wilayah: ${userScope.timKerjaNama || 'Tim Kerja'}`
                       : 'Distribusi permohonan aktif pada setiap tahapan SOP harmonisasi'}
                   </p>
@@ -419,7 +419,7 @@ export const HomePage = ({
                     <span>Sebaran Wilayah Administrasi ({wilayahStats.length})</span>
                   </h2>
                   <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {userScope.isTimKerja 
+                    {userScope.isTimKerja
                       ? `Wilayah binaan ${userScope.timKerjaNama}`
                       : 'Distribusi permohonan regulasi di seluruh Kabupaten / Kota se-Riau'}
                   </p>
@@ -486,7 +486,7 @@ export const HomePage = ({
               RIGHT COLUMN (5 COLS): PRIORITY ACTIONS, AUDIT FEED & SOP CARD
               ======================================================================= */}
           <div className="lg:col-span-5 space-y-6">
-            
+
             {/* Card 1: Tugas Perlu Tindakan (Action Hub) */}
             <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-3.5">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -618,7 +618,7 @@ export const HomePage = ({
             4. BOTTOM SECTION: FULL-WIDTH HORIZONTAL CARD FOR BAR CHART TREND
             ========================================================================= */}
         <div className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
-          
+
           {/* Header with 6-Month Period Toggle and Total */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3.5">
             <div>
@@ -641,11 +641,10 @@ export const HomePage = ({
                 <button
                   type="button"
                   onClick={() => setSemester(1)}
-                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
-                    semester === 1
-                      ? 'bg-white text-[#2B3056] shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${semester === 1
+                    ? 'bg-white text-[#2B3056] shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                    }`}
                   title="Tampilkan Semester 1 (Januari - Juni)"
                 >
                   <ChevronLeft className="h-3 w-3" />
@@ -655,11 +654,10 @@ export const HomePage = ({
                 <button
                   type="button"
                   onClick={() => setSemester(2)}
-                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${
-                    semester === 2
-                      ? 'bg-white text-[#2B3056] shadow-xs'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-bold rounded-md transition-all cursor-pointer ${semester === 2
+                    ? 'bg-white text-[#2B3056] shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                    }`}
                   title="Tampilkan Semester 2 (Juli - Desember)"
                 >
                   <span>Jul - Des</span>
@@ -672,29 +670,29 @@ export const HomePage = ({
           {/* Full-Width Vertical Bar Chart */}
           <div className="h-[280px] w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={displayedTrendData} 
+              <BarChart
+                data={displayedTrendData}
                 margin={{ top: 15, right: 20, left: -10, bottom: 5 }}
                 barGap={3}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
-                <XAxis 
-                  dataKey="bulan" 
-                  tick={{ fontSize: 11.5, fill: '#2B3056', fontWeight: 700 }} 
-                  axisLine={{ stroke: '#E2E8F0' }} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="bulan"
+                  tick={{ fontSize: 11.5, fill: '#2B3056', fontWeight: 700 }}
+                  axisLine={{ stroke: '#E2E8F0' }}
+                  tickLine={false}
                 />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }} 
-                  axisLine={{ stroke: '#E2E8F0' }} 
-                  tickLine={false} 
-                  allowDecimals={false} 
+                <YAxis
+                  tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }}
+                  axisLine={{ stroke: '#E2E8F0' }}
+                  tickLine={false}
+                  allowDecimals={false}
                 />
                 <Tooltip content={<CustomChartTooltip />} cursor={{ fill: 'rgba(43, 48, 86, 0.04)', radius: 6 }} />
-                <Legend 
-                  wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 600 }} 
-                  iconType="circle" 
-                  iconSize={8} 
+                <Legend
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 600 }}
+                  iconType="circle"
+                  iconSize={8}
                 />
                 <Bar dataKey="Total Permohonan" fill="#2B3056" radius={[4, 4, 0, 0]} maxBarSize={18} />
                 <Bar dataKey="Draf Awal" fill="#64748B" radius={[4, 4, 0, 0]} maxBarSize={18} />

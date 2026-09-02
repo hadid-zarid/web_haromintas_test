@@ -14,7 +14,7 @@ export const INITIAL_ACTIVITY_LOGS = [
     user: 'Ahmad Subandi, S.H.',
     role: 'Tim Kerja 1',
     action: 'Unggah Surat Hasil Harmonisasi (Dokumen 5)',
-    detail: 'Surat Penetapan Hasil Harmonisasi Kanwil Kemenkumham Riau disahkan.',
+    detail: 'Surat Penetapan Hasil Harmonisasi Kanwil Kemenkum Riau disahkan.',
     timestamp: '2024-03-15 10:30',
   },
   {

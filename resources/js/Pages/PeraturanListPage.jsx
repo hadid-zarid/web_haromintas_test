@@ -238,9 +238,8 @@ export const PeraturanListPage = ({
     return (
       <th
         onClick={() => handleSort(columnKey)}
-        className={`py-3.5 px-4 cursor-pointer select-none transition hover:bg-slate-100/80 group ${
-          alignRight ? "text-right" : ""
-        }`}
+        className={`py-3.5 px-4 cursor-pointer select-none transition hover:bg-slate-100/80 group ${alignRight ? "text-right" : ""
+          }`}
         title={`Urutkan berdasarkan ${label}`}
       >
         <div className={`inline-flex items-center gap-1.5 ${alignRight ? "justify-end" : ""}`}>
@@ -395,8 +394,8 @@ export const PeraturanListPage = ({
                 className="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               >
                 <option value="ALL">
-                  {isTimKerja 
-                    ? `Semua Wilayah (${user?.tim_kerja?.nama_tim_kerja || 'Tim Kerja Anda'})` 
+                  {isTimKerja
+                    ? `Semua Wilayah (${user?.tim_kerja?.nama_tim_kerja || 'Tim Kerja Anda'})`
                     : 'Semua Kabupaten / Kota'}
                 </option>
                 {availableKabupatens.map((k) => (
@@ -474,10 +473,10 @@ export const PeraturanListPage = ({
           <div className="p-4 sm:p-5 border-b border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-extrabold text-[#2B3056]">
-                Daftar Permohonan Regulasi ({permohonans?.total || permohonans?.data?.length || 0})
+                Daftar Permohonan Harmonitas ({permohonans?.total || permohonans?.data?.length || 0})
               </h2>
               <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                Klik baris permohonan untuk membuka lembar kerja detail dan 7 slot dokumen.
+                Klik baris permohonan untuk membuka lembar kerja detail dan 7 dokumen.
               </p>
             </div>
 
@@ -557,11 +556,10 @@ export const PeraturanListPage = ({
 
                         {/* Jenis */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold border ${
-                            jenisName === "Ranperda"
-                              ? "bg-purple-50 text-purple-700 border-purple-200"
-                              : "bg-teal-50 text-teal-700 border-teal-200"
-                          }`}>
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold border ${jenisName === "Ranperda"
+                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            : "bg-teal-50 text-teal-700 border-teal-200"
+                            }`}>
                             {jenisName}
                           </span>
                         </td>
@@ -590,13 +588,12 @@ export const PeraturanListPage = ({
                             <span>{item.uploader?.nama || "Petugas Kanwil"}</span>
                           </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
-                              docCount >= 7 
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
-                                : docCount > 0 
-                                ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                            <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${docCount >= 7
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : docCount > 0
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
                                 : 'bg-slate-50 text-slate-500 border-slate-200'
-                            }`}>
+                              }`}>
                               📁 {docCount}/7 Dokumen
                             </span>
                           </div>
@@ -684,13 +681,12 @@ export const PeraturanListPage = ({
                       type="button"
                       disabled={!link.url || link.active}
                       onClick={() => link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })}
-                      className={`min-w-[32px] h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${
-                        link.active
-                          ? "bg-[#2B3056] text-[#FFD82B] shadow-2xs font-extrabold"
-                          : link.url
+                      className={`min-w-[32px] h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center cursor-pointer ${link.active
+                        ? "bg-[#2B3056] text-[#FFD82B] shadow-2xs font-extrabold"
+                        : link.url
                           ? "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-2xs"
                           : "opacity-40 text-slate-400 bg-slate-100 cursor-not-allowed border border-slate-200"
-                      }`}
+                        }`}
                     >
                       {displayLabel}
                     </button>

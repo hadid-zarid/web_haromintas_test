@@ -46,7 +46,7 @@ import {
  * with interactive layered paper sheets that peek upwards on hover.
  */
 const MapDokumenCard = ({
-  slot,
+  jenisDokumen,
   doc,
   isUploaded,
   isOptional,
@@ -65,7 +65,7 @@ const MapDokumenCard = ({
         if (isUploaded) {
           onView(doc);
         } else if (canUpload) {
-          onUpload(slot);
+          onUpload(jenisDokumen);
         }
       }}
       className={`group relative rounded-3xl border transition-all duration-300 flex flex-col justify-between cursor-pointer select-none overflow-visible mt-2.5 ${
@@ -128,7 +128,7 @@ const MapDokumenCard = ({
                 : 'bg-slate-100 text-slate-700 group-hover:bg-[#2B3056] group-hover:text-[#FFD82B]'
             }`}>
               <Folder className="h-3.5 w-3.5 shrink-0" />
-              <span>Slot #{slot.urutan}</span>
+              <span>Dokumen #{jenisDokumen.urutan}</span>
             </span>
           </div>
 
@@ -151,10 +151,10 @@ const MapDokumenCard = ({
           FOLDER BODY CONTENT
           ========================================================================= */}
       <div className="p-4 space-y-3 relative z-10 flex-1 flex flex-col justify-between">
-        {/* Document Slot Name */}
+        {/* Document Name */}
         <div>
           <h3 className="font-extrabold text-xs text-[#2B3056] group-hover:text-[#3A4070] transition-colors leading-snug min-h-[32px] line-clamp-2">
-            {slot.nama_dokumen}
+            {jenisDokumen.nama_dokumen}
           </h3>
         </div>
 
@@ -226,7 +226,7 @@ const MapDokumenCard = ({
           {canUpload ? (
             <button
               type="button"
-              onClick={() => onUpload(slot)}
+              onClick={() => onUpload(jenisDokumen)}
               className={`py-2 px-3 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 isUploaded
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0'
@@ -269,7 +269,7 @@ export const PeraturanDetailPage = ({
   const { flash } = usePage().props;
 
   // Active modals
-  const [activeUploadSlot, setActiveUploadSlot] = useState(null);
+  const [activeUploadDoc, setActiveUploadDoc] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusAction, setStatusAction] = useState(null); // 'APPROVE' or 'REVISE'
@@ -324,7 +324,7 @@ export const PeraturanDetailPage = ({
   const timName = permohonan.tim_kerja?.nama_tim_kerja || permohonan.kabupaten?.tim_kerja?.nama_tim_kerja || 'Tim Kerja';
   const jenisName = permohonan.jenis_regulasi?.nama_jenis || (permohonan.jenis_regulasi_id === 1 ? 'Ranperda' : 'Ranperkada');
 
-  // Map uploaded documents by jenis_dokumen_id (slots 1 to 7)
+  // Map uploaded documents by jenis_dokumen_id (dokumen 1 to 7)
   const uploadedDocsMap = {};
   if (permohonan.dokumens) {
     permohonan.dokumens.forEach((doc) => {
@@ -333,21 +333,21 @@ export const PeraturanDetailPage = ({
   }
 
   // Hitung kelengkapan dokumen Tahap I & Tahap II
-  const harmonisasiSlots = [1, 2, 3, 4, 5];
-  const uploadedHarmonisasiCount = harmonisasiSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
+  const harmonisasiDocIds = [1, 2, 3, 4, 5];
+  const uploadedHarmonisasiCount = harmonisasiDocIds.filter((id) => Boolean(uploadedDocsMap[id])).length;
   const isHarmonisasiComplete = uploadedHarmonisasiCount === 5;
 
-  const requiredFasilitasiSlots = [7];
-  const uploadedFasilitasiCount = requiredFasilitasiSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
-  const isFasilitasiComplete = uploadedFasilitasiCount === requiredFasilitasiSlots.length;
-  const requiredDocumentSlots = [...harmonisasiSlots, ...requiredFasilitasiSlots];
-  const requiredUploadedCount = requiredDocumentSlots.filter((id) => Boolean(uploadedDocsMap[id])).length;
+  const requiredFasilitasiDocIds = [7];
+  const uploadedFasilitasiCount = requiredFasilitasiDocIds.filter((id) => Boolean(uploadedDocsMap[id])).length;
+  const isFasilitasiComplete = uploadedFasilitasiCount === requiredFasilitasiDocIds.length;
+  const requiredDocumentIds = [...harmonisasiDocIds, ...requiredFasilitasiDocIds];
+  const requiredUploadedCount = requiredDocumentIds.filter((id) => Boolean(uploadedDocsMap[id])).length;
 
   // Open Upload Modal
-  const openUploadModal = (slot) => {
-    setActiveUploadSlot(slot);
+  const openUploadModal = (jenisDokumen) => {
+    setActiveUploadDoc(jenisDokumen);
     uploadForm.setData({
-      jenis_dokumen_id: slot.jenis_dokumen_id,
+      jenis_dokumen_id: jenisDokumen.jenis_dokumen_id,
       file: null,
       keterangan: '',
     });
@@ -356,12 +356,12 @@ export const PeraturanDetailPage = ({
   // Submit Upload
   const handleUploadSubmit = (e) => {
     e.preventDefault();
-    if (!activeUploadSlot) return;
+    if (!activeUploadDoc) return;
 
     uploadForm.post(`/peraturan/${permohonan.rancangan_id}/dokumen`, {
       forceFormData: true,
       onSuccess: () => {
-        setActiveUploadSlot(null);
+        setActiveUploadDoc(null);
         uploadForm.reset();
       },
     });
@@ -398,17 +398,17 @@ export const PeraturanDetailPage = ({
     });
   };
 
-  // Check upload permissions per slot
-  const canUploadSlot = (slotId) => {
+  // Check upload permissions per dokumen
+  const canUploadDoc = (docId) => {
     if (isAdmin) return true;
-    if (slotId >= 1 && slotId <= 5) return isTimKerja;
-    if (slotId === 6 || slotId === 7) return isBiroHukum;
+    if (docId >= 1 && docId <= 5) return isTimKerja;
+    if (docId === 6 || docId === 7) return isBiroHukum;
     return false;
   };
 
-  // Get Authority badge & styling per slot
-  const getSlotAuthority = (slotId) => {
-    if (slotId >= 1 && slotId <= 5) {
+  // Get Authority badge & styling per dokumen
+  const getDocAuthority = (docId) => {
+    if (docId >= 1 && docId <= 5) {
       return {
         roleName: 'Kewenangan: Tim Kerja Kanwil',
         authorityDesc: 'Dikelola oleh Tim Kerja Kanwil Kemenkum Provinsi Riau & Pemda',
@@ -560,14 +560,14 @@ export const PeraturanDetailPage = ({
           </div>
         )}
 
-        {/* 7 SLOT DOKUMEN SISTEM HARMONITAS DALAM BENTUK MAP DOKUMEN */}
+        {/* 7 DOKUMEN SISTEM HARMONITAS DALAM BENTUK MAP DOKUMEN */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-6 space-y-6">
           {/* Header Section with 2-Stage Progress */}
           <div className="border-b border-slate-200/90 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h2 className="text-base font-extrabold text-[#2B3056] flex items-center gap-2">
                 <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
-                <span>7 Slot Dokumen Berkas Harmonisasi & Fasilitasi</span>
+                <span>7 Dokumen Berkas Harmonisasi & Fasilitasi</span>
               </h2>
               <p className="text-xs text-slate-500 font-normal mt-0.5">
                 Arahkan kursor ke tiap map berkas untuk melihat isi dokumen. Klik card untuk membuka pratinjau dokumen langsung di web.
@@ -587,26 +587,26 @@ export const PeraturanDetailPage = ({
                 isFasilitasiComplete ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-purple-50 text-purple-700 border-purple-200'
               }`}>
                 {isFasilitasiComplete ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <span className="w-2 h-2 rounded-full bg-purple-600" />}
-                <span>Tahap II (Biro Hukum): <strong>{uploadedFasilitasiCount}/1 Wajib</strong> • Slot #6 Opsional</span>
+                <span>Tahap II (Biro Hukum): <strong>{uploadedFasilitasiCount}/1 Wajib</strong> • Dokumen #6 Opsional</span>
               </div>
             </div>
           </div>
 
           {/* 4-Column Grid of Map Dokumen Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-8 pt-5">
-            {jenisDokumens.map((slot) => {
-              const doc = uploadedDocsMap[slot.jenis_dokumen_id];
+            {jenisDokumens.map((jenisDok) => {
+              const doc = uploadedDocsMap[jenisDok.jenis_dokumen_id];
               const isUploaded = Boolean(doc);
-              const isOptional = slot.jenis_dokumen_id === 6;
-              const isFasilitasiSlot = slot.jenis_dokumen_id === 6 || slot.jenis_dokumen_id === 7;
-              const isLockedForUpload = isFasilitasiSlot && !isHarmonisasiComplete;
-              const canUpload = canUploadSlot(slot.jenis_dokumen_id) && !isLockedForUpload;
-              const authInfo = getSlotAuthority(slot.jenis_dokumen_id);
+              const isOptional = jenisDok.jenis_dokumen_id === 6;
+              const isFasilitasiDoc = jenisDok.jenis_dokumen_id === 6 || jenisDok.jenis_dokumen_id === 7;
+              const isLockedForUpload = isFasilitasiDoc && !isHarmonisasiComplete;
+              const canUpload = canUploadDoc(jenisDok.jenis_dokumen_id) && !isLockedForUpload;
+              const authInfo = getDocAuthority(jenisDok.jenis_dokumen_id);
 
               return (
                 <MapDokumenCard
-                  key={slot.jenis_dokumen_id}
-                  slot={slot}
+                  key={jenisDok.jenis_dokumen_id}
+                  jenisDokumen={jenisDok}
                   doc={doc}
                   isUploaded={isUploaded}
                   isOptional={isOptional}
@@ -614,7 +614,7 @@ export const PeraturanDetailPage = ({
                   canUpload={canUpload}
                   authInfo={authInfo}
                   onView={(d) => setPreviewDoc(d)}
-                  onUpload={(s) => openUploadModal(s)}
+                  onUpload={(jd) => openUploadModal(jd)}
                   formatFileSize={formatFileSize}
                 />
               );
@@ -783,27 +783,27 @@ export const PeraturanDetailPage = ({
       )}
 
       {/* =========================================================================
-          MODAL: UNGGAH DOKUMEN SLOT
+          MODAL: UNGGAH DOKUMEN
           ========================================================================= */}
-      {activeUploadSlot && (
+      {activeUploadDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2B3056]/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-[#2B3056] text-white p-5 flex items-center justify-between border-b border-[#3A4070]">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-white/10 text-[#FFD82B] flex items-center justify-center font-bold text-sm">
-                  {activeUploadSlot.urutan}
+                  {activeUploadDoc.urutan}
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-white">{activeUploadSlot.nama_dokumen}</h3>
+                  <h3 className="text-sm font-extrabold text-white">{activeUploadDoc.nama_dokumen}</h3>
                   <p className="text-[10px] text-slate-300 font-medium">
-                    Slot #{activeUploadSlot.urutan} • {getSlotAuthority(activeUploadSlot.jenis_dokumen_id).roleName}
-                    {activeUploadSlot.jenis_dokumen_id === 6 ? ' • Opsional' : ''}
+                    Dokumen #{activeUploadDoc.urutan} • {getDocAuthority(activeUploadDoc.jenis_dokumen_id).roleName}
+                    {activeUploadDoc.jenis_dokumen_id === 6 ? ' • Opsional' : ''}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveUploadSlot(null)}
+                onClick={() => setActiveUploadDoc(null)}
                 className="text-slate-300 hover:text-white p-1 rounded-lg transition"
               >
                 <X className="w-5 h-5" />
@@ -825,7 +825,7 @@ export const PeraturanDetailPage = ({
                       type="file"
                       ref={fileInputRef}
                       required
-                      accept=".pdf,.doc,.docx"
+                      accept={[5, 7].includes(activeUploadDoc?.jenis_dokumen_id) ? '.pdf' : '.pdf,.doc,.docx'}
                       onChange={(e) => uploadForm.setData('file', e.target.files[0])}
                       className="hidden"
                     />
@@ -841,8 +841,15 @@ export const PeraturanDetailPage = ({
 
                     <div className="flex items-center justify-center gap-1.5 mt-3 pt-3 border-t border-slate-200/60">
                       <span className="px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold">.PDF</span>
-                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">.DOC</span>
-                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">.DOCX</span>
+                      {![5, 7].includes(activeUploadDoc?.jenis_dokumen_id) && (
+                        <>
+                          <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">.DOC</span>
+                          <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">.DOCX</span>
+                        </>
+                      )}
+                      {[5, 7].includes(activeUploadDoc?.jenis_dokumen_id) && (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">Surat Resmi — Wajib PDF</span>
+                      )}
                       <span className="text-[10px] text-slate-400 font-semibold ml-1">Maks. 25MB</span>
                     </div>
                   </div>
@@ -890,7 +897,7 @@ export const PeraturanDetailPage = ({
                         <input
                           type="file"
                           ref={fileInputRef}
-                          accept=".pdf,.doc,.docx"
+                          accept={[5, 7].includes(activeUploadDoc?.jenis_dokumen_id) ? '.pdf' : '.pdf,.doc,.docx'}
                           onChange={(e) => uploadForm.setData('file', e.target.files[0])}
                           className="hidden"
                         />
@@ -923,7 +930,7 @@ export const PeraturanDetailPage = ({
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveUploadSlot(null)}
+                  onClick={() => setActiveUploadDoc(null)}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
                 >
                   Batal
@@ -961,7 +968,7 @@ export const PeraturanDetailPage = ({
                 </div>
                 <div>
                   <h3 className="text-sm font-extrabold text-white">
-                    {statusAction === 'APPROVE' ? 'Persetujuan Hasil Fasilitasi (Selesai)' : 'Pengembalian Berkas Fasilitasi (Perlu Perbaikan)'}
+                    {statusAction === 'APPROVE' ? 'Surat Fasilitasi Rancangan Peraturan (Selesai)' : 'Pengembalian Berkas Fasilitasi (Perlu Perbaikan)'}
                   </h3>
                   <p className="text-[10px] text-slate-300 font-medium">
                     Kewenangan Resmi Biro Hukum Sekretariat Daerah Provinsi Riau
@@ -983,7 +990,7 @@ export const PeraturanDetailPage = ({
               }`}>
                 {statusAction === 'APPROVE' ? (
                   <p>
-                    Rancangan peraturan ini akan disahkan sebagai <strong>SELESAI (TUNTAS)</strong>. Anda dapat melampirkan file <strong>Surat Hasil Fasilitasi / Surat Persetujuan</strong> resmi di bawah ini.
+                    Rancangan peraturan ini akan disahkan sebagai <strong>SELESAI (TUNTAS)</strong>. Anda dapat melampirkan file <strong>Surat Fasilitasi Rancangan Peraturan</strong> resmi (format PDF) di bawah ini.
                   </p>
                 ) : (
                   <p>
@@ -995,7 +1002,7 @@ export const PeraturanDetailPage = ({
               {/* Upload Surat Keputusan */}
               <div>
                 <label className="block text-xs font-bold text-[#2B3056] mb-2">
-                  {statusAction === 'APPROVE' ? 'Lampiran Surat Hasil Fasilitasi / Persetujuan (Opsional)' : 'Lampiran Surat Penolakan / Pengembalian Berkas (Opsional)'}
+                  {statusAction === 'APPROVE' ? 'Lampiran Surat Fasilitasi Rancangan Peraturan (Opsional, PDF)' : 'Lampiran Surat Penolakan / Pengembalian Berkas (Opsional, PDF)'}
                 </label>
 
                 {!statusForm.data.surat_file ? (
@@ -1006,15 +1013,15 @@ export const PeraturanDetailPage = ({
                     <input
                       type="file"
                       ref={suratDecisionInputRef}
-                      accept=".pdf,.doc,.docx"
+                      accept=".pdf"
                       onChange={(e) => statusForm.setData('surat_file', e.target.files[0])}
                       className="hidden"
                     />
                     <Upload className="w-6 h-6 text-[#2B3056] mx-auto mb-1.5 group-hover:scale-105 transition" />
                     <p className="text-xs font-bold text-[#2B3056]">
-                      {statusAction === 'APPROVE' ? 'Pilih file Surat Persetujuan (.PDF, .DOC, .DOCX)' : 'Pilih file Surat Penolakan (.PDF, .DOC, .DOCX)'}
+                      {statusAction === 'APPROVE' ? 'Pilih file Surat Fasilitasi Rancangan Peraturan (.PDF)' : 'Pilih file Surat Penolakan / Pengembalian (.PDF)'}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">Maks. 25MB</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">Format PDF • Maks. 25MB</p>
                   </div>
                 ) : (
                   <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 shadow-2xs flex items-center justify-between">

@@ -60,7 +60,7 @@ class GoogleAuthController extends Controller
             if ($user->status !== 'ACTIVE') {
                 return redirect()->route('login')->with(
                     'error',
-                    'Akun Anda berstatus NON-AKTIF. Silakan hubungi Administrator Sistem Kanwil Kemenkumham Riau.'
+                    'Akun Anda berstatus NON-AKTIF. Silakan hubungi Administrator Sistem Kanwil Kemenkum Riau.'
                 );
             }
 

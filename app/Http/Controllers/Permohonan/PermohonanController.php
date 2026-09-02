@@ -207,7 +207,7 @@ class PermohonanController extends Controller
 
                 Dokumen::create([
                     'rancangan_id' => $rancangan->rancangan_id,
-                    'jenis_dokumen_id' => 1, // Slot 1: Draft Rancangan
+                    'jenis_dokumen_id' => 1, // Dokumen 1: Draft Rancangan
                     'nama_file' => $origName,
                     'path_file' => $storagePath,
                     'ukuran_file' => $fileSize,
@@ -259,7 +259,7 @@ class PermohonanController extends Controller
     }
 
     /**
-     * Tampilkan Detail Berkas Permohonan & 7 Slot Dokumen
+     * Tampilkan Detail Berkas Permohonan & 7 Dokumen
      */
     public function show(Request $request, $id): Response
     {
@@ -398,7 +398,7 @@ class PermohonanController extends Controller
     }
 
     /**
-     * Unggah / Ganti Dokumen pada Slot Dokumen 1-7 dengan Logika Alur Otomatis
+     * Unggah / Ganti Dokumen pada Dokumen 1-7 dengan Logika Alur Otomatis
      */
     public function uploadDokumen(UploadDokumenRequest $request, $id): RedirectResponse
     {
@@ -409,32 +409,32 @@ class PermohonanController extends Controller
         $this->authorizeRancanganAccess($rancangan, $user);
 
         $validated = $request->validated();
-        $slotId = (int) $validated['jenis_dokumen_id'];
+        $jenisDokumenId = (int) $validated['jenis_dokumen_id'];
 
         // RBAC upload permission check
         if (! $user->isAdmin()) {
-            if ($slotId >= 1 && $slotId <= 5 && ! $user->isTimKerja()) {
-                abort(403, 'Akses Ditolak: Hanya Tim Kerja Kanwil yang berwenang mengunggah dokumen slot 1-5.');
+            if ($jenisDokumenId >= 1 && $jenisDokumenId <= 5 && ! $user->isTimKerja()) {
+                abort(403, 'Akses Ditolak: Hanya Tim Kerja Kanwil yang berwenang mengunggah Dokumen 1-5.');
             }
-            if (($slotId === 6 || $slotId === 7) && ! $user->isBiroHukum()) {
-                abort(403, 'Akses Ditolak: Hanya Biro Hukum Setda Provinsi Riau yang berwenang mengunggah dokumen fasilitasi (slot 6-7).');
+            if (($jenisDokumenId === 6 || $jenisDokumenId === 7) && ! $user->isBiroHukum()) {
+                abort(403, 'Akses Ditolak: Hanya Biro Hukum Setda Provinsi Riau yang berwenang mengunggah dokumen fasilitasi (Dokumen 6-7).');
             }
         }
 
-        // SYARAT KHUSUS BIRO HUKUM (SLOT 6 & 7):
-        // Biro Hukum HANYA DAPAT mengunggah dokumen slot 6 dan 7 jika 5 dokumen Tahap Harmonisasi (Slot 1-5) SUDAH LENGKAP!
-        if ($slotId === 6 || $slotId === 7) {
-            $existingHarmonisasiSlots = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+        // SYARAT KHUSUS BIRO HUKUM (DOKUMEN 6 & 7):
+        // Biro Hukum HANYA DAPAT mengunggah dokumen 6 dan 7 jika 5 dokumen Tahap Harmonisasi (Dokumen 1-5) SUDAH LENGKAP!
+        if ($jenisDokumenId === 6 || $jenisDokumenId === 7) {
+            $existingHarmonisasiDocs = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
                 ->whereIn('jenis_dokumen_id', [1, 2, 3, 4, 5])
                 ->pluck('jenis_dokumen_id')
                 ->toArray();
 
-            $missingSlots = array_diff([1, 2, 3, 4, 5], $existingHarmonisasiSlots);
+            $missingDocs = array_diff([1, 2, 3, 4, 5], $existingHarmonisasiDocs);
 
-            if (! empty($missingSlots)) {
+            if (! empty($missingDocs)) {
                 return back()->with(
                     'error',
-                    'Akses Ditolak: Dokumen Tahap Fasilitasi (Slot 6 & 7) belum dapat diunggah karena berkas Tahap Harmonisasi (Slot 1 s.d. 5) belum lengkap diunggah oleh Tim Kerja Kanwil Kemenkumham Riau.'
+                    'Akses Ditolak: Dokumen Tahap Fasilitasi (Dokumen 6 & 7) belum dapat diunggah karena berkas Tahap Harmonisasi (Dokumen 1 s.d. 5) belum lengkap diunggah oleh Tim Kerja Kanwil Kemenkum Riau.'
                 );
             }
         }
@@ -446,12 +446,12 @@ class PermohonanController extends Controller
         $mimeType = $this->guessMimeFromExt($ext);
 
         $existingDoc = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
-            ->where('jenis_dokumen_id', $slotId)
+            ->where('jenis_dokumen_id', $jenisDokumenId)
             ->first();
 
         $version = $existingDoc ? ($existingDoc->versi + 1) : 1;
 
-        $cleanFileName = "slot{$slotId}_v{$version}_" . time() . "_" . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
+        $cleanFileName = "dokumen{$jenisDokumenId}_v{$version}_" . time() . "_" . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
         $targetDir = storage_path("app/secure_drafts/{$rancangan->rancangan_id}");
         if (! file_exists($targetDir)) {
             mkdir($targetDir, 0755, true);
@@ -481,7 +481,7 @@ class PermohonanController extends Controller
         } else {
             Dokumen::create([
                 'rancangan_id' => $rancangan->rancangan_id,
-                'jenis_dokumen_id' => $slotId,
+                'jenis_dokumen_id' => $jenisDokumenId,
                 'nama_file' => $origName,
                 'path_file' => $storagePath,
                 'ukuran_file' => $fileSize,
@@ -495,15 +495,15 @@ class PermohonanController extends Controller
         // =========================================================================
         // PERUBAHAN STATUS OTOMATIS BERBASIS KELENGKAPAN BERKAS (FILE-DRIVEN)
         // =========================================================================
-        $allUploadedSlots = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+        $allUploadedDocIds = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
             ->pluck('jenis_dokumen_id')
             ->toArray();
 
-        $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($allUploadedSlots);
-        $isFasilitasiComplete = PermohonanWorkflowService::isFasilitasiComplete($allUploadedSlots);
+        $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($allUploadedDocIds);
+        $isFasilitasiComplete = PermohonanWorkflowService::isFasilitasiComplete($allUploadedDocIds);
 
         if ($isFasilitasiComplete) {
-            // Slot 6 bersifat opsional. Slot 1-5 dan Slot 7 lengkap -> Status beralih ke SELESAI (4)
+            // Dokumen 6 bersifat opsional. Dokumen 1-5 dan Dokumen 7 lengkap -> Status beralih ke SELESAI (4)
             if ($rancangan->status_id !== 4) {
                 $rancangan->update([
                     'status_id' => 4,
@@ -511,7 +511,7 @@ class PermohonanController extends Controller
                 ]);
             }
         } elseif ($isHarmonisasiComplete) {
-            // Jika 5 slot dokumen harmonisasi lengkap -> Status beralih ke PROSES FASILITASI (3)
+            // Jika 5 dokumen harmonisasi lengkap -> Status beralih ke PROSES FASILITASI (3)
             if ($rancangan->status_id !== 3 && $rancangan->status_id !== 4) {
                 $rancangan->update([
                     'status_id' => 3,
@@ -523,21 +523,21 @@ class PermohonanController extends Controller
                 NotifikasiService::notifyBiroHukum(
                     $rancangan,
                     'Permohonan Siap Difasilitasi',
-                    "Dokumen harmonisasi Kanwil untuk '{$rancangan->judul_rancangan}' ({$kabName}) telah lengkap 5 slot. Berkas siap untuk ditelaah dan difasilitasi oleh Biro Hukum."
+                    "Dokumen harmonisasi Kanwil untuk '{$rancangan->judul_rancangan}' ({$kabName}) telah lengkap 5 dokumen. Berkas siap untuk ditelaah dan difasilitasi oleh Biro Hukum."
                 );
             }
         } else {
-            // Jika Tim Kerja mengunggah kelanjutan pembahasan (Slot 2, 3, atau 4) saat status masih Draf Awal (1) -> Otomatis beralih ke PROSES HARMONISASI (2)
-            if (in_array($slotId, [2, 3, 4]) && $rancangan->status_id === 1) {
+            // Jika Tim Kerja mengunggah kelanjutan pembahasan (Dokumen 2, 3, atau 4) saat status masih Draf Awal (1) -> Otomatis beralih ke PROSES HARMONISASI (2)
+            if (in_array($jenisDokumenId, [2, 3, 4]) && $rancangan->status_id === 1) {
                 $rancangan->update([
                     'status_id' => 2,
-                    'keterangan' => 'Dokumen pembahasan harmonisasi sedang dilengkapi dan diproses oleh Tim Kerja Kanwil Kemenkumham Riau.',
+                    'keterangan' => 'Dokumen pembahasan harmonisasi sedang dilengkapi dan diproses oleh Tim Kerja Kanwil Kemenkum Riau.',
                 ]);
             }
         }
 
-        $jenisDoc = JenisDokumen::find($slotId);
-        $namaDoc = $jenisDoc ? $jenisDoc->nama_dokumen : "Dokumen Slot #{$slotId}";
+        $jenisDoc = JenisDokumen::find($jenisDokumenId);
+        $namaDoc = $jenisDoc ? $jenisDoc->nama_dokumen : "Dokumen #{$jenisDokumenId}";
 
         AuditLog::create([
             'user_id' => $user->user_id,
@@ -548,7 +548,7 @@ class PermohonanController extends Controller
             'user_agent' => $request->userAgent(),
             'payload' => [
                 'rancangan_id' => $rancangan->rancangan_id,
-                'slot_id' => $slotId,
+                'jenis_dokumen_id' => $jenisDokumenId,
                 'nama_dokumen' => $namaDoc,
                 'file_name' => $origName,
                 'versi' => $version,
@@ -588,11 +588,11 @@ class PermohonanController extends Controller
             $ext = strtolower($file->getClientOriginalExtension());
             $mimeType = $this->guessMimeFromExt($ext);
 
-            $existingSlot7 = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+            $existingDoc7 = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
                 ->where('jenis_dokumen_id', 7)
                 ->first();
 
-            $version = $existingSlot7 ? ($existingSlot7->versi + 1) : 1;
+            $version = $existingDoc7 ? ($existingDoc7->versi + 1) : 1;
             $prefix = $newStatusId === 4 ? 'surat_persetujuan_' : 'surat_penolakan_';
             $cleanFileName = "{$prefix}v{$version}_" . time() . "_" . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
 
@@ -604,15 +604,15 @@ class PermohonanController extends Controller
 
             $storagePath = "secure_drafts/{$rancangan->rancangan_id}/{$cleanFileName}";
 
-            if ($existingSlot7) {
-                if ($existingSlot7->path_file) {
-                    $oldPath = $this->resolveSecureFilePath($existingSlot7);
+            if ($existingDoc7) {
+                if ($existingDoc7->path_file) {
+                    $oldPath = $this->resolveSecureFilePath($existingDoc7);
                     if ($oldPath && file_exists($oldPath)) {
                         @unlink($oldPath);
                     }
                 }
 
-                $existingSlot7->update([
+                $existingDoc7->update([
                     'nama_file' => $origName,
                     'path_file' => $storagePath,
                     'ukuran_file' => $fileSize,

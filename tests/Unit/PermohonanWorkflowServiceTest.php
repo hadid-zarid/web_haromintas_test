@@ -7,21 +7,22 @@ use PHPUnit\Framework\TestCase;
 
 class PermohonanWorkflowServiceTest extends TestCase
 {
-    public function test_fasilitasi_can_be_completed_without_optional_slot_six(): void
+    public function test_fasilitasi_can_be_completed_without_optional_document_six(): void
     {
-        $uploadedSlots = [1, 2, 3, 4, 5, 7];
+        $uploadedDocs = [1, 2, 3, 4, 5, 7];
 
         $this->assertTrue(
-            PermohonanWorkflowService::isFasilitasiComplete($uploadedSlots)
+            PermohonanWorkflowService::isFasilitasiComplete($uploadedDocs)
         );
     }
 
-    public function test_fasilitasi_cannot_be_completed_without_required_slot_seven(): void
+    public function test_fasilitasi_cannot_be_completed_without_required_document_seven(): void
     {
-        $uploadedSlots = [1, 2, 3, 4, 5, 6];
+        $uploadedDocs = [1, 2, 3, 4, 5, 6];
 
         $this->assertFalse(
-            PermohonanWorkflowService::isFasilitasiComplete($uploadedSlots)
+            PermohonanWorkflowService::isFasilitasiComplete($uploadedDocs)
         );
     }
 }
+

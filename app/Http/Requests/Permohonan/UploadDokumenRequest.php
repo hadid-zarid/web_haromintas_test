@@ -24,7 +24,15 @@ class UploadDokumenRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     if ($value && $value->isValid()) {
                         $ext = strtolower($value->getClientOriginalExtension());
-                        if (! in_array($ext, ['pdf', 'doc', 'docx'])) {
+                        $jenisDokumenId = (int) $this->input('jenis_dokumen_id');
+
+                        // Dokumen 5 (Surat Resmi Hasil Harmonisasi) dan Dokumen 7 (Surat Keputusan Fasilitasi)
+                        // wajib berformat PDF karena merupakan surat resmi yang ditandatangani.
+                        if (in_array($jenisDokumenId, [5, 7])) {
+                            if ($ext !== 'pdf') {
+                                $fail('Surat resmi hasil harmonisasi/fasilitasi wajib diunggah dalam format PDF.');
+                            }
+                        } elseif (! in_array($ext, ['pdf', 'doc', 'docx'])) {
                             $fail('Format berkas dokumen harus berupa PDF, DOC, atau DOCX.');
                         }
                     }
@@ -37,8 +45,8 @@ class UploadDokumenRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'jenis_dokumen_id.required' => 'Slot jenis dokumen wajib ditentukan.',
-            'jenis_dokumen_id.in' => 'Slot jenis dokumen tidak valid.',
+            'jenis_dokumen_id.required' => 'Jenis dokumen wajib ditentukan.',
+            'jenis_dokumen_id.in' => 'Jenis dokumen tidak valid.',
             'file.required' => 'Berkas dokumen wajib diunggah.',
             'file.max' => 'Ukuran berkas dokumen maksimal 25MB.',
         ];

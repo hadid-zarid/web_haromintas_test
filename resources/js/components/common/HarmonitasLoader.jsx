@@ -17,7 +17,7 @@ export const HarmonitasLoader = ({
   steps = [
     "Menghubungkan ke layanan HARMONITAS...",
     "Memvalidasi sesi autentikasi pengguna...",
-    "Memuat struktur dokumen 7 slot permohonan...",
+    "Memuat struktur 7 dokumen permohonan...",
     "Sinkronisasi database JDIH & Kanwil Kemenkum Provinsi Riau...",
     "Menyiapkan ruang kerja digital...",
   ],

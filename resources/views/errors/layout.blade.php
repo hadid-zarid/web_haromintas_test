@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="{{ asset('LOGO HARMONITAS.png') }}" />
     <link rel="shortcut icon" type="image/png" href="{{ asset('LOGO HARMONITAS.png') }}" />
-    <title>@yield('title') - HARMONITAS Kanwil Kemenkumham Riau</title>
+    <title>@yield('title') - HARMONITAS Kanwil Kemenkum Riau</title>
 
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
