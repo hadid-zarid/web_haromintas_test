@@ -707,7 +707,7 @@ export const PeraturanListPage = ({
                     <PlusCircle className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-white">Tambah Permohonan Regulasi Baru</h3>
+                    <h3 className="text-sm font-extrabold text-white">Tambah Permohonan Harmonisasi Baru</h3>
                     <p className="text-[10px] text-slate-300 font-medium">
                       Pengajuan berkas Ranperda / Ranperkada ke Kanwil Kemenkum Provinsi Riau
                     </p>

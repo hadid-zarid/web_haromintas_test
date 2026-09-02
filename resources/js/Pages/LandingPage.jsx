@@ -885,7 +885,7 @@ export const LandingPage = () => {
                 </h2>
 
                 <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base font-normal text-slate-600 leading-relaxed">
-                  Layanan fasilitasi permohonan regulasi untuk 1 Pemerintah Provinsi dan seluruh 12 Kabupaten/Kota di Riau terbagi dalam 3 Tim Kerja Perancang.
+                  Layanan fasilitasi Harmonisas untuk 1 Pemerintah Provinsi dan seluruh 12 Kabupaten/Kota di Riau terbagi dalam 3 Tim Kerja Perancang.
                 </p>
               </div>
             </Reveal>
@@ -992,12 +992,12 @@ export const LandingPage = () => {
 
                               <span
                                 className={`text-xs font-bold shrink-0 px-2 py-0.5 rounded-md ${w.isGov
-                                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                    : w.isCapital
-                                      ? 'bg-blue-100 text-blue-900 border border-blue-300'
-                                      : w.isCity
-                                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                        : 'bg-slate-200/80 text-slate-700'
+                                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                  : w.isCapital
+                                    ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                    : w.isCity
+                                      ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                      : 'bg-slate-200/80 text-slate-700'
                                   }`}
                               >
                                 {w.type}
