@@ -28,28 +28,30 @@ Fitur **Notifikasi Terintegrasi** ini dibangun dengan tujuan:
 - **Executive Summary bagi Pimpinan**: Memberikan notifikasi pencapaian (*milestone*) saat produk hukum daerah tuntas disahkan.
 - **Bebas Spam untuk Administrator**: Akun Admin difokuskan pada pemeliharaan sistem tanpa dibebani notifikasi alur operasional permohonan.
 
----
-
 ## 2. Sistem Notifikasi Ganda (Dual-Channel Notifications)
 
-Sistem HARMONITAS menerapkan mekanisme **Dual-Channel Delivery**:
+Sistem HARMONITAS menerapkan mekanisme **Dual-Channel Delivery** yang cerdas (*Smart & Fail-Safe Delivery*):
 1. **Channel 1: In-App Notification (Web Database)**
    - Tersimpan di tabel database `notifikasi`.
    - Ditampilkan langsung pada ikon lonceng header dengan *unread badge counter*.
    - Navigasi instan 1-klik menuju halaman berkas terkait.
-2. **Channel 2: Email Dispatch (Gmail / SMTP Mailer)**
+   - **Selalu dibuat 100% untuk semua akun yang relevan** (baik akun dummy untuk simulasi/demo maupun akun riil).
+2. **Channel 2: Email Dispatch (Gmail / SMTP Mailer dengan Validasi DNS MX)**
    - Mengirimkan email berdesain resmi dengan **Logo HARMONITAS**, ringkasan data regulasi, dan tombol aksi langsung (*Direct CTA Link*).
-   - Dilengkapi proteksi **Fail-Safe (`try...catch`)** agar jika server mail offline, transaksi alur kerja web tetap berhasil 100%.
+   - **Validasi DNS MX Record Dinamis**: Sebelum menghubungi server SMTP, sistem secara otomatis memeriksa apakah domain email penerima memiliki *Mail Exchange (MX) Record* aktif di internet:
+     - 🛡️ **Domain Dummy / Simulasi (tanpa MX Record, misal `@harmonitas.go.id`)**: Pengiriman SMTP dilewati secara otomatis (*gracefully skipped*). Notifikasi lonceng di web tetap dibuat 100%, sistem terhindar dari *timeout/lag*, dan pengirim tidak menerima pesan *bounce* (*"Address not found"*).
+     - ✉️ **Domain Email Riil / Aktif (misal `@gmail.com`, `@mahasiswa.pcr.ac.id`)**: Email kedinasan resmi langsung dikirim ke kotak masuk (*inbox*) pengguna.
+   - Dilengkapi proteksi **Fail-Safe (`try...catch \Throwable`)** agar jika server mail offline atau jaringan terganggu, transaksi alur kerja web tetap berhasil 100% tanpa pernah memicu Error 500.
 
 ---
 
 ## 3. Matriks Peran (Role) & Aturan Notifikasi
 
 | Peran (Role) | Role ID | Akun Default | Notifikasi yang Diterima | Notifikasi yang Dikecualikan | Saluran Pengiriman |
-| :--- | :---: | :--- | :--- | :--- | :---: |
-| **Biro Hukum** | `3` | `birohukum.riau@harmonitas.go.id` | 1. Berkas 5 dokumen harmonisasi lengkap (Siap Fasilitasi)<br>2. Unggah pembaruan berkas revisi oleh Tim Kerja | - Pendaftaran draf awal<br>- Unggah dokumen perantara (dokumen 2-4) | In-App + Email |
-| **Tim Kerja 1, 2, 3** | `2` | `timkerja1@harmonitas.go.id`<br>`timkerja2@harmonitas.go.id`<br>`timkerja3@harmonitas.go.id` | 1. Permohonan baru terdaftar di wilayah binaannya<br>2. Biro Hukum menyetujui fasilitasi (*Status: Selesai*)<br>3. Biro Hukum mengembalikan berkas (*Status: Perlu Perbaikan*) | - Berkas di luar wilayah binaan kerja masing-masing | In-App + Email |
-| **Pimpinan**<br>*(Kakanwil & Kadiv)* | `4` | `kakanwil.riau@harmonitas.go.id`<br>`kadiv.kumham@harmonitas.go.id` | 1. **Milestone Selesai**: Produk hukum daerah selesai difasilitasi (*Status: Selesai*) | - Notifikasi mikro teknis (unggah berkas dokumen 1-5, revisi draf, dll) | In-App + Email |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| **Biro Hukum** | `3` | `birohukum.riau@harmonitas.go.id` | 1. Berkas 5 slot harmonisasi lengkap (Siap Fasilitasi)<br>2. Unggah pembaruan berkas revisi oleh Tim Kerja | - Pendaftaran draf awal<br>- Unggah slot perantara (slot 2-4) | In-App + Email (Jika domain aktif) |
+| **Tim Kerja 1, 2, 3** | `2` | `timkerja1@harmonitas.go.id`<br>`timkerja2@harmonitas.go.id`<br>`timkerja3@harmonitas.go.id` | 1. Permohonan baru terdaftar di wilayah binaannya<br>2. Biro Hukum menyetujui fasilitasi (*Status: Selesai*)<br>3. Biro Hukum mengembalikan berkas (*Status: Perlu Perbaikan*) | - Berkas di luar wilayah binaan kerja masing-masing | In-App + Email (Jika domain aktif) |
+| **Pimpinan**<br>*(Kakanwil & Kadiv)* | `4` | `kakanwil.riau@harmonitas.go.id`<br>`kadiv.kumham@harmonitas.go.id` | 1. **Milestone Selesai**: Produk hukum daerah selesai difasilitasi (*Status: Selesai*) | - Notifikasi mikro teknis (unggah berkas slot 1-5, revisi draf, dll) | In-App + Email (Jika domain aktif) |
 | **Administrator** | `1` | `admin@harmonitas.go.id` | **Tidak menerima notifikasi operasional** (Panel pasif sistem) | - Seluruh notifikasi alur kerja regulasi daerah | Panel Pasif |
 
 ---
@@ -108,10 +110,16 @@ Seluruh template email menggunakan format responsif berbasis tabel standar email
 
 ---
 
-## 6. Panduan Konfigurasi Email (Gmail SMTP / Log) di .env
+## 6. Panduan Konfigurasi Email & Antrean di .env
 
-### Mode Development (Default - Tanpa Kirim Email Asli):
-Secara default, Laravel menyimpan seluruh pesan email yang terkirim ke dalam file log:
+### Konfigurasi Antrean (Queue):
+Untuk memastikan notifikasi email dikirim secara langsung tanpa memerlukan service worker terpisah, gunakan driver `sync`:
+```env
+QUEUE_CONNECTION=sync
+```
+
+### Mode Development (Default - Log File):
+Secara default pada masa pengembangan lokal tanpa koneksi SMTP:
 ```env
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS="notifikasi@harmonitas.go.id"
@@ -120,13 +128,13 @@ MAIL_FROM_NAME="HARMONITAS Kanwil Kemenkum Riau"
 *Isi email dapat diperiksa langsung di file: `storage/logs/laravel.log`.*
 
 ### Mode Produksi (Kirim Langsung ke Gmail Asli via SMTP):
-Untuk mengirimkan email langsung ke akun Gmail penerima, gunakan akun Google dengan fitur **App Password (Sandi Aplikasi 16 Digit)**:
+Untuk mengirimkan email langsung ke akun Gmail penerima:
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
 MAIL_USERNAME=email_dinas_anda@gmail.com
-MAIL_PASSWORD=xxxx-xxxx-xxxx-xxxx  # Masukkan 16 digit Sandi Aplikasi Google
+MAIL_PASSWORD=xxxx-xxxx-xxxx-xxxx  # 16 digit Sandi Aplikasi (App Password) Google
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="notifikasi@harmonitas.go.id"
 MAIL_FROM_NAME="HARMONITAS Kanwil Kemenkum Riau"
@@ -175,7 +183,7 @@ Komponen utama: `resources/js/components/layout/NotificationDropdown.jsx`
 
 ---
 
-## 9. Tabel Pengujian Manual Black Box Testing (14 Skenario)
+## 9. Tabel Pengujian Manual Black Box Testing (15 Skenario)
 
 Gunakan tabel berikut untuk memverifikasi fungsionalitas notifikasi (In-App & Email) secara menyeluruh:
 
@@ -202,9 +210,10 @@ Gunakan tabel berikut untuk memverifikasi fungsionalitas notifikasi (In-App & Em
 | **9** | **Trigger Notifikasi Milestone Pimpinan (Kakanwil & Kadiv)** | 1. Lakukan persetujuan regulasi hingga berstatus *4 - Selesai* oleh Biro Hukum.<br>2. Login sebagai Kakanwil atau Kadiv. | Biro Hukum ➔ Kakanwil / Kadiv | Kakanwil & Kadiv menerima notifikasi pencapaian: *"Produk Hukum Daerah Selesai"*. | [ ] Pass<br>[ ] Fail |
 | **10** | **Verifikasi Pengecualian Akun Admin** | 1. Jalankan proses unggah dan perubahan status.<br>2. Login sebagai Administrator (`admin@harmonitas.go.id`).<br>3. Buka dropdown notifikasi. | Admin | Tidak ada badge angka dan dropdown menampilkan informasi akun administrator sistem (bebas dari notifikasi operasional). | [ ] Pass<br>[ ] Fail |
 | **11** | **Proteksi Keamanan Akses (IDOR Defense)** | Coba lakukan request API `POST /notifikasi/{id_milik_user_lain}/read`. | User Lain via Postman / Fetch | Server mengembalikan respon `403 Forbidden` (Akses Ditolak). | [ ] Pass<br>[ ] Fail |
-| **12** | **Pengiriman Email Notifikasi Alur Kerja (Workflow Email)** | 1. Lakukan trigger notifikasi (misal: 5 dokumen lengkap atau persetujuan fasilitasi).<br>2. Buka `storage/logs/laravel.log` atau kotak masuk Gmail penerima. | Tim Kerja / Biro Hukum | Email resmi dengan subjek `[HARMONITAS] ...`, Logo HARMONITAS, ringkasan berkas, dan tombol CTA terkirim dengan rapi. | [ ] Pass<br>[ ] Fail |
+| **12** | **Pengiriman Email Notifikasi Alur Kerja (Workflow Email)** | 1. Lakukan trigger notifikasi pada akun dengan email riil/aktif.<br>2. Buka `storage/logs/laravel.log` atau kotak masuk Gmail penerima. | Tim Kerja / Biro Hukum | Email resmi dengan subjek `[HARMONITAS] ...`, Logo HARMONITAS, ringkasan berkas, dan tombol CTA terkirim langsung ke kotak masuk pengguna. | [ ] Pass<br>[ ] Fail |
 | **13** | **Pengiriman Email Reset Password Berlogo** | 1. Buka halaman `/forgot-password`.<br>2. Masukkan email kedinasan terdaftar dan klik kirim.<br>3. Periksa email yang masuk. | Semua Akun | Email pemulihan kata sandi memuat logo HARMONITAS, tombol reset emas, dan catatan keamanan 60 menit. | [ ] Pass<br>[ ] Fail |
 | **14** | **Ketahanan Kegagalan Pengiriman Email (Fail-Safe)** | Putuskan koneksi internet / simulasikan error SMTP, lalu lakukan submit alur kerja regulasi di web. | Tim Kerja / Biro Hukum | Transaksi web tetap sukses, notifikasi in-app tetap tersimpan, dan error email hanya dicatat di log tanpa merusak alur kerja user. | [ ] Pass<br>[ ] Fail |
+| **15** | **Smart DNS MX Validation (Akun Dummy vs Riil)** | Buat permohonan baru pada wilayah yang memiliki kombinasi akun dummy (`@harmonitas.go.id`) dan akun riil. | Tim Kerja / Biro Hukum | Form tersimpan instan tanpa loading lama/timeout, notifikasi lonceng in-app bertambah pada akun dummy, dan pengiriman email SMTP hanya dilakukan ke alamat domain yang memiliki MX Record aktif. | [ ] Pass<br>[ ] Fail |
 
 ---
 
