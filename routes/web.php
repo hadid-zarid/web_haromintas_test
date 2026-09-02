@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
     // Draft Generate Surat
     Route::get('/draft-generate', function () {
         return Inertia::render('DraftGeneratePage');
-    })->name('draft.generate')->middleware('role:TIM_KERJA');
+    })->name('draft.generate');
 
     // Notifikasi Sistem
     Route::get('/notifikasi', [\App\Http\Controllers\NotifikasiController::class, 'index'])->name('notifikasi.index');
@@ -150,7 +150,7 @@ Route::middleware('auth')->group(function () {
             ], 500);
         }
 
-        $zip = new ZipArchive();
+        $zip = new \ZipArchive();
         if ($zip->open($tempFile) === true) {
             $xml = $zip->getFromName('word/document.xml');
             if ($xml === false) {

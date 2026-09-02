@@ -273,6 +273,7 @@ export const PeraturanDetailPage = ({
   const [activeUploadDoc, setActiveUploadDoc] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusAction, setStatusAction] = useState('APPROVE');
   const [activityPage, setActivityPage] = useState(1);
   const ACTIVITIES_PER_PAGE = 5;
   const totalActivityPages = Math.ceil((auditLogs?.length || 0) / ACTIVITIES_PER_PAGE) || 1;

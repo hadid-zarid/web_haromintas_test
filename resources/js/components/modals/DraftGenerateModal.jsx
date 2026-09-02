@@ -267,114 +267,107 @@ export const DraftGenerateModal = ({
     const printContent = printAreaRef.current;
     if (!printContent) return;
 
-    const printWindow = window.open('', '_blank', 'width=900,height=1000');
-    printWindow.document.write(`
+    // Remove any previous hidden print iframe
+    const oldIframe = document.getElementById('harmonitas-print-iframe');
+    if (oldIframe) {
+      oldIframe.remove();
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'harmonitas-print-iframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8">
-          <title>Cetak - Surat Selesai ${letterType.toUpperCase()} - W.4-PP.04.02-${formData.nomorSurat}</title>
+          <title>Surat Selesai ${letterType.toUpperCase()} - W.4-PP.04.02-${formData.nomorSurat}</title>
           <style>
-            @page { size: A4 portrait; margin: 15mm 20mm 20mm 20mm; }
-            * { box-sizing: border-box; }
-            body {
-              font-family: Arial, Helvetica, "Bookman Old Style", sans-serif;
-              font-size: 11pt;
-              line-height: 1.4;
-              color: #000000;
-              margin: 0; padding: 0; background: #ffffff;
+            @page {
+              size: A4 portrait;
+              margin: 12mm 20mm 15mm 25mm;
+            }
+            * {
+              box-sizing: border-box;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            body > div, .print-paper {
-              width: 100% !important; max-width: 100% !important;
-              padding: 0 !important; margin: 0 !important;
-              box-shadow: none !important; border: none !important;
-              background: #ffffff !important; min-height: auto !important;
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+              font-family: Arial, Helvetica, sans-serif !important;
+              font-size: 11pt !important;
+              color: #000000 !important;
+              width: 100% !important;
             }
-            .flex { display: flex !important; }
-            .flex-col { flex-direction: column !important; }
-            .items-center { align-items: center !important; }
-            .justify-between { justify-content: space-between !important; }
-            .justify-end { justify-content: flex-end !important; }
-            .shrink-0 { flex-shrink: 0 !important; }
-            .flex-1 { flex: 1 1 0% !important; }
-            table { width: 100% !important; border-collapse: collapse !important; }
-            td { vertical-align: top; }
-            .align-middle { vertical-align: middle !important; }
-            .align-top { vertical-align: top !important; }
-            .text-center { text-align: center !important; }
-            .text-right { text-align: right !important; }
-            .text-left { text-align: left !important; }
-            .text-justify { text-align: justify !important; text-justify: inter-word !important; }
-            .whitespace-nowrap { white-space: nowrap !important; }
-            .indent-9 { text-indent: 38px !important; }
-            .signature-container {
-              margin-top: 40px !important; width: 100% !important;
-              display: flex !important; justify-content: flex-end !important;
+            .print-paper {
+              width: 100% !important;
+              max-width: 100% !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
             }
-            .signature-box {
-              width: 260px !important; margin-left: auto !important;
-              float: right !important; text-align: left !important; font-size: 11pt !important;
+            table {
+              width: 100% !important;
+              border-collapse: collapse !important;
+              font-family: Arial, sans-serif !important;
             }
-            p { margin: 0 0 12px 0; text-align: justify; line-height: 1.4; }
-            ol { margin: 0; padding-left: 20px; }
-            li { margin-bottom: 2px; }
-            .w-24 { width: 90px !important; min-width: 90px !important; }
-            .w-20 { width: 75px !important; }
-            .h-24 { height: 90px !important; }
-            .w-16 { width: 70px !important; }
-            .w-4 { width: 15px !important; }
-            .w-64 { width: 260px !important; }
-            .w-full { width: 100% !important; }
-            .m-0 { margin: 0 !important; }
-            .mb-1 { margin-bottom: 4px !important; }
-            .mb-4 { margin-bottom: 16px !important; }
-            .mb-5 { margin-bottom: 20px !important; }
-            .mb-14 { margin-bottom: 56px !important; }
-            .mt-0\.5 { margin-top: 2px !important; }
-            .mt-1 { margin-top: 4px !important; }
-            .mt-8 { margin-top: 30px !important; }
-            .mt-10 { margin-top: 40px !important; }
-            .my-5 { margin-top: 20px !important; margin-bottom: 20px !important; }
-            .pb-2 { padding-bottom: 8px !important; }
-            .pr-4 { padding-right: 16px !important; }
-            .py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
-            .py-0\.5 { padding-top: 2px !important; padding-bottom: 2px !important; }
-            .pl-5 { padding-left: 20px !important; }
-            .border-b-2 { border-bottom: 2.5px solid #000000 !important; }
-            .border-black { border-color: #000000 !important; }
-            .text-\[12pt\] { font-size: 12pt !important; }
-            .text-\[13pt\] { font-size: 13pt !important; }
-            .text-\[9pt\] { font-size: 9pt !important; }
-            .text-\[10pt\] { font-size: 10pt !important; }
-            .text-\[11pt\] { font-size: 11pt !important; }
-            .font-normal { font-weight: normal !important; }
-            .font-bold { font-weight: bold !important; }
-            .tracking-wide { letter-spacing: 0.5px !important; }
-            .uppercase { text-transform: uppercase !important; }
-            .leading-tight { line-height: 1.25 !important; }
-            .leading-snug { line-height: 1.4 !important; }
-            .leading-relaxed { line-height: 1.5 !important; }
-            .underline { text-decoration: underline !important; }
-            .text-blue-700 { color: #1d4ed8 !important; }
+            td {
+              vertical-align: top !important;
+              padding: 0 !important;
+            }
+            img {
+              width: 65px !important;
+              max-width: 65px !important;
+              height: 74px !important;
+              object-fit: contain !important;
+              display: block !important;
+              margin: 0 auto !important;
+            }
+            p {
+              margin: 0 0 12px 0 !important;
+              text-align: justify !important;
+              text-justify: inter-word !important;
+              line-height: 1.35 !important;
+              font-family: Arial, sans-serif !important;
+            }
+            ol {
+              margin: 0 !important;
+              padding-left: 20px !important;
+              font-size: 10pt !important;
+            }
+            li {
+              margin-bottom: 2px !important;
+              font-size: 10pt !important;
+            }
           </style>
         </head>
         <body>
-          ${printContent.innerHTML}
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-                setTimeout(function() { window.close(); }, 500);
-              }, 350);
-            };
-          </script>
+          <div class="print-paper">
+            ${printContent.innerHTML}
+          </div>
         </body>
       </html>
     `);
-    printWindow.document.close();
-    showToast('Membuka dialog cetak PDF...', 'success');
+    doc.close();
+
+    showToast('Membuka dialog cetak PDF...', 'info');
+
+    // Wait a brief moment for layout/images to finish parsing in the iframe
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }, 450);
   };
 
   const handleDownloadDocx = () => {
@@ -448,11 +441,11 @@ export const DraftGenerateModal = ({
     const fullText = `
 KEMENTERIAN HUKUM REPUBLIK INDONESIA
 KANTOR WILAYAH RIAU
-Jl. Jend. Sudirman No. 233, Kec. Pekanbaru Kota, Kota Pekanbaru
-Telepon: (0761) 853000
-Laman: https://riau.kemenkum.go.id/ Pos-el: harmonitas.kanwil@kemenkum.go.id
+Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
+Telepon: (0761) 23846 - 0811-6904-422
+Laman: https://riau.kemenkum.go.id/ Pos-el: subbidfpphdriaubedelau@gmail.com
 
-Nomor : ${formData.nomorSurat}                                                                      ${formData.tanggalSurat}
+Nomor : ${formData.nomorSurat.startsWith('W.4-PP.04.02-') ? formData.nomorSurat : `W.4-PP.04.02-${formData.nomorSurat}`}                                                                      ${formData.tanggalSurat}
 Sifat : Penting
 Hal   : ${formData.hal}
 
@@ -829,44 +822,45 @@ Tembusan:
               ref={printAreaRef}
               className="bg-white text-black w-full max-w-[760px] p-8 sm:p-12 shadow-2xl rounded-xs min-h-[920px] select-text"
               style={{
-                fontFamily: 'Arial, Helvetica, "Segoe UI", sans-serif',
+                fontFamily: 'Arial, Helvetica, sans-serif',
                 fontSize: '11pt',
-                lineHeight: '1.38',
+                lineHeight: '1.25',
                 color: '#000000'
               }}
             >
               {/* KOP SURAT RESMI KANWIL KEMENKUM PROVINSI RIAU */}
-              <div className="border-b-2 border-black pb-2 mb-4">
-                <table className="w-full border-collapse">
+              <div className="border-b-2 border-black pb-1 mb-4" style={{ borderBottom: '2.5px solid #000000', paddingBottom: '6px', marginBottom: '16px' }}>
+                <table className="w-full border-collapse" style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>
                     <tr>
-                      <td className="w-24 align-middle pr-4 py-0 shrink-0">
-                        <LogoPengayoman
-                          className="w-20 h-24 rounded-none shadow-none"
-                          bgColor="#0B1A38"
-                          symbolColor="#FFDE00"
+                      <td className="align-middle text-center shrink-0" style={{ width: '75px', minWidth: '75px', maxWidth: '75px', verticalAlign: 'middle', textAlign: 'center', paddingRight: '12px', paddingLeft: '0' }}>
+                        <img
+                          src="/images/logo_kemenkum_surat.png"
+                          alt="Logo Pengayoman"
+                          width="65"
+                          height="74"
+                          style={{ width: '65px', height: '74px', objectFit: 'contain', margin: '0 auto', display: 'block' }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
                       </td>
-                      <td className="align-middle text-center text-black py-0">
-                        <p className="text-[11.5pt] font-normal tracking-wide uppercase m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      <td className="align-middle text-center text-black" style={{ verticalAlign: 'middle', textAlign: 'center', padding: 0 }}>
+                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', fontWeight: 'normal', textTransform: 'uppercase', lineHeight: '1.2', margin: '0' }}>
                           KEMENTERIAN HUKUM REPUBLIK INDONESIA
-                        </p>
-                        <p className="text-[12.5pt] font-bold tracking-wide uppercase m-0 mt-0.5 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        </div>
+                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11.5pt', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '1.2', margin: '2px 0 0 0' }}>
                           KANTOR WILAYAH RIAU
-                        </p>
-                        <p className="text-[9pt] font-normal text-black m-0 mt-1 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          Jl. Jend. Sudirman No. 233, Kec. Pekanbaru Kota, Kota Pekanbaru, Riau
-                        </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          Telepon: (0761) 853000
-                        </p>
-                        <p className="text-[9pt] font-normal text-black m-0 leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          Laman:{' '}
-                          <span className="text-blue-700 underline">
-                            https://riau.kemenkum.go.id/
-                          </span>{' '}
-                          Pos-el: harmonitas.kanwil@kemenkum.go.id
-                        </p>
+                        </div>
+                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '3px 0 0 0' }}>
+                          Jl. Jend. Sudirman No.233, Kec. Pekanbaru Kota, Kota Pekanbaru
+                        </div>
+                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
+                          Telepon: (0761) 23846 - 0811-6904-422
+                        </div>
+                        <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '9pt', fontWeight: 'normal', lineHeight: '1.2', margin: '1px 0 0 0' }}>
+                          Laman: <span style={{ textDecoration: 'underline', color: '#1d4ed8' }}>https://riau.kemenkum.go.id/</span> &nbsp;Pos-el: subbidfpphdriaubedelau@gmail.com
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -875,60 +869,65 @@ Tembusan:
 
               {/* INFORMASI NOMOR, TANGGAL, SIFAT, HAL */}
               <table
-                className="w-full text-[11pt] mb-4 border-collapse"
+                className="w-full mb-4 border-collapse"
                 style={{
+                  width: '100%',
                   fontFamily: 'Arial, sans-serif',
-                  tableLayout: 'fixed'
+                  fontSize: '11pt',
+                  marginBottom: '16px',
+                  tableLayout: 'fixed',
+                  borderCollapse: 'collapse'
                 }}
               >
                 <colgroup>
                   <col style={{ width: '60px' }} />
                   <col style={{ width: '15px' }} />
-                  <col style={{ width: '56%' }} />
+                  <col style={{ width: '58%' }} />
                   <col style={{ width: 'auto' }} />
                 </colgroup>
                 <tbody>
                   <tr>
-                    <td className="align-top py-0.5 whitespace-nowrap">Nomor</td>
-                    <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5">
+                    <td style={{ verticalAlign: 'top', padding: '1px 0', whiteSpace: 'nowrap' }}>Nomor</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}>:</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0', whiteSpace: 'nowrap' }}>
                       {formData.nomorSurat.startsWith('W.4-PP.04.02-')
                         ? formData.nomorSurat
                         : `W.4-PP.04.02-${formData.nomorSurat}`}
                     </td>
-                    <td className="text-right align-top py-0.5 whitespace-nowrap">
+                    <td style={{ verticalAlign: 'top', padding: '1px 0', textAlign: 'right', whiteSpace: 'nowrap' }}>
                       {formData.tanggalSurat}
                     </td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5 whitespace-nowrap">Sifat</td>
-                    <td className="align-top py-0.5">:</td>
-                    <td className="align-top py-0.5">Penting</td>
-                    <td className="align-top py-0.5"></td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0', whiteSpace: 'nowrap' }}>Sifat</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}>:</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}>Penting</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}></td>
                   </tr>
                   <tr>
-                    <td className="align-top py-0.5 whitespace-nowrap">Hal</td>
-                    <td className="align-top py-0.5">:</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0', whiteSpace: 'nowrap' }}>Hal</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}>:</td>
                     <td
-                      className="align-top py-0.5 text-justify"
                       style={{
+                        verticalAlign: 'top',
+                        padding: '1px 0',
                         textAlign: 'justify',
                         textJustify: 'inter-word'
                       }}
                     >
                       {formData.hal}
                     </td>
-                    <td className="align-top py-0.5"></td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}></td>
                   </tr>
                 </tbody>
               </table>
 
               {/* TUJUAN SURAT (YTH & DI) */}
-              <table className="w-full text-[11pt] mb-4 border-collapse" style={{ fontFamily: 'Arial, sans-serif' }}>
+              <table className="w-full mb-4 border-collapse" style={{ width: '100%', fontFamily: 'Arial, sans-serif', fontSize: '11pt', marginBottom: '16px', borderCollapse: 'collapse' }}>
                 <tbody>
                   <tr>
-                    <td className="w-12 align-top py-0.5">Yth</td>
-                    <td className="align-top py-0.5">
+                    <td style={{ width: '45px', verticalAlign: 'top', padding: '1px 0' }}>Yth</td>
+                    <td style={{ verticalAlign: 'top', padding: '1px 0' }}>
                       <div>{formData.jabatanPemrakarsa}</div>
                       <div>di {formData.ibukota}</div>
                     </td>
@@ -937,8 +936,8 @@ Tembusan:
               </table>
 
               {/* ISI SURAT */}
-              <div className="space-y-3.5 text-justify text-[11pt]" style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
-                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
+              <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', lineHeight: '1.35', textAlign: 'justify' }}>
+                <p style={{ textIndent: '38px', margin: '0 0 12px 0', textAlign: 'justify', textJustify: 'inter-word', lineHeight: '1.35' }}>
                   Menindaklanjuti surat permohonan {formData.jabatanPemrakarsa} Nomor{' '}
                   {formData.nomorSuratP} Tanggal {formData.tanggalSuratP} perihal Mohon
                   Harmonisasi Rancangan {formData.jenisPeraturan}{' '}
@@ -956,7 +955,7 @@ Tembusan:
                   ditindaklanjuti ke tahapan selanjutnya
                 </p>
 
-                <p className="indent-9 m-0" style={{ textIndent: '38px', textAlign: 'justify', textJustify: 'inter-word' }}>
+                <p style={{ textIndent: '38px', margin: '0 0 12px 0', textAlign: 'justify', textJustify: 'inter-word', lineHeight: '1.35' }}>
                   Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan
                   terima kasih.
                 </p>
@@ -964,41 +963,39 @@ Tembusan:
 
               {/* TANDA TANGAN KAKANWIL */}
               <div
-                className="mt-8 flex justify-end signature-container"
                 style={{
-                  marginTop: '32px',
+                  marginTop: '28px',
                   display: 'flex',
                   justifyContent: 'flex-end',
                   width: '100%',
-                  fontFamily: 'Arial, sans-serif'
+                  fontFamily: 'Arial, sans-serif',
+                  fontSize: '11pt'
                 }}
               >
                 <div
-                  className="w-64 text-left text-[11pt] signature-box"
                   style={{
-                    width: '260px',
+                    width: '250px',
                     marginLeft: 'auto',
                     textAlign: 'left'
                   }}
                 >
-                  <p
-                    className="mb-14 font-normal"
-                    style={{ marginBottom: '56px', margin: '0 0 56px 0' }}
+                  <div
+                    style={{ marginBottom: '56px' }}
                   >
                     {formData.jabatanKakanwil}
-                  </p>
-                  <p className="font-normal" style={{ margin: 0 }}>
+                  </div>
+                  <div>
                     {formData.namaKakanwil}
-                  </p>
+                  </div>
                 </div>
               </div>
 
               {/* TEMBUSAN */}
-              <div className="mt-6 pt-2 text-[10pt]" style={{ fontFamily: 'Arial, sans-serif' }}>
-                <p className="font-normal mb-1 m-0">Tembusan:</p>
-                <ol className="list-decimal pl-5 space-y-0.5 text-neutral-900 m-0">
+              <div style={{ marginTop: '20px', fontFamily: 'Arial, sans-serif', fontSize: '10pt' }}>
+                <div style={{ marginBottom: '4px' }}>Tembusan:</div>
+                <ol style={{ margin: 0, paddingLeft: '20px' }}>
                   {formData.tembusan.map((item, idx) => (
-                    <li key={idx} className="pl-0.5">{item}</li>
+                    <li key={idx} style={{ marginBottom: '2px' }}>{item}</li>
                   ))}
                 </ol>
               </div>
