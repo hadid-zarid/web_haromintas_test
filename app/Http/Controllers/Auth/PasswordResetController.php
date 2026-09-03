@@ -86,9 +86,9 @@ class PasswordResetController extends Controller
         try {
             Mail::to($user->email)->send(new ResetPasswordMail($user->nama, $resetUrl));
         } catch (\Throwable $e) {
+            // Jangan pernah mencatat $resetUrl — mengandung token reset aktif (plaintext).
             Log::warning('Gagal mengirim email reset password via SMTP.', [
                 'email' => $user->email,
-                'reset_url' => $resetUrl,
                 'error' => $e->getMessage(),
             ]);
         }
@@ -97,7 +97,9 @@ class PasswordResetController extends Controller
 
         $safeEmail = e($user->email);
         $successMsg = "Tautan pemulihan kata sandi telah dikirim ke email <strong>{$safeEmail}</strong>. Silakan periksa kotak masuk atau folder spam Anda.";
-        if ($isLogMailer) {
+        // Tampilkan tautan langsung HANYA di lingkungan lokal — jangan pernah membocorkan
+        // token reset di response pada staging/produksi meski mail driver kebetulan 'log'.
+        if ($isLogMailer && app()->isLocal()) {
             $successMsg .= "<br><div class='mt-2 p-2.5 bg-amber-100/80 border border-amber-300 rounded-xl text-[11px] text-amber-950 leading-relaxed'><strong>[Mode Pengembang Lokal]</strong> Pengiriman email fisik SMTP belum dihubungkan di .env. Anda dapat mengeklik tautan langsung berikut untuk menguji:<br><a href='{$resetUrl}' class='inline-block mt-1.5 px-3 py-1 bg-[#1A1A5E] text-white font-black rounded-lg hover:bg-[#2C3154] transition-all text-xs no-underline'>Buka Form Reset Password Baru &rarr;</a></div>";
         }
 

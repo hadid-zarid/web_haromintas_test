@@ -31,9 +31,15 @@ class GoogleAuthController extends Controller
         try {
             $driver = Socialite::driver('google')->stateless();
 
-            // Atasi cURL error 60 SSL Certificate pada lingkungan Windows / Localhost
+            // Verifikasi sertifikat TLS WAJIB aktif di luar lingkungan lokal/testing.
+            // Hanya dev lokal yang boleh menonaktifkannya (workaround cURL error 60 di
+            // sebagian instalasi PHP Windows) lewat GOOGLE_OAUTH_INSECURE_TLS=true di .env.
+            $verifyTls = app()->environment('local', 'testing')
+                ? filter_var(env('GOOGLE_OAUTH_INSECURE_TLS', false), FILTER_VALIDATE_BOOLEAN)
+                : true;
+
             $client = new Client([
-                'verify' => app()->environment('production') && (bool) ini_get('curl.cainfo'),
+                'verify' => $verifyTls,
                 'timeout' => 15,
             ]);
             $driver->setHttpClient($client);

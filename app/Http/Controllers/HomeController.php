@@ -237,7 +237,7 @@ class HomeController extends Controller
         }
 
         // Recent Audit Logs: Fokus pada aktivitas berkas & alur kerja regulasi
-        $auditQuery = AuditLog::with('user')
+        $auditQuery = AuditLog::with('user:user_id,nama,role_id')
             ->where('module', '!=', 'AUTHENTICATION')
             ->latest('created_at');
 

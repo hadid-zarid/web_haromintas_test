@@ -51,7 +51,7 @@ class PermohonanController extends Controller
             'kabupaten.timKerja',
             'timKerja',
             'statusRegulasi',
-            'uploader',
+            'uploader:user_id,nama,role_id',
             'dokumens.jenisDokumen',
         ]);
 
@@ -270,9 +270,9 @@ class PermohonanController extends Controller
             'kabupaten.timKerja',
             'timKerja',
             'statusRegulasi',
-            'uploader',
+            'uploader:user_id,nama,role_id',
             'dokumens.jenisDokumen',
-            'dokumens.uploader',
+            'dokumens.uploader:user_id,nama,role_id',
         ])->findOrFail($id);
 
         // RBAC Check for View Details (IDOR Defense)
@@ -282,7 +282,7 @@ class PermohonanController extends Controller
         $statuses = StatusRegulasi::orderBy('urutan')->get();
 
         // Audit Logs riwayat untuk berkas ini
-        $auditLogs = AuditLog::with('user')
+        $auditLogs = AuditLog::with('user:user_id,nama,role_id')
             ->where('target_id', (string) $rancangan->rancangan_id)
             ->latest('created_at')
             ->get();
@@ -309,15 +309,22 @@ class PermohonanController extends Controller
         $validated = $request->validated();
         $kabupaten = Kabupaten::findOrFail($validated['kabupaten_id']);
 
-        $rancangan->update([
+        $payloadUpdate = [
             'judul_rancangan' => $validated['judul_rancangan'],
             'nomor_regulasi' => $validated['nomor_regulasi'] ?? $rancangan->nomor_regulasi,
             'jenis_regulasi_id' => $validated['jenis_regulasi_id'],
             'kabupaten_id' => $validated['kabupaten_id'],
             'tim_kerja_id' => $kabupaten->tim_kerja_id ?? $rancangan->tim_kerja_id,
-            'status_id' => $validated['status_id'] ?? $rancangan->status_id,
             'keterangan' => $validated['keterangan'] ?? $rancangan->keterangan,
-        ]);
+        ];
+
+        // Perubahan status via form edit hanya diizinkan untuk Biro Hukum & Admin.
+        // Tim Kerja mengubah status lewat alur otomatis kelengkapan dokumen, bukan manual.
+        if (($validated['status_id'] ?? null) !== null && ($user->isBiroHukum() || $user->isAdmin())) {
+            $payloadUpdate['status_id'] = (int) $validated['status_id'];
+        }
+
+        $rancangan->update($payloadUpdate);
 
         AuditLog::create([
             'user_id' => $user->user_id,
@@ -568,8 +575,15 @@ class PermohonanController extends Controller
         $rancangan = RancanganRegulasi::findOrFail($id);
         $user = Auth::user();
 
-        // RBAC Check for Status Change
+        // RBAC Check for Status Change (IDOR / wilayah)
         $this->authorizeRancanganAccess($rancangan, $user);
+
+        // Keputusan hasil fasilitasi (Selesai / Perlu Perbaikan) adalah wewenang
+        // Biro Hukum Provinsi Riau & Admin. Tim Kerja hanya menggerakkan status
+        // lewat alur otomatis kelengkapan dokumen (lihat uploadDokumen()).
+        if (! ($user->isBiroHukum() || $user->isAdmin())) {
+            abort(403, 'Akses Ditolak: Hanya Biro Hukum Provinsi Riau yang berwenang memutuskan hasil fasilitasi berkas ini.');
+        }
 
         $validated = $request->validated();
         $oldStatusId = $rancangan->status_id;
