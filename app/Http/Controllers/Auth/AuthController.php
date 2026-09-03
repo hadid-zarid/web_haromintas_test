@@ -58,7 +58,7 @@ class AuthController extends Controller
         ];
 
         return Inertia::render('LoginPage', [
-            'demoUsers' => $demoUsers,
+            'demoUsers' => [], // Dinonaktifkan untuk keamanan (cegah kebocoran kredensial via Inertia props)
         ]);
     }
 

@@ -277,7 +277,8 @@ export const LoginPage = ({ demoUsers = [] }) => {
               )}
             </button>
 
-            {/* Demo Users Quick Selector */}
+            {/* Demo Users Quick Selector (Dinonaktifkan sementara) */}
+            {/*
             {demoUsers.length > 0 && (
               <div className="pt-5 mt-2 border-t border-slate-200">
                 <div className="flex items-center justify-between mb-2.5">
@@ -328,13 +329,14 @@ export const LoginPage = ({ demoUsers = [] }) => {
                 </div>
               </div>
             )}
+            */}
           </form>
         </div>
 
         {/* Card Footer */}
         <div className="px-6 py-3.5 bg-slate-50/90 border-t border-slate-200 text-center text-[10px] text-slate-500 font-medium flex items-center justify-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Sistem Informasi Terenkripsi • Kanwil Kemenkum Provinsi Riau</span>
+          <span>Sistem Informasi Terenkripsi • Kantor Wilayah Kementerian Hukum Provinsi Riau</span>
         </div>
       </div>
     </div>
