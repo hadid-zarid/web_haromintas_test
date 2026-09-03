@@ -57,7 +57,7 @@ web_harmonitas/
 ## ⚡ Cara Menjalankan Proyek (Untuk Pertama Kali / Baru Clone)
 
 ### 1. Prasyarat Sistem
-* **PHP** >= 8.2 (Extension wajib aktif: `pdo_mysql`, `mbstring`, `openssl`, `curl`, `fileinfo`)
+* **PHP** >= 8.3 (Extension wajib aktif: `pdo_mysql`, `mbstring`, `openssl`, `curl`, `fileinfo`, `zip`)
 * **Composer** >= 2.x
 * **Node.js** >= 18.x & **npm**
 * **MySQL / MariaDB** (via XAMPP, Laragon, atau native service)
