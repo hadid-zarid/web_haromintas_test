@@ -85,19 +85,26 @@ export const DraftGeneratePage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSaveHistory = (newDraft) => {
+  const handleSaveHistory = (newDraft = {}) => {
+    // Modal mengirim { id, nomorSurat, jenis, judul, kabupaten, tanggal, ... }.
+    // Terima juga bentuk lama ({ jenisPeraturan, judulPeraturan, ... }) sebagai cadangan.
+    const jenisRaw = String(newDraft.jenisPeraturan || '');
+    const jenis =
+      newDraft.jenis ||
+      (jenisRaw.includes('Daerah') ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA');
+    const isPerda = String(jenis).includes('PERDA');
+
     setHistoryList((prev) => [
       {
-        id: `DRAFT-00${prev.length + 1}`,
-        nomorSurat: newDraft.nomorSurat || `W.4-PP.04.02-${Math.floor(1000 + Math.random() * 9000)}`,
-        jenis: newDraft.jenisPeraturan.includes('Daerah')
-          ? 'Surat Selesai PERDA'
-          : 'Surat Selesai PERKADA',
-        judul: newDraft.judulPeraturan,
-        kabupaten: newDraft.asalPemrakarsa,
-        tanggal: newDraft.tanggalSurat,
-        pejabat: newDraft.namaKakanwil,
-        typeCode: newDraft.jenisPeraturan.includes('Daerah') ? 'perda' : 'perkada',
+        id: newDraft.id || `DRAFT-${Date.now()}`,
+        nomorSurat:
+          newDraft.nomorSurat || `W.4-PP.04.02-${Math.floor(1000 + Math.random() * 9000)}`,
+        jenis,
+        judul: newDraft.judul || newDraft.judulPeraturan || '-',
+        kabupaten: newDraft.kabupaten || newDraft.asalPemrakarsa || '-',
+        tanggal: newDraft.tanggal || newDraft.tanggalSurat || '',
+        pejabat: newDraft.pejabat || newDraft.namaKakanwil || '',
+        typeCode: isPerda ? 'perda' : 'perkada',
       },
       ...prev,
     ]);

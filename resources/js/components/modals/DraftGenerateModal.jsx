@@ -251,18 +251,28 @@ export const DraftGenerateModal = ({
     setFormData((prev) => ({ ...prev, nomorSurat: randomNum }));
   };
 
-  const handlePrint = () => {
-    if (onSaveHistory) {
+  // Simpan ke riwayat draft dengan aman — bug pada callback induk tidak boleh
+  // menggagalkan proses unduh/cetak (dulu menyebabkan halaman jadi putih).
+  const saveToHistory = (extra = {}) => {
+    if (typeof onSaveHistory !== 'function') return;
+    try {
       onSaveHistory({
         id: `DRAFT-${Date.now()}`,
-        nomorSurat: `W.4-PP.04.02-${formData.nomorSurat}`,
+        nomorSurat: formData.nomorSurat,
         jenis: letterType === 'perda' ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA',
         judul: `Rancangan ${formData.jenisPeraturan} ${formData.asalPemrakarsa} tentang ${formData.judulPeraturan}`,
         kabupaten: formData.asalPemrakarsa,
         tanggal: formData.tanggalSurat,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        ...extra
       });
+    } catch (e) {
+      console.error('Gagal menyimpan riwayat draft (diabaikan):', e);
     }
+  };
+
+  const handlePrint = () => {
+    saveToHistory({ nomorSurat: `W.4-PP.04.02-${formData.nomorSurat}` });
 
     const printContent = printAreaRef.current;
     if (!printContent) return;
@@ -420,58 +430,17 @@ export const DraftGenerateModal = ({
       link.download = `Surat_Selesai_${letterType.toUpperCase()}_${formData.nomorSurat.replace(/[^a-zA-Z0-9_\-]/g, '_')}.docx`;
       document.body.appendChild(link);
       link.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
+      link.remove();
+      // Beri jeda sebelum revoke agar unduhan tidak terputus di sebagian browser.
+      setTimeout(() => window.URL.revokeObjectURL(url), 2000);
 
-      if (onSaveHistory) {
-        onSaveHistory({
-          id: `DRAFT-${Date.now()}`,
-          nomorSurat: formData.nomorSurat,
-          jenis: letterType === 'perda' ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA',
-          judul: `Rancangan ${formData.jenisPeraturan} ${formData.asalPemrakarsa} tentang ${formData.judulPeraturan}`,
-          kabupaten: formData.asalPemrakarsa,
-          tanggal: formData.tanggalSurat,
-          createdAt: new Date().toISOString()
-        });
-      }
+      saveToHistory();
 
       showToast('Dokumen Word resmi (.docx) berhasil diunduh!', 'success');
     } catch (err) {
-      console.error('AJAX download failed, falling back to form submit:', err);
-
-      try {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/api/generate-surat-docx';
-
-        const entriesWithToken = { ...payload, _token: csrfToken };
-        for (const [key, value] of Object.entries(entriesWithToken)) {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-
-        if (onSaveHistory) {
-          onSaveHistory({
-            id: `DRAFT-${Date.now()}`,
-            nomorSurat: formData.nomorSurat,
-            jenis: letterType === 'perda' ? 'Surat Selesai PERDA' : 'Surat Selesai PERKADA',
-            judul: `Rancangan ${formData.jenisPeraturan} ${formData.asalPemrakarsa} tentang ${formData.judulPeraturan}`,
-            kabupaten: formData.asalPemrakarsa,
-            tanggal: formData.tanggalSurat,
-            createdAt: new Date().toISOString()
-          });
-        }
-        showToast('Dokumen Word resmi (.docx) sedang diunduh!', 'success');
-      } catch (fallbackErr) {
-        showToast(err.message || 'Gagal memproses file Word. Silakan coba lagi.', 'error');
-      }
+      // Jangan pakai form.submit() sebagai fallback — itu menavigasi SPA & bikin halaman putih.
+      console.error('Gagal mengunduh DOCX:', err);
+      showToast(err.message || 'Gagal memproses file Word. Silakan coba lagi.', 'error');
     } finally {
       setIsDownloading(false);
     }
