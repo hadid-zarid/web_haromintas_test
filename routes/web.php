@@ -88,10 +88,11 @@ Route::middleware('auth')->group(function () {
     })->name('ai');
 
     // API - Generate Surat DOCX
-    Route::match(['get', 'post'], '/api/generate-surat-docx', function (Request $request) {
+    Route::post('/api/generate-surat-docx', function (Request $request) {
         $type = strtolower($request->input('type', 'perda'));
-        $templatePerda = base_path('SURAT SELESAI PERDA.docx');
-        $templatePerkada = base_path('SURAT SELESAI PERKADA.docx');
+
+        // Batasi ketat ke dua nilai valid — 'type' dipakai untuk menyusun path file.
+        abort_unless(in_array($type, ['perda', 'perkada'], true), 400, 'Jenis surat tidak valid.');
 
         // Helper closure to read XML from zip/docx file
         $readXmlFromZip = function ($zipFilePath) {
@@ -134,20 +135,6 @@ Route::middleware('auth')->group(function () {
             return false;
         };
 
-        // Always ensure PERKADA template is perfectly synced from PERDA template with correct legal basis
-        if ($type === 'perkada' && file_exists($templatePerda)) {
-            $xmlP = $readXmlFromZip($templatePerda);
-            if ($xmlP) {
-                $xmlP = str_replace(
-                    'Pasal 58 Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
-                    'Pasal 97D Undang-Undang Nomor 13 Tahun 2022 tentang Perubahan Kedua Atas Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
-                    $xmlP
-                );
-                copy($templatePerda, $templatePerkada);
-                $writeXmlToZip($templatePerkada, $xmlP);
-            }
-        }
-
         $filename = $type === 'perda' ? 'SURAT SELESAI PERDA.docx' : 'SURAT SELESAI PERKADA.docx';
         $templatePath = base_path($filename);
 
@@ -173,7 +160,7 @@ Route::middleware('auth')->group(function () {
 
         $tempDir = storage_path('app/temp');
         if (! file_exists($tempDir)) {
-            mkdir($tempDir, 0777, true);
+            mkdir($tempDir, 0775, true);
         }
 
         $tempFile = $tempDir . '/Surat_Selesai_' . strtoupper($type) . '_' . uniqid() . '.docx';
@@ -191,6 +178,16 @@ Route::middleware('auth')->group(function () {
             return response()->json([
                 'error' => 'Gagal membaca document.xml dari template Word.',
             ], 500);
+        }
+
+        // Dasar hukum PERKADA berbeda dari PERDA — terapkan pada salinan sementara ini
+        // (bukan dengan menimpa file template di root proyek).
+        if ($type === 'perkada') {
+            $xml = str_replace(
+                'Pasal 58 Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
+                'Pasal 97D Undang-Undang Nomor 13 Tahun 2022 tentang Perubahan Kedua Atas Undang-Undang Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan',
+                $xml
+            );
         }
 
         $replacements = [

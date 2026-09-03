@@ -377,6 +377,9 @@ export const DraftGenerateModal = ({
     setIsDownloading(true);
     showToast('Mengunduh dokumen Word (.docx) sesuai template asli...', 'info');
 
+    const csrfToken =
+      document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
     const payload = {
       type: letterType,
       nomor_surat: formData.nomorSurat,
@@ -398,8 +401,10 @@ export const DraftGenerateModal = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/json'
+          'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/json',
+          'X-CSRF-TOKEN': csrfToken
         },
+        credentials: 'same-origin',
         body: JSON.stringify(payload)
       });
 
@@ -439,7 +444,8 @@ export const DraftGenerateModal = ({
         form.method = 'POST';
         form.action = '/api/generate-surat-docx';
 
-        for (const [key, value] of Object.entries(payload)) {
+        const entriesWithToken = { ...payload, _token: csrfToken };
+        for (const [key, value] of Object.entries(entriesWithToken)) {
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = key;
