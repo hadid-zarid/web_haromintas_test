@@ -279,7 +279,7 @@ export const PeraturanListPage = ({
         ) : null
       }
     >
-      <Head title="Daftar Permohonan Regulasi - HARMONITAS" />
+      <Head title="Daftar Permohonan Harmonisasi - HARMONITAS" />
 
       <div className="space-y-6">
         {/* Flash Notifications */}
