@@ -439,7 +439,7 @@ export const LandingPage = () => {
                   </div>
 
                   {/* Call to Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3.5 pt-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
                     <Link
                       href={user ? "/home" : "/login"}
                       className="inline-flex h-12 sm:h-13 items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 px-7 text-sm sm:text-base font-bold text-[#2B3056] shadow-md transition duration-200 hover:-translate-y-0.5 cursor-pointer"

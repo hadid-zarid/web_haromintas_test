@@ -102,12 +102,12 @@ const AIAssistantPage = () => {
           <div className="xl:col-span-2 space-y-6">
             {/* Upload Document Card */}
             <section className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2B3056] flex items-center justify-center text-white">
+              <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#2B3056] flex items-center justify-center text-white shrink-0">
                   <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
                 </div>
-                <div>
-                  <h2 className="text-sm font-bold text-[#2B3056]">
+                <div className="min-w-0">
+                  <h2 className="text-sm font-bold text-[#2B3056] truncate">
                     Pemeriksaan & Analisa Dokumen
                   </h2>
                   <p className="text-xs text-slate-500 font-normal">
@@ -116,13 +116,13 @@ const AIAssistantPage = () => {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {!selectedFile ? (
                   <label
                     htmlFor="document-upload"
                     className="block cursor-pointer group"
                   >
-                    <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center transition-colors hover:border-[#2B3056] hover:bg-slate-50/50">
+                    <div className="border-2 border-dashed border-slate-200 rounded-2xl p-5 sm:p-8 text-center transition-colors hover:border-[#2B3056] hover:bg-slate-50/50">
                       <div className="mx-auto w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-[#2B3056] mb-3 group-hover:scale-105 transition-transform">
                         <Upload className="w-6 h-6 text-[#2B3056]" />
                       </div>
@@ -199,13 +199,13 @@ const AIAssistantPage = () => {
 
             {/* Analysis Result Section */}
             <section className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#2B3056]">
+              <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#2B3056] shrink-0">
                     <Search className="w-5 h-5 text-[#2B3056]" />
                   </div>
-                  <div>
-                    <h2 className="text-sm font-bold text-[#2B3056]">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-[#2B3056] truncate">
                       Hasil Analisa & Rekomendasi
                     </h2>
                     <p className="text-xs text-slate-500 font-normal">
@@ -215,22 +215,22 @@ const AIAssistantPage = () => {
                 </div>
 
                 {isAnalyzing ? (
-                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-700 border border-amber-200 animate-pulse">
-                    Sedang Memindai AI
+                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-700 border border-amber-200 animate-pulse shrink-0">
+                    Sedang Memindai
                   </span>
                 ) : analysisResult ? (
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200 shrink-0">
                     Selesai Dipindai
                   </span>
                 ) : (
-                  <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-500 border border-slate-200">
+                  <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-500 border border-slate-200 shrink-0">
                     Menunggu Dokumen
                   </span>
                 )}
               </div>
 
               {isAnalyzing ? (
-                <div className="p-8 sm:p-12 flex items-center justify-center">
+                <div className="p-6 sm:p-12 flex items-center justify-center">
                   <HarmonitasLoader
                     variant="scanner"
                     title="AI Sedang Menelaah Naskah Regulasi..."
@@ -245,7 +245,7 @@ const AIAssistantPage = () => {
                   />
                 </div>
               ) : !analysisResult ? (
-                <div className="p-10 text-center">
+                <div className="p-8 sm:p-10 text-center">
                   <div className="mx-auto w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
                     <FileText className="w-6 h-6" />
                   </div>
@@ -257,7 +257,7 @@ const AIAssistantPage = () => {
                   </p>
                 </div>
               ) : (
-                <div className="p-6 space-y-6">
+                <div className="p-4 sm:p-6 space-y-6">
                   {/* Score Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="rounded-2xl bg-[#2B3056] p-5 text-white">

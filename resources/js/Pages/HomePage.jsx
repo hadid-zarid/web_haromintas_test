@@ -280,14 +280,14 @@ export const HomePage = ({
             </div>
 
             {/* Quick Actions & Year Filter */}
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 xl:pt-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0 pt-2 xl:pt-0 w-full xl:w-auto">
               {availableYears.length > 1 ? (
-                <div className="inline-flex items-center rounded-xl bg-slate-100 p-1 mr-1 border border-slate-200 shadow-2xs">
+                <div className="inline-flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 shadow-2xs">
                   {availableYears.map(y => (
                     <button
                       key={y}
                       onClick={() => router.visit(`/home?tahun=${y}`)}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${y === selectedYear
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-lg transition-all ${y === selectedYear
                           ? 'bg-white text-[#2B3056] shadow-sm ring-1 ring-slate-200/50'
                           : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                         }`}
@@ -297,7 +297,7 @@ export const HomePage = ({
                   ))}
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs mr-1">
+                <div className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold text-slate-700 shadow-2xs">
                   <Calendar className="h-3.5 w-3.5 text-slate-400" />
                   <span>Tahun {selectedYear}</span>
                 </div>
@@ -305,15 +305,15 @@ export const HomePage = ({
 
               <Link
                 href="/panduan"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold text-slate-700 transition-colors shadow-2xs cursor-pointer"
               >
                 <BookOpen className="h-3.5 w-3.5 text-slate-500" />
-                <span>Panduan SOP</span>
+                <span>Panduan</span>
               </Link>
 
               <Link
                 href="/ai"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 text-xs font-bold text-[#2B3056] transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold text-[#2B3056] transition-colors shadow-2xs cursor-pointer"
               >
                 <Bot className="h-3.5 w-3.5 text-[#B3912D]" />
                 <span>Asisten AI</span>
@@ -321,10 +321,10 @@ export const HomePage = ({
 
               <Link
                 href="/peraturan"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] px-4 py-2 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer"
               >
                 <FileText className="h-3.5 w-3.5 text-[#FFD82B]" />
-                <span>Lihat Semua Berkas</span>
+                <span>Semua Berkas</span>
                 <ChevronRight className="h-3.5 w-3.5 text-white/70" />
               </Link>
             </div>
@@ -334,7 +334,7 @@ export const HomePage = ({
         {/* =========================================================================
             2. REFINED 5 METRIC CARDS
             ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <MetricCard
             title="Total Permohonan"
             value={metrics.total || 0}
@@ -710,47 +710,47 @@ export const HomePage = ({
           </div>
 
           {/* Full-Width Vertical Bar Chart */}
-          <div className="h-[280px] w-full pt-2">
+          <div className="h-[230px] sm:h-[280px] w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={displayedTrendData}
-                margin={{ top: 15, right: 20, left: -10, bottom: 5 }}
-                barGap={3}
+                margin={{ top: 15, right: 10, left: -15, bottom: 5 }}
+                barGap={2}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                 <XAxis
                   dataKey="bulan"
-                  tick={{ fontSize: 11.5, fill: '#2B3056', fontWeight: 700 }}
+                  tick={{ fontSize: 11, fill: '#2B3056', fontWeight: 700 }}
                   axisLine={{ stroke: '#E2E8F0' }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: '#64748B', fontWeight: 600 }}
+                  tick={{ fontSize: 10.5, fill: '#64748B', fontWeight: 600 }}
                   axisLine={{ stroke: '#E2E8F0' }}
                   tickLine={false}
                   allowDecimals={false}
                 />
                 <Tooltip content={<CustomChartTooltip />} cursor={{ fill: 'rgba(43, 48, 86, 0.04)', radius: 6 }} />
                 <Legend
-                  wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 600 }}
+                  wrapperStyle={{ fontSize: '10.5px', paddingTop: '8px', fontWeight: 600 }}
                   iconType="circle"
-                  iconSize={8}
+                  iconSize={7}
                 />
-                <Bar dataKey="Total Permohonan" fill="#2B3056" radius={[4, 4, 0, 0]} maxBarSize={18} />
-                <Bar dataKey="Draf Awal" fill="#64748B" radius={[4, 4, 0, 0]} maxBarSize={18} />
-                <Bar dataKey="Proses Harmonisasi" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={18} />
-                <Bar dataKey="Proses Fasilitasi" fill="#3B82F6" radius={[4, 4, 0, 0]} maxBarSize={18} />
-                <Bar dataKey="Selesai" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                <Bar dataKey="Total Permohonan" fill="#2B3056" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar dataKey="Draf Awal" fill="#64748B" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar dataKey="Proses Harmonisasi" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar dataKey="Proses Fasilitasi" fill="#3B82F6" radius={[4, 4, 0, 0]} maxBarSize={16} />
+                <Bar dataKey="Selesai" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={16} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Footer Period Note */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+          <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 text-[11px] text-slate-500 font-medium">
             <span>
               Menampilkan periode <strong>Semester {semester} ({semester === 1 ? 'Januari – Juni' : 'Juli – Desember'} {new Date().getFullYear()})</strong>. Klik tombol di atas untuk beralih semester.
             </span>
-            <span className="font-semibold text-slate-600">
+            <span className="font-semibold text-slate-600 shrink-0">
               Sinkronisasi Real-Time
             </span>
           </div>

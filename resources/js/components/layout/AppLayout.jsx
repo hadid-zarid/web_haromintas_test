@@ -146,9 +146,9 @@ export const AppLayout = ({
         {/* =================================
             HEADER
         ================================== */}
-        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-[#E2E6EF] bg-white/95 px-4 shadow-[0_5px_18px_rgba(30,39,89,0.04)] backdrop-blur-xl sm:px-8">
+        <header className="sticky top-0 z-30 flex h-[60px] sm:h-[72px] items-center justify-between border-b border-[#E2E6EF] bg-white/95 px-3 sm:px-8 shadow-[0_5px_18px_rgba(30,39,89,0.04)] backdrop-blur-xl">
           {/* Left */}
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {/* Mobile Menu */}
             <button
               type="button"
@@ -156,7 +156,7 @@ export const AppLayout = ({
                 setIsProfileOpen(false);
                 setIsMobileOpen(true);
               }}
-              className="flat-btn-secondary rounded-xl p-2 text-[#303661] focus:outline-none lg:hidden"
+              className="flat-btn-secondary rounded-xl p-2 text-[#303661] focus:outline-none lg:hidden shrink-0"
               aria-label="Buka menu navigasi"
             >
               <Menu className="w-5 h-5" />
@@ -164,17 +164,17 @@ export const AppLayout = ({
 
             {/* User Greeting */}
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-extrabold text-[#20283D]">
+              <h1 className="truncate text-xs sm:text-sm font-extrabold text-[#20283D] max-w-[140px] xs:max-w-[200px] sm:max-w-none">
                 {displayName}
               </h1>
-              <p className="truncate text-[10px] font-semibold text-[#7A8294]">
+              <p className="truncate text-[9px] sm:text-[10px] font-semibold text-[#7A8294] max-w-[140px] xs:max-w-[200px] sm:max-w-none">
                 {displayUnit}
               </p>
             </div>
           </div>
 
           {/* Right */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <NotificationDropdown />
 
             {/* Account Trigger & Dropdown */}
@@ -182,7 +182,7 @@ export const AppLayout = ({
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((current) => !current)}
-                className={`group flex h-10 items-center gap-2 rounded-xl px-2.5 transition-all duration-200 border cursor-pointer select-none ${
+                className={`group flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl px-2 sm:px-2.5 transition-all duration-200 border cursor-pointer select-none ${
                   isProfileOpen
                     ? "border-[#2B3056] bg-[#2B3056] text-white shadow-sm"
                     : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
@@ -192,7 +192,7 @@ export const AppLayout = ({
                 aria-haspopup="menu"
                 aria-expanded={isProfileOpen}
               >
-                <div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-lg border border-[#FFD82B]/60 bg-white/20 shrink-0">
+                <div className="relative flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center overflow-hidden rounded-lg border border-[#FFD82B]/60 bg-white/20 shrink-0">
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
@@ -200,9 +200,9 @@ export const AppLayout = ({
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <User className="h-4 w-4" />
+                    <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   )}
-                  <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-white" />
+                  <span className="absolute bottom-0 right-0 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-500 ring-1 ring-white" />
                 </div>
                 <span className="hidden sm:block text-xs font-bold truncate max-w-[120px]">
                   {displayName.split(" ")[0]}
@@ -219,7 +219,7 @@ export const AppLayout = ({
                   pada layar yang sangat sempit. */}
               {isProfileOpen && (
                 <div
-                  className="fixed inset-x-3 top-[76px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[275px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-[0_16px_40px_rgba(43,48,86,0.12)] animate-in fade-in zoom-in-95 duration-150 origin-top-right space-y-3"
+                  className="fixed inset-x-3 top-[64px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[275px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-[0_16px_40px_rgba(43,48,86,0.12)] animate-in fade-in zoom-in-95 duration-150 origin-top-right space-y-3"
                   role="menu"
                   aria-label="Informasi akun pengguna"
                 >
@@ -289,30 +289,30 @@ export const AppLayout = ({
         {/* =================================
             MAIN CONTENT
         ================================== */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-7 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8">
           {/* Unified Page Header */}
           {!hideHeader && (
-            <div className="mb-6 space-y-2.5">
+            <div className="mb-4 sm:mb-6 space-y-2">
               {/* Breadcrumb Navigation */}
               <div>
                 <Breadcrumb />
               </div>
 
               {/* Title & Action Row */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2B3056] tracking-tight">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#2B3056] tracking-tight truncate">
                     {getHeaderTitle(pathname)}
                   </h1>
                   {subtitle && (
-                    <p className="text-xs text-slate-500 font-medium mt-1">
+                    <p className="text-xs text-slate-500 font-medium mt-0.5 sm:mt-1">
                       {subtitle}
                     </p>
                   )}
                 </div>
 
                 {headerAction && (
-                  <div className="shrink-0">
+                  <div className="shrink-0 w-full sm:w-auto">
                     {headerAction}
                   </div>
                 )}

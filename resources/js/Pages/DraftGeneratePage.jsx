@@ -430,8 +430,8 @@ export const DraftGeneratePage = () => {
                 </div>
               </div>
 
-              {/* Table Container */}
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+              {/* Table Container for Desktop */}
+              <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-[#2B3056]">
@@ -513,6 +513,63 @@ export const DraftGeneratePage = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card List (Visible on screens smaller than md) */}
+              <div className="md:hidden divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                {filteredHistory.length > 0 ? (
+                  filteredHistory.map((item) => (
+                    <div key={item.id} className="p-4 space-y-2.5 bg-white hover:bg-slate-50/80 transition">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-xs text-[#2B3056] px-2 py-0.5 bg-slate-100 rounded-lg border border-slate-200">
+                          {item.nomorSurat}
+                        </span>
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-md text-[9.5px] font-bold ${
+                            item.jenis.includes('PERDA')
+                              ? 'bg-blue-50 text-blue-900 border border-blue-200'
+                              : 'bg-amber-50 text-amber-900 border border-amber-200'
+                          }`}
+                        >
+                          {item.jenis}
+                        </span>
+                      </div>
+
+                      <p className="font-bold text-xs text-[#2B3056] leading-snug">
+                        {item.judul}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
+                        <span className="text-slate-700 font-semibold">{item.kabupaten}</span>
+                        <span>•</span>
+                        <span>{item.tanggal}</span>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickPrint(item)}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#2B3056]/20 bg-[#2B3056]/5 text-[#2B3056] hover:bg-[#2B3056] hover:text-white text-xs font-bold transition shadow-2xs"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Unduh Word</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickPrint(item)}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100 text-xs font-bold transition shadow-2xs"
+                        >
+                          <Printer className="w-3.5 h-3.5 text-[#B3912D]" />
+                          <span>Cetak PDF</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-slate-400 text-xs font-medium bg-white">
+                    Tidak ada draf surat yang sesuai dengan pencarian Anda.
+                  </div>
+                )}
               </div>
             </div>
 

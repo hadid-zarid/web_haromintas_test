@@ -109,30 +109,30 @@ export const AdvancedFilterModal = ({ isOpen, onClose, filters, onApplyFilters, 
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+        <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <button
             type="button"
             onClick={handleReset}
-            className="px-3 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+            className="px-3 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Filter</span>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-white border border-slate-200 rounded-xl transition-colors cursor-pointer text-center"
             >
               Batal
             </button>
             <button
               type="button"
               onClick={handleApply}
-              className="px-4 py-2 text-xs font-bold text-white bg-[#2B3056] hover:bg-[#3A4070] rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold text-white bg-[#2B3056] hover:bg-[#3A4070] rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
             >
               <Check className="w-4 h-4 text-[#FFD82B]" />
-              <span>Terapkan Filter</span>
+              <span>Terapkan</span>
             </button>
           </div>
         </div>

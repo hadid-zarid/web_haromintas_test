@@ -342,9 +342,9 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
         {/* SEARCH & FILTER TOOLBAR */}
         <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 sm:gap-3">
             {/* Search Input */}
-            <div className="sm:col-span-5 relative">
+            <div className="sm:col-span-2 md:col-span-5 relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Search className="w-4 h-4" />
               </div>
@@ -373,7 +373,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </div>
 
             {/* Role Filter */}
-            <div className="sm:col-span-4">
+            <div className="sm:col-span-1 md:col-span-4">
               <select
                 value={selectedRole}
                 onChange={(e) => {
@@ -391,7 +391,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </div>
 
             {/* Status Filter */}
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-1 md:col-span-2">
               <select
                 value={selectedStatus}
                 onChange={(e) => {
@@ -407,7 +407,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </div>
 
             {/* Action Filter Buttons */}
-            <div className="sm:col-span-1 flex items-center gap-1.5">
+            <div className="sm:col-span-2 md:col-span-1 flex items-center gap-1.5">
               <button
                 type="submit"
                 className="flex-1 py-2 px-2.5 bg-[#2B3056] text-white hover:bg-[#3A4070] rounded-xl text-xs font-bold transition flex items-center justify-center shadow-2xs cursor-pointer"
@@ -458,7 +458,8 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Desktop Table (Visible on md and above) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-500 select-none">
@@ -678,6 +679,143 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
             </table>
           </div>
 
+          {/* Mobile Card List (Visible on screens smaller than md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {paginatedUsers && paginatedUsers.length > 0 ? (
+              paginatedUsers.map((u) => {
+                const userId = u.user_id || u.id;
+                const userName = u.nama || u.name;
+                const isSelf = userId === currentAdminId;
+                const timName = u.tim_kerja?.nama_tim_kerja || u.timKerja?.nama_tim_kerja || u.pokja?.nama_pokja;
+
+                return (
+                  <div key={userId} className="p-4 space-y-3 hover:bg-slate-50/80 transition">
+                    {/* Top Row: User Avatar, Name, Self Badge, Status */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-[#2B3056] font-black flex items-center justify-center shrink-0 shadow-2xs">
+                          {userName ? userName.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-extrabold text-xs text-[#2B3056] truncate flex items-center gap-1.5">
+                            <span>{userName}</span>
+                            {isSelf && (
+                              <span className="px-1.5 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[9px] font-black border border-purple-200">
+                                Anda
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-[10px] font-semibold text-slate-400 font-mono">
+                            NIP: {u.nip || '-'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
+                        {u.status === 'ACTIVE' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            Aktif
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-black bg-rose-50 text-rose-700 border border-rose-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                            Nonaktif
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Middle Info: Role & Contact */}
+                    <div className="space-y-1.5 text-[11px] bg-slate-50/70 p-2.5 rounded-xl border border-slate-200/70">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <RoleBadge 
+                          role={u.role || u.role_relation?.nama_role} 
+                          timKerjaName={timName} 
+                        />
+                      </div>
+                      <p className="font-medium text-slate-600 flex items-center gap-1.5 truncate">
+                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>{u.email}</span>
+                      </p>
+                      {u.no_hp && (
+                        <p className="text-slate-500 font-medium flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>{u.no_hp}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Actions Row */}
+                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                      {/* Toggle Status Button */}
+                      <button
+                        type="button"
+                        disabled={isSelf}
+                        onClick={() => setTogglingUser(u)}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1 shadow-2xs ${
+                          isSelf
+                            ? 'opacity-30 cursor-not-allowed border-slate-200 text-slate-400'
+                            : u.status === 'ACTIVE'
+                            ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                        }`}
+                      >
+                        {u.status === 'ACTIVE' ? (
+                          <>
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            <span>Nonaktifkan</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>Aktifkan</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Edit Button */}
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(u)}
+                        className="p-1.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition shadow-2xs"
+                        title="Edit Akun"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        disabled={isSelf}
+                        onClick={() => setDeletingUser(u)}
+                        className={`p-1.5 rounded-xl border transition shadow-2xs ${
+                          isSelf
+                            ? 'opacity-30 cursor-not-allowed border-slate-200 text-slate-400'
+                            : 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
+                        }`}
+                        title="Hapus Akun"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-10 text-center text-slate-400 font-bold">
+                <p className="text-xs text-slate-500">Tidak ditemukan akun pengguna dengan kriteria pencarian ini.</p>
+                <button
+                  type="button"
+                  onClick={handleResetFilter}
+                  className="mt-2 text-xs font-black text-[#2B3056] hover:underline cursor-pointer"
+                >
+                  Reset Filter & Pencarian
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Pagination Controls */}
           {totalItems > 0 && (
             <div className="p-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -686,7 +824,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
               </p>
               
               {totalPages > 1 && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 flex-wrap justify-center sm:justify-end">
                   {/* Prev Button */}
                   <button
                     type="button"

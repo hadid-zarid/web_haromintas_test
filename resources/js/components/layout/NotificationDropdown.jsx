@@ -104,7 +104,7 @@ export const NotificationDropdown = () => {
       <button 
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none cursor-pointer border ${
+        className={`relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none cursor-pointer border ${
           isOpen 
             ? 'bg-[#2B3056] text-[#FFD82B] border-[#2B3056] shadow-sm' 
             : 'border-slate-200 bg-slate-50 text-[#2B3056] hover:bg-white hover:border-[#2B3056]/30 hover:shadow-2xs'
@@ -126,7 +126,7 @@ export const NotificationDropdown = () => {
           mendorong panel keluar dari tepi kiri layar pada layar sempit.
           Desktop (>=sm): kembali ke pola dropdown biasa, menempel di bawah tombol. */}
       {isOpen && (
-        <div className="fixed inset-x-3 top-[76px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_40px_rgba(43,48,86,0.14)] animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+        <div className="fixed inset-x-3 top-[64px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_40px_rgba(43,48,86,0.14)] animate-in fade-in zoom-in-95 duration-150 origin-top-right">
           
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100 bg-[#2B3056] text-white">
@@ -188,7 +188,7 @@ export const NotificationDropdown = () => {
           </div>
 
           {/* Notification List Body */}
-          <div className="max-h-[20rem] overflow-y-auto divide-y divide-slate-100">
+          <div className="max-h-[60vh] sm:max-h-[20rem] overflow-y-auto divide-y divide-slate-100">
             {displayedNotifications.length > 0 ? (
               displayedNotifications.map((notif) => {
                 const visual = getNotificationVisuals(notif.judul);

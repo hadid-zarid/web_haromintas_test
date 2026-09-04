@@ -367,9 +367,9 @@ export const PeraturanListPage = ({
 
         {/* SEARCH & FILTER TOOLBAR */}
         <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <form onSubmit={handleFilterSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 sm:gap-3">
             {/* Search Input */}
-            <div className="sm:col-span-4 relative">
+            <div className="sm:col-span-2 md:col-span-4 relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Search className="w-4 h-4" />
               </div>
@@ -383,7 +383,7 @@ export const PeraturanListPage = ({
             </div>
 
             {/* Filter Kabupaten */}
-            <div className="sm:col-span-3">
+            <div className="sm:col-span-1 md:col-span-3">
               <select
                 value={selectedKabupaten}
                 onChange={(e) => {
@@ -407,7 +407,7 @@ export const PeraturanListPage = ({
             </div>
 
             {/* Filter Jenis (Ranperda / Ranperkada) */}
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-1 md:col-span-2">
               <select
                 value={selectedJenis}
                 onChange={(e) => {
@@ -427,7 +427,7 @@ export const PeraturanListPage = ({
             </div>
 
             {/* Filter Status */}
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-1 md:col-span-2">
               <select
                 value={selectedStatus}
                 onChange={(e) => {
@@ -447,7 +447,7 @@ export const PeraturanListPage = ({
             </div>
 
             {/* Actions Buttons */}
-            <div className="sm:col-span-1 flex items-center gap-1.5">
+            <div className="sm:col-span-2 md:col-span-1 flex items-center gap-1.5">
               <button
                 type="submit"
                 className="flex-1 py-2 px-2.5 bg-[#2B3056] text-white hover:bg-[#3A4070] rounded-xl text-xs font-bold transition flex items-center justify-center shadow-2xs cursor-pointer"
@@ -500,8 +500,8 @@ export const PeraturanListPage = ({
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          {/* Desktop Table (Visible on md and above) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-200/90 text-[10.5px] font-extrabold uppercase tracking-wider text-slate-500">
@@ -651,6 +651,121 @@ export const PeraturanListPage = ({
             </table>
           </div>
 
+          {/* Mobile Card List (Visible on screens smaller than md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {permohonans?.data && permohonans.data.length > 0 ? (
+              permohonans.data.map((item) => {
+                const docCount = item.dokumens?.length || 0;
+                const jenisName = item.jenis_regulasi?.nama_jenis || (item.jenis_regulasi_id === 1 ? "Ranperda" : "Ranperkada");
+                const kabName = item.kabupaten?.nama_kabupaten || "Wilayah Riau";
+                const timName = item.tim_kerja?.nama_tim_kerja || item.kabupaten?.tim_kerja?.nama_tim_kerja || "Tim Kerja";
+
+                return (
+                  <div
+                    key={item.rancangan_id}
+                    onClick={() => router.visit(`/peraturan/${item.rancangan_id}`)}
+                    className="p-4 space-y-3 hover:bg-slate-50/80 transition cursor-pointer"
+                  >
+                    {/* Top Row: Nomor + Jenis + Status */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 bg-slate-100 border border-slate-200/80 rounded-lg text-[10.5px] font-mono font-bold text-[#2B3056]">
+                          {item.nomor_regulasi}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-md text-[9.5px] font-extrabold border ${jenisName === "Ranperda"
+                          ? "bg-purple-50 text-purple-700 border-purple-200"
+                          : "bg-teal-50 text-teal-700 border-teal-200"
+                          }`}>
+                          {jenisName}
+                        </span>
+                      </div>
+                      <StatusBadge statusId={item.status_id} />
+                    </div>
+
+                    {/* Judul Rancangan */}
+                    <div>
+                      <h3 className="font-bold text-xs text-[#2B3056] leading-snug">
+                        {item.judul_rancangan}
+                      </h3>
+                    </div>
+
+                    {/* Meta details */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
+                      <span className="flex items-center gap-1 text-slate-700 font-semibold">
+                        <Building className="w-3.5 h-3.5 text-[#FFC800] shrink-0" />
+                        <span>{kabName}</span>
+                      </span>
+                      {!isTimKerja && (
+                        <span className="text-slate-400">• {timName}</span>
+                      )}
+                      <span className="flex items-center gap-1 text-slate-500">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>
+                          {item.tanggal_dibuat
+                            ? new Date(item.tanggal_dibuat).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+                            : "-"}
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* Footer Row: Dokumen Badge & Action Buttons */}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${docCount >= 7
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : docCount > 0
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-slate-50 text-slate-500 border-slate-200'
+                        }`}>
+                        📁 {docCount}/7 Dokumen
+                      </span>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => router.visit(`/peraturan/${item.rancangan_id}`)}
+                          title="Buka Lembar Detail Berkas"
+                          className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-[#2B3056] hover:text-[#FFD82B] text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Detail</span>
+                        </button>
+
+                        {(isTimKerja || isAdmin) && (
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(item)}
+                            title="Edit Data Berkas"
+                            className="p-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition shadow-2xs cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+
+                        {(isAdmin || isTimKerja) && (
+                          <button
+                            type="button"
+                            onClick={() => setDeletingPermohonan(item)}
+                            title="Hapus Berkas Permohonan"
+                            className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 transition shadow-2xs cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-10 text-center text-slate-400">
+                <EmptyState
+                  title="Tidak Ada Permohonan Ditemukan"
+                  description="Belum ada berkas rancangan peraturan yang sesuai dengan kata kunci atau filter yang Anda pilih."
+                />
+              </div>
+            )}
+          </div>
+
           {/* COMPREHENSIVE PAGINATION SECTION */}
           <div className="p-4 border-t border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
             <div className="text-[11px] font-semibold text-slate-500">
@@ -666,7 +781,7 @@ export const PeraturanListPage = ({
 
             {/* Pagination Button List */}
             {permohonans?.links && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap">
                 {permohonans.links.map((link, idx) => {
                   const isPrevious = link.label.includes("Previous") || link.label.includes("&laquo;");
                   const isNext = link.label.includes("Next") || link.label.includes("&raquo;");

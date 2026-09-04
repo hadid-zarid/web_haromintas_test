@@ -391,9 +391,9 @@ export const PanduanPage = () => {
           {/* =========================================================================
               CARD BODY WITH ANIMATED SLIDE TRANSITION
               ========================================================================= */}
-          <div className="p-6 sm:p-8 space-y-6 key={currentSlide} animate-in fade-in slide-in-from-right-4 duration-300">
+          <div className="p-4 sm:p-8 space-y-5 sm:space-y-6 key={currentSlide} animate-in fade-in slide-in-from-right-4 duration-300">
             {/* Subtitle / Purpose */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
               <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
               <p className="text-xs text-slate-700 font-semibold leading-relaxed">
                 {currentGuide.subtitle}

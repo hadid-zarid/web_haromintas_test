@@ -524,11 +524,11 @@ export const PeraturanDetailPage = ({
         </div>
 
         {/* HERO BANNER CARD */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2B3056] via-[#323963] to-[#2B3056] p-6 sm:p-7 text-white shadow-xl border border-[#3A4070]">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2B3056] via-[#323963] to-[#2B3056] p-4 sm:p-7 text-white shadow-xl border border-[#3A4070]">
           {/* Gold Accent Left Stripe */}
           <span className="absolute inset-y-0 left-0 w-2 bg-gradient-to-b from-[#FFD82B] via-[#FFC800] to-[#FFD82B]" />
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
             <div className="space-y-3 max-w-3xl">
               {/* Badges Row */}
               <div className="flex flex-wrap items-center gap-2">
@@ -550,12 +550,12 @@ export const PeraturanDetailPage = ({
               </div>
 
               {/* Title */}
-              <h1 className="text-xl sm:text-2xl font-extrabold text-white leading-snug">
+              <h1 className="text-lg sm:text-2xl font-extrabold text-white leading-snug">
                 {permohonan.judul_rancangan}
               </h1>
 
               {/* Metadata Row */}
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 font-medium pt-1">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300 font-medium pt-1">
                 <div className="flex items-center gap-1.5">
                   <Building className="w-3.5 h-3.5 text-[#FFD82B]" />
                   <span className="text-white font-bold">{kabName}</span>
@@ -574,7 +574,7 @@ export const PeraturanDetailPage = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 w-full sm:w-auto lg:w-fit">
               {(isBiroHukum || isAdmin) && isHarmonisasiComplete && permohonan.status_id !== 4 && (
                 <>
                   <button
@@ -620,11 +620,11 @@ export const PeraturanDetailPage = ({
         )}
 
         {/* 7 DOKUMEN SISTEM HARMONITAS DALAM BENTUK MAP DOKUMEN */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-6 space-y-6">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs p-4 sm:p-6 space-y-6">
           {/* Header Section with 2-Stage Progress */}
           <div className="border-b border-slate-200/90 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h2 className="text-base font-extrabold text-[#2B3056] flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-extrabold text-[#2B3056] flex items-center gap-2">
                 <FileCheck2 className="w-5 h-5 text-[#FFC800]" />
                 <span>7 Dokumen Berkas Harmonisasi & Fasilitasi</span>
               </h2>
@@ -634,7 +634,7 @@ export const PeraturanDetailPage = ({
             </div>
 
             {/* Indikator Progres 2 Tahap */}
-            <div className="flex flex-wrap items-center gap-2.5 text-[11px] font-bold">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 text-[11px] font-bold">
               <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border ${
                 isHarmonisasiComplete ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-blue-50 text-blue-700 border-blue-200'
               }`}>
@@ -652,7 +652,7 @@ export const PeraturanDetailPage = ({
           </div>
 
           {/* 4-Column Grid of Map Dokumen Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-8 pt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-x-5 sm:gap-y-8 pt-2 sm:pt-5">
             {jenisDokumens.map((jenisDok) => {
               const doc = uploadedDocsMap[jenisDok.jenis_dokumen_id];
               const isUploaded = Boolean(doc);

@@ -16,10 +16,10 @@ export const Breadcrumb = () => {
   };
 
   return (
-    <nav className="flex items-center text-xs text-slate-500 font-medium">
-      <Link href="/home" className="flex items-center gap-1 hover:text-blue-900 transition-colors">
+    <nav className="flex items-center text-xs text-slate-500 font-medium overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap">
+      <Link href="/home" className="flex items-center gap-1 hover:text-blue-900 transition-colors shrink-0">
         <Home className="w-3.5 h-3.5" />
-        <span>Dashboard</span>
+        <span className="hidden xs:inline">Dashboard</span>
       </Link>
       {pathnames.map((value, index) => {
         const to = `/${pathnames.slice(0, index + 1).join('/')}`;
@@ -28,11 +28,11 @@ export const Breadcrumb = () => {
 
         return (
           <React.Fragment key={to}>
-            <ChevronRight className="w-3.5 h-3.5 mx-1.5 text-slate-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 mx-1 sm:mx-1.5 text-slate-400 shrink-0" />
             {isLast ? (
-              <span className="font-semibold text-blue-950 truncate max-w-[200px]">{displayName}</span>
+              <span className="font-semibold text-blue-950 truncate max-w-[140px] sm:max-w-[220px] shrink-0">{displayName}</span>
             ) : (
-              <Link href={to} className="hover:text-blue-900 transition-colors truncate max-w-[150px]">
+              <Link href={to} className="hover:text-blue-900 transition-colors truncate max-w-[100px] sm:max-w-[160px] shrink-0">
                 {displayName}
               </Link>
             )}
