@@ -253,15 +253,17 @@ export const HomePage = ({
           {/* Subtle Top Pure Gold Accent Line */}
           <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FFD82B] via-[#FFC800] to-[#FFB943]" />
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1.5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="space-y-1.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-[#2B3056]/10 px-2.5 py-1 text-[11px] font-bold text-[#2B3056]">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#B3912D]" />
                   {getRoleDisplayName()}
                 </span>
-                <span className="text-xs text-slate-400 font-medium hidden sm:inline">•</span>
-                <span className="text-[11px] font-medium text-slate-500">
+                {/* "•" dan teks unit digabung jadi satu unit flex-wrap agar tidak pernah
+                    ke-wrap terpisah (bullet nyasar sendirian di barisnya sendiri). */}
+                <span className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500">
+                  <span className="text-slate-400 hidden sm:inline">•</span>
                   Kanwil Kementerian Hukum Riau
                 </span>
               </div>
@@ -278,7 +280,7 @@ export const HomePage = ({
             </div>
 
             {/* Quick Actions & Year Filter */}
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 sm:pt-0">
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 xl:pt-0">
               {availableYears.length > 1 ? (
                 <div className="inline-flex items-center rounded-xl bg-slate-100 p-1 mr-1 border border-slate-200 shadow-2xs">
                   {availableYears.map(y => (

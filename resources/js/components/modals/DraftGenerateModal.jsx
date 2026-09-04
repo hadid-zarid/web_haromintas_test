@@ -836,7 +836,7 @@ Tembusan:
           >
             <div
               ref={printAreaRef}
-              className="bg-white text-black w-full max-w-[760px] p-8 sm:p-12 shadow-2xl rounded-xs min-h-[920px] select-text"
+              className="bg-white text-black w-full min-w-0 max-w-[760px] p-4 sm:p-8 md:p-12 shadow-2xl rounded-xs min-h-[920px] select-text"
               style={{
                 fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                 fontSize: '11pt',
@@ -861,7 +861,7 @@ Tembusan:
                           }}
                         />
                       </td>
-                      <td className="align-middle text-center text-black" style={{ verticalAlign: 'middle', textAlign: 'center', padding: 0 }}>
+                      <td className="align-middle text-center text-black" style={{ verticalAlign: 'middle', textAlign: 'center', padding: 0, overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         <div style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif', fontSize: '11pt', fontWeight: 'normal', textTransform: 'uppercase', lineHeight: '1.2', margin: '0' }}>
                           KEMENTERIAN HUKUM REPUBLIK INDONESIA
                         </div>

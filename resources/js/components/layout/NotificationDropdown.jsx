@@ -120,9 +120,13 @@ export const NotificationDropdown = () => {
         )}
       </button>
 
-      {/* Dropdown Panel with Smooth Entrance Animation */}
+      {/* Dropdown Panel with Smooth Entrance Animation.
+          Mobile (<sm): fixed & dijangkarkan ke tepi VIEWPORT (bukan ke tombol lonceng) —
+          tombol lonceng tidak selalu di ujung kanan layar, jadi anchor ke tombol bisa
+          mendorong panel keluar dari tepi kiri layar pada layar sempit.
+          Desktop (>=sm): kembali ke pola dropdown biasa, menempel di bawah tombol. */}
       {isOpen && (
-        <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_40px_rgba(43,48,86,0.14)] animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+        <div className="fixed inset-x-3 top-[76px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_40px_rgba(43,48,86,0.14)] animate-in fade-in zoom-in-95 duration-150 origin-top-right">
           
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100 bg-[#2B3056] text-white">

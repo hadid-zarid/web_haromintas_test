@@ -214,10 +214,12 @@ export const AppLayout = ({
                 />
               </button>
 
-              {/* Account Dropdown Panel */}
+              {/* Account Dropdown Panel — dijangkarkan ke tepi viewport pada mobile
+                  (pola sama dengan NotificationDropdown) agar tidak pernah keluar layar
+                  pada layar yang sangat sempit. */}
               {isProfileOpen && (
                 <div
-                  className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[265px] sm:w-[275px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-[0_16px_40px_rgba(43,48,86,0.12)] animate-in fade-in zoom-in-95 duration-150 origin-top-right space-y-3"
+                  className="fixed inset-x-3 top-[76px] sm:absolute sm:inset-x-auto sm:top-[calc(100%+0.5rem)] sm:right-0 z-50 w-auto sm:w-[275px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-[0_16px_40px_rgba(43,48,86,0.12)] animate-in fade-in zoom-in-95 duration-150 origin-top-right space-y-3"
                   role="menu"
                   aria-label="Informasi akun pengguna"
                 >
