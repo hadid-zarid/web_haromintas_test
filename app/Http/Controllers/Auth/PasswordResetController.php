@@ -95,8 +95,7 @@ class PasswordResetController extends Controller
 
         RateLimiter::hit($throttleKey, 300); // 5 minutes cooldown for subsequent attempts after limit reached
 
-        $safeEmail = e($user->email);
-        $successMsg = "Tautan pemulihan kata sandi telah dikirim ke email <strong>{$safeEmail}</strong>. Silakan periksa kotak masuk atau folder spam Anda.";
+        $successMsg = "Tautan pemulihan kata sandi telah dikirim ke email {$user->email}. Silakan periksa kotak masuk atau folder spam Anda.";
         // Tampilkan tautan langsung HANYA di lingkungan lokal — jangan pernah membocorkan
         // token reset di response pada staging/produksi meski mail driver kebetulan 'log'.
         if ($isLogMailer && app()->isLocal()) {

@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $judul }} - HARMONITAS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+        body, table, td, p, a, h1, div, span {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+        }
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #F4F5F9;
             margin: 0;
             padding: 24px 12px;
@@ -210,7 +217,7 @@
 
         <!-- BADGE SUB-HEADER -->
         <div class="badge-bar">
-            {{ $badgeText ?? 'Pemberitahuan Sistem Alur Kerja Regulasi' }}
+            {{ $badgeText ?? 'Pemberitahuan Sistem Alur Kerja Harmonisasi' }}
         </div>
         
         <!-- CONTENT BODY -->
@@ -231,7 +238,7 @@
 
             <!-- REGULATION DETAILS TABLE -->
             <div class="details-card">
-                <div class="details-header">Ringkasan Berkas Regulasi</div>
+                <div class="details-header">Ringkasan Berkas Permohonan Harmonisasi</div>
                 
                 <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
                     <tr>
@@ -247,7 +254,7 @@
                         <td style="padding: 5px 0; color: #101B4F; font-weight: 700;">{{ $rancangan->kabupaten->nama_kabupaten ?? $rancangan->kabupaten_nama ?? 'Pemerintah Daerah' }}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 5px 0; color: #718096; font-weight: 600;">Jenis Regulasi</td>
+                        <td style="padding: 5px 0; color: #718096; font-weight: 600;">Jenis Permohonan</td>
                         <td style="padding: 5px 0; color: #101B4F; font-weight: 700;">{{ $rancangan->jenisRegulasi->nama_jenis ?? 'Peraturan Daerah' }}</td>
                     </tr>
                     <tr>

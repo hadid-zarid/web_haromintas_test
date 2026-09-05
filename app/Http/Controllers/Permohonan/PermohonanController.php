@@ -240,8 +240,8 @@ class PermohonanController extends Controller
                 NotifikasiService::notifyTimKerja(
                     (int) $timKerjaId,
                     $rancangan,
-                    'Permohonan Regulasi Baru',
-                    "Permohonan baru '{$rancangan->judul_rancangan}' ({$kabupaten->nama_kabupaten}) berhasil didaftarkan ke wilayah kerja Anda."
+                    'Permohonan Harmonisasi Baru',
+                    "Permohonan harmonisasi baru '{$rancangan->judul_rancangan}' ({$kabupaten->nama_kabupaten}) berhasil didaftarkan ke wilayah kerja Anda."
                 );
             }
 
