@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NotifikasiWorkflowMail extends Mailable implements ShouldQueue
+class NotifikasiWorkflowMail extends Mailable
 {
     use Queueable, SerializesModels;
 
