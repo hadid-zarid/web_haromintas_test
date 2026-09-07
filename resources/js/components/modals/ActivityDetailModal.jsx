@@ -58,8 +58,8 @@ export const ActivityDetailModal = ({ isOpen, onClose, activity }) => {
 
           <div className="pt-2 border-t border-slate-200 text-xs">
             <span className="font-semibold text-slate-700 block text-[11px] mb-0.5">Rincian Perubahan / Keterangan:</span>
-            <p className="text-slate-700 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed font-mono text-[11px]">
-              {activity.detail}
+            <p className="text-slate-700 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed font-mono text-[11px] whitespace-pre-wrap">
+              {activity.detail || activity.description}
             </p>
           </div>
         </div>

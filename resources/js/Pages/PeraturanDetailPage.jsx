@@ -309,6 +309,8 @@ export const PeraturanDetailPage = ({
         );
       case 'UPDATE_PERMOHONAN':
         return <span>Memperbarui data dan informasi rancangan harmonisasi.</span>;
+      case 'DELETE_PERMOHONAN':
+        return <span>Menghapus berkas permohonan harmonisasi dari sistem.</span>;
       default:
         return (
           <span>{log.payload?.catatan || log.payload?.nama_dokumen ? `Pembaruan berkas: ${log.payload?.catatan || log.payload?.nama_dokumen}` : `Memperbarui status berkas ke ${log.payload?.to_status_name || 'Draf Awal (Pra-Harmonisasi)'}.`}</span>
@@ -328,6 +330,8 @@ export const PeraturanDetailPage = ({
         return <XCircle className="w-4 h-4 text-rose-600" />;
       case 'CHANGE_PERATURAN_STATUS':
         return <RefreshCw className="w-4 h-4 text-amber-600" />;
+      case 'DELETE_PERMOHONAN':
+        return <Trash2 className="w-4 h-4 text-rose-600" />;
       default:
         return <CheckCircle className="w-4 h-4 text-[#2B3056]" />;
     }
