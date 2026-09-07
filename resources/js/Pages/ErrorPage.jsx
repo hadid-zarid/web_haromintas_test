@@ -28,7 +28,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
-import logoPengayoman from '../assets/logo_pengayoman.png';
+import logoPengayoman from '../assets/logo_pengayoman_official.png';
 import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
 
 const ERROR_CONFIGS = {
@@ -269,7 +269,15 @@ ${debug ? `Debug Details: ${JSON.stringify(debug, null, 2)}` : ''}`;
         <header className="sticky top-0 z-50 w-full border-b border-slate-200/90 bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8">
           <div className="mx-auto flex h-[66px] max-w-7xl items-center justify-between">
             {/* Brand Logo & Title */}
-            <Link href="/" className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer">
+            <Link href="/" className="group flex items-center gap-2 sm:gap-2.5 cursor-pointer">
+              <span className="shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
+                <img
+                  src={logoPengayoman}
+                  alt="Logo Pengayoman Kementerian Hukum"
+                  className="h-full w-full object-contain drop-shadow-2xs"
+                />
+              </span>
+
               <span className="shrink-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center">
                 <img
                   src={logoHarmonitas}

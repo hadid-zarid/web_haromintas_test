@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
-import logoPengayoman from '../assets/logo_pengayoman.png';
+import logoPengayoman from '../assets/logo_pengayoman_official.png';
 import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
 import {
   FileText,
@@ -384,12 +384,12 @@ export const LandingPage = () => {
                 <Reveal direction="up" delay={0} className="space-y-6">
 
                   {/* Institutional Badge */}
-                  <span className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-[#2B3056] shadow-xs">
-                    <span className="flex h-5 w-5 items-center justify-center shrink-0">
+                  <span className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-[#2B3056] shadow-xs">
+                    <span className="flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center shrink-0">
                       <img
                         src={logoPengayoman}
                         alt="Logo Pengayoman"
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-contain rounded-xs drop-shadow-2xs"
                       />
                     </span>
                     <span>Kantor Wilayah Kementerian Hukum Riau</span>
@@ -1112,8 +1112,8 @@ export const LandingPage = () => {
               <div className="md:col-span-5 space-y-4">
                 <div className="flex items-center gap-3.5">
                   <div className="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-md border border-white/20">
+                    <img src={logoPengayoman} alt="Logo Pengayoman" className="h-9 w-auto object-contain rounded-xs" />
                     <img src={logoHarmonitas} alt="Logo HARMONITAS" className="h-9 w-auto object-contain" />
-                    <img src={logoPengayoman} alt="Logo Pengayoman" className="h-9 w-auto object-contain" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">

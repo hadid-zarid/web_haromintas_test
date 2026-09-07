@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Globe2, LogIn, Mail, Menu, Phone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
 import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
+import logoPengayoman from '../../assets/logo_pengayoman_official.png';
 
 export const PublicNavbar = () => {
   const { auth } = usePage().props || {};
@@ -70,16 +71,30 @@ export const PublicNavbar = () => {
           className={`w-full transition-all duration-300 ${
             isScrolled
               ? 'rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xl shadow-xl shadow-slate-900/5 px-4 sm:px-5'
-              : 'border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8'
+              : 'border-b border-slate-200 bg-white'
           }`}
         >
           <div
             className={`mx-auto flex items-center justify-between transition-all duration-300 ${
-              isScrolled ? 'h-[56px] max-w-6xl' : 'h-[64px] max-w-7xl'
+              isScrolled ? 'h-[56px] max-w-6xl' : 'h-[64px] max-w-7xl px-4 sm:px-6 lg:px-8'
             }`}
           >
             {/* Logo and Brand */}
-            <Link href="/" className="group flex min-w-0 items-center gap-2.5 shrink-0">
+            <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5 shrink-0">
+              {/* Logo Pengayoman (Official Kemenkumham) */}
+              <span
+                className={`shrink-0 flex items-center justify-center transition-all ${
+                  isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'
+                }`}
+              >
+                <img
+                  src={logoPengayoman}
+                  alt="Logo Pengayoman Kementerian Hukum"
+                  className="h-full w-full object-contain drop-shadow-xs"
+                />
+              </span>
+
+              {/* Logo HARMONITAS */}
               <span
                 className={`shrink-0 flex items-center justify-center transition-all ${
                   isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'
@@ -183,7 +198,7 @@ export const PublicNavbar = () => {
 
           {/* Mobile Menu Dropdown */}
           {mobileMenuOpen && (
-            <div className="border-t border-slate-100 pb-3 pt-2 lg:hidden">
+            <div className={`border-t border-slate-100 pb-3 pt-2 lg:hidden ${!isScrolled ? 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8' : ''}`}>
               <nav className="space-y-1">
                 {navLinks.map((item) => (
                   <a
