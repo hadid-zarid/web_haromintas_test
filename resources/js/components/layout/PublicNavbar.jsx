@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Globe2, LogIn, Mail, Menu, Phone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { LogIn, Mail, Menu, Phone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
 import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../../assets/logo_pengayoman_official.png';
 
@@ -49,13 +49,6 @@ export const PublicNavbar = () => {
               (0761) 853000
             </span>
           </div>
-
-          <span className="inline-flex items-center gap-1.5 text-white/90">
-            <Globe2 className="h-3.5 w-3.5 text-[#FFD82B]" />
-            <span>ID</span>
-            <span className="text-white/30">|</span>
-            <span className="text-white/60">EN</span>
-          </span>
         </div>
       </div>
 
