@@ -6,3 +6,8 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command('logs:clean-preview', function () {
+    $deleted = \App\Models\AuditLog::where('action', 'PREVIEW_CONFIDENTIAL_DOKUMEN')->delete();
+    $this->info("Deleted {$deleted} preview audit logs.");
+})->purpose('Clean document preview audit logs');

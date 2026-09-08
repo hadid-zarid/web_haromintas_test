@@ -284,6 +284,7 @@ class PermohonanController extends Controller
         // Audit Logs riwayat untuk berkas ini
         $auditLogs = AuditLog::with('user:user_id,nama,role_id')
             ->where('target_id', (string) $rancangan->rancangan_id)
+            ->where('action', '!=', 'PREVIEW_CONFIDENTIAL_DOKUMEN')
             ->latest('created_at')
             ->get();
 
@@ -829,22 +830,6 @@ HTML;
                 'X-Frame-Options' => 'SAMEORIGIN',
             ]);
         }
-
-        // Catat jejak audit akses berkas rahasia
-        AuditLog::create([
-            'user_id' => $user->user_id,
-            'action' => 'PREVIEW_CONFIDENTIAL_DOKUMEN',
-            'module' => 'DOKUMEN_REGULASI',
-            'target_id' => (string) $dokumen->dokumen_id,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'payload' => [
-                'nama_file' => $dokumen->nama_file,
-                'rancangan_id' => $dokumen->rancangan_id,
-                'nomor_regulasi' => $dokumen->rancanganRegulasi?->nomor_regulasi,
-            ],
-            'created_at' => now(),
-        ]);
 
         $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
         $mimeType = $this->guessMimeFromExt($ext);
