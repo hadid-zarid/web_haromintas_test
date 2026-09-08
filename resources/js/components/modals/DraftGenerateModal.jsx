@@ -489,17 +489,16 @@ Tembusan:
     <div className="space-y-5">
       {/* HEADER TOOLBAR DENGAN WARNA RESMI HARMONITAS (#2B3056) */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-        
+
         {/* Format Selector Pills */}
         <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
           <button
             type="button"
             onClick={() => handleChangeType('perda')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
-              letterType === 'perda'
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${letterType === 'perda'
                 ? 'bg-[#2B3056] text-white shadow-xs'
                 : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-50'
-            }`}
+              }`}
           >
             <FileText className="w-3.5 h-3.5" />
             <span>Surat Selesai PERDA</span>
@@ -508,11 +507,10 @@ Tembusan:
           <button
             type="button"
             onClick={() => handleChangeType('perkada')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
-              letterType === 'perkada'
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${letterType === 'perkada'
                 ? 'bg-[#2B3056] text-white shadow-xs'
                 : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-50'
-            }`}
+              }`}
           >
             <FileOutput className="w-3.5 h-3.5" />
             <span>Surat Selesai PERKADA</span>
@@ -525,11 +523,10 @@ Tembusan:
             <button
               type="button"
               onClick={() => setActiveTab('form')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTab === 'form'
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'form'
                   ? 'bg-[#2B3056] text-white'
                   : 'text-slate-600 hover:text-[#2B3056]'
-              }`}
+                }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               <span>Sesuaikan Data</span>
@@ -538,11 +535,10 @@ Tembusan:
             <button
               type="button"
               onClick={() => setActiveTab('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTab === 'preview'
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'preview'
                   ? 'bg-[#2B3056] text-white'
                   : 'text-slate-600 hover:text-[#2B3056]'
-              }`}
+                }`}
             >
               <Eye className="w-3.5 h-3.5" />
               <span>Pratinjau Naskah</span>
@@ -830,9 +826,8 @@ Tembusan:
       {activeTab === 'preview' && (
         <div className="space-y-4">
           <div
-            className={`bg-slate-700/80 p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center ${
-              isModal ? 'max-h-[62vh] overflow-y-auto' : 'min-h-[750px] py-8'
-            }`}
+            className={`bg-slate-700/80 p-4 sm:p-8 rounded-2xl overflow-x-auto shadow-inner flex justify-center ${isModal ? 'max-h-[62vh] overflow-y-auto' : 'min-h-[750px] py-8'
+              }`}
           >
             <div
               ref={printAreaRef}
@@ -1076,11 +1071,10 @@ Tembusan:
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Generator ${
-        letterType === 'perda'
+      title={`Generator ${letterType === 'perda'
           ? 'Surat Selesai PERDA'
           : 'Surat Selesai PERKADA'
-      }`}
+        }`}
       size="5xl"
     >
       {content}
