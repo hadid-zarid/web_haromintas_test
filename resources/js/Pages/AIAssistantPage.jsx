@@ -17,6 +17,53 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+// URL sementara (Cloudflare Tunnel) ke backend AI Document Checker yang jalan
+// di laptop - dipakai buat presentasi/demo. Ganti string ini kalau tunnel-nya
+// di-restart dan dapet URL baru (tiap restart cloudflared, URL-nya berubah).
+const AI_API_BASE_URL = 'https://display-excited-recorders-gospel.trycloudflare.com';
+
+// Peta status/error dari AI Document Checker ke bentuk yang dipahami UI ini.
+const SEVERITY_LABELS = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' };
+const ERROR_TYPE_LABELS = {
+  pedoman: 'Struktur Peraturan',
+  ejaan: 'Kaidah Penulisan',
+  tanda_baca: 'Kaidah Penulisan',
+  kosa_kata: 'Kaidah Penulisan',
+};
+
+function mapCheckReportToAnalysisResult(report) {
+  const summary = report.summary || {};
+  const score = Math.round(report.compliance_score?.overall_score ?? 0);
+  const totalErrors = summary.total_span_errors ?? 0;
+  const writingErrors =
+    (summary.errors_ejaan ?? 0) + (summary.errors_tanda_baca ?? 0) + (summary.errors_kosa_kata ?? 0);
+  const structureErrors = summary.errors_pedoman ?? 0;
+  const formatErrors = summary.tidak_ditemukan_rujukan ?? 0;
+  const recommendations = summary.perlu_revisi ?? 0;
+
+  const errors = [];
+  (report.blocks || []).forEach((block) => {
+    (block.span_errors || []).forEach((se) => {
+      errors.push({
+        type: ERROR_TYPE_LABELS[se.error_type] || 'Rekomendasi',
+        severity: SEVERITY_LABELS[se.severity] || 'Sedang',
+        page: `Halaman ${block.page_number || 1}`,
+        description: se.explanation || se.original_snippet,
+      });
+    });
+  });
+
+  return {
+    score,
+    totalErrors,
+    writingErrors,
+    structureErrors,
+    formatErrors,
+    recommendations,
+    errors: errors.slice(0, 30),
+  };
+}
+
 const AIAssistantPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -44,53 +91,68 @@ const AIAssistantPage = () => {
     setAnalysisResult(null);
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!selectedFile) return;
 
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setAnalysisResult({
-        score: 87,
-        totalErrors: 8,
-        writingErrors: 3,
-        structureErrors: 2,
-        formatErrors: 2,
-        recommendations: 1,
-        errors: [
-          {
-            type: 'Kaidah Penulisan',
-            severity: 'Sedang',
-            page: 'Halaman 2',
-            description:
-              'Ditemukan penggunaan istilah dan rujukan frasa yang berpotensi tidak konsisten dengan kaidah baku legal drafting.',
-          },
-          {
-            type: 'Struktur Peraturan',
-            severity: 'Tinggi',
-            page: 'Halaman 4',
-            description:
-              'Struktur penomoran pasal dan ayat perlu diperiksa karena terdapat hierarki sub-pasal yang melompati urutan baku.',
-          },
-          {
-            type: 'Kesesuaian Format',
-            severity: 'Sedang',
-            page: 'Halaman 6',
-            description:
-              'Format penomoran lampiran dan konsiderans menimbang memerlukan penyesuaian tata naskah dinas.',
-          },
-          {
-            type: 'Rekomendasi',
-            severity: 'Rendah',
-            page: 'Halaman 8',
-            description:
-              'Direkomendasikan melakukan standardisasi definisi operasional pada Pasal 1 Ketentuan Umum.',
-          },
-        ],
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const startRes = await fetch(`${AI_API_BASE_URL}/api/check/start`, {
+        method: 'POST',
+        body: formData,
       });
-    }, 1800);
+      if (!startRes.ok) {
+        const errBody = await startRes.json().catch(() => ({}));
+        throw new Error(errBody.detail || 'Gagal memulai analisis dokumen di server AI.');
+      }
+      const { job_id } = await startRes.json();
+
+      // Polling status job - toleran terhadap kegagalan sesaat (server AI lagi
+      // restart dsb), sama seperti pola yang dipakai di dashboard AI Document
+      // Checker sendiri.
+      const report = await new Promise((resolve, reject) => {
+        let consecutiveFailures = 0;
+        const MAX_CONSECUTIVE_FAILURES = 40; // ~60 detik toleransi
+
+        const interval = setInterval(async () => {
+          let statusRes;
+          try {
+            statusRes = await fetch(`${AI_API_BASE_URL}/api/check/status/${job_id}`);
+          } catch (networkErr) {
+            statusRes = null;
+          }
+
+          if (!statusRes || !statusRes.ok) {
+            consecutiveFailures += 1;
+            if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+              clearInterval(interval);
+              reject(new Error('Server AI tidak merespons setelah beberapa kali percobaan.'));
+            }
+            return;
+          }
+          consecutiveFailures = 0;
+
+          const job = await statusRes.json();
+          if (job.status === 'done') {
+            clearInterval(interval);
+            resolve(job.report);
+          } else if (job.status === 'error') {
+            clearInterval(interval);
+            reject(new Error(job.error_message || 'Analisis dokumen gagal diproses.'));
+          }
+        }, 1500);
+      });
+
+      setAnalysisResult(mapCheckReportToAnalysisResult(report));
+    } catch (error) {
+      alert(`Gagal menganalisis dokumen: ${error.message}`);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
