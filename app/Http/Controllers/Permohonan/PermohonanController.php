@@ -378,6 +378,15 @@ class PermohonanController extends Controller
 
             $rancangan->delete();
 
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Gagal menghapus permohonan: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Gagal menghapus permohonan. Silakan coba beberapa saat lagi.');
+        }
+
+        // Catat audit log DI LUAR transaksi agar selalu tersimpan setelah penghapusan berhasil
+        try {
             AuditLog::create([
                 'user_id' => $user->user_id,
                 'action' => 'DELETE_PERMOHONAN',
@@ -388,21 +397,18 @@ class PermohonanController extends Controller
                 'payload' => [
                     'nomor_regulasi' => $nomor,
                     'judul_rancangan' => $judul,
+                    'keterangan' => "Berkas permohonan '{$judul}' ({$nomor}) telah dihapus dari sistem.",
                 ],
                 'created_at' => now(),
             ]);
-
-            DB::commit();
-
-            return redirect()->route('peraturan.index')->with(
-                'success',
-                "Permohonan '{$judul}' ({$nomor}) berhasil dihapus dari sistem."
-            );
         } catch (\Exception $e) {
-            DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Gagal menghapus permohonan: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return back()->with('error', 'Gagal menghapus permohonan. Silakan coba beberapa saat lagi.');
+            \Illuminate\Support\Facades\Log::warning('Gagal menyimpan audit log hapus permohonan: ' . $e->getMessage());
         }
+
+        return redirect()->route('peraturan.index')->with(
+            'success',
+            "Permohonan '{$judul}' ({$nomor}) berhasil dihapus dari sistem."
+        );
     }
 
     /**

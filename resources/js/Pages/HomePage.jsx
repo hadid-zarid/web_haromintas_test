@@ -45,7 +45,8 @@ import {
   BookOpen,
   HelpCircle,
   Check,
-  Bot
+  Bot,
+  Trash2
 } from 'lucide-react';
 
 /* Custom Compact & Clean Tooltip for Horizontal Recharts */
@@ -126,9 +127,22 @@ export const HomePage = ({
 
   // Helper Formatter Riwayat Aktivitas
   const formatAuditItem = (act) => {
-    const action = act.action;
+    const rawAction = act.action || '';
+    const action = String(rawAction).toUpperCase().trim();
     const p = act.payload || {};
     const userName = act.user?.nama || act.user?.name || 'Sistem';
+
+    // Prioritaskan formatted data langsung dari backend jika tersedia
+    if (act.formatted_title) {
+      const isDelete = action.includes('DELETE') || action.includes('HAPUS') || action.includes('DESTROY');
+      return {
+        icon: isDelete ? Trash2 : History,
+        badge: act.formatted_badge || (isDelete ? 'Hapus' : 'Berkas'),
+        badgeClass: act.formatted_badge_class || (isDelete ? 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold' : 'bg-slate-50 text-slate-600 border-slate-200/60 font-bold'),
+        title: act.formatted_title,
+        desc: act.formatted_desc || (typeof p === 'string' ? p : (p.judul_rancangan || p.keterangan || p.nama_dokumen || 'Data permohonan harmonisasi.')),
+      };
+    }
 
     switch (action) {
       case 'CREATE_PERMOHONAN':
@@ -179,6 +193,57 @@ export const HomePage = ({
           title: `${userName} memperbarui data`,
           desc: p.judul_rancangan || 'Pembaruan data permohonan.',
         };
+      case 'DELETE_PERMOHONAN':
+      case 'HAPUS_PERMOHONAN':
+      case 'DELETE_BERKAS':
+      case 'HAPUS_BERKAS':
+        return {
+          icon: Trash2,
+          badge: 'Hapus',
+          badgeClass: 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold',
+          title: `${userName} menghapus berkas`,
+          desc: p.judul_rancangan ? `${p.judul_rancangan}${p.nomor_regulasi ? ` (${p.nomor_regulasi})` : ''}` : (p.keterangan || 'Berkas permohonan telah dihapus dari sistem.'),
+        };
+      case 'DELETE_DOKUMEN':
+        return {
+          icon: Trash2,
+          badge: 'Hapus',
+          badgeClass: 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold',
+          title: `${userName} menghapus dokumen`,
+          desc: p.nama_dokumen || p.file_name || 'Dokumen berkas telah dihapus.',
+        };
+      case 'ADMIN_CREATE_USER':
+        return {
+          icon: PlusCircle,
+          badge: 'Pengguna',
+          badgeClass: 'bg-blue-50 text-blue-700 border-blue-200/70 font-bold',
+          title: `${userName} mendaftarkan akun pengguna`,
+          desc: p.nama ? `${p.nama} (${p.email || ''})` : 'Pendaftaran akun pengguna baru.',
+        };
+      case 'ADMIN_UPDATE_USER':
+        return {
+          icon: Edit3,
+          badge: 'Pengguna',
+          badgeClass: 'bg-amber-50 text-amber-700 border-amber-200/70 font-bold',
+          title: `${userName} memperbarui akun pengguna`,
+          desc: p.target_name || p.nama || 'Pembaruan data akun pengguna.',
+        };
+      case 'ADMIN_DELETE_USER':
+        return {
+          icon: Trash2,
+          badge: 'Hapus',
+          badgeClass: 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold',
+          title: `${userName} menghapus akun pengguna`,
+          desc: p.target_name ? `Akun: ${p.target_name}` : 'Penghapusan akun pengguna.',
+        };
+      case 'ADMIN_TOGGLE_USER_STATUS':
+        return {
+          icon: RefreshCw,
+          badge: 'Status',
+          badgeClass: 'bg-slate-50 text-slate-700 border-slate-200/70 font-bold',
+          title: `${userName} mengubah status akun`,
+          desc: p.target_name ? `${p.target_name} (${p.is_active ? 'Diaktifkan' : 'Dinonaktifkan'})` : 'Perubahan status aktif akun.',
+        };
       case 'PREVIEW_CONFIDENTIAL_DOKUMEN':
         return {
           icon: Eye,
@@ -212,14 +277,33 @@ export const HomePage = ({
           title: `${userName} keluar dari sistem`,
           desc: 'Sesi akun resmi telah diakhiri.',
         };
-      default:
+      default: {
+        const isDelete = action && (
+          action.includes('DELETE') || 
+          action.includes('HAPUS') || 
+          action.includes('DESTROY') || 
+          action.includes('REMOVE')
+        );
+        const isCreate = action && (action.includes('CREATE') || action.includes('DAFTAR') || action.includes('BUAT'));
+        const badgeLabel = isDelete ? 'Hapus' : isCreate ? 'Baru' : 'Aktivitas';
+        const badgeColor = isDelete
+          ? 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold'
+          : isCreate
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70 font-bold'
+          : 'bg-slate-50 text-slate-600 border-slate-200/60 font-bold';
+        const titleText = isDelete
+          ? `${userName} menghapus berkas`
+          : isCreate
+          ? `${userName} mendaftarkan data baru`
+          : `${userName} melakukan aktivitas sistem`;
         return {
-          icon: History,
-          badge: 'Berkas',
-          badgeClass: 'bg-slate-50 text-slate-600 border-slate-200/60 font-bold',
-          title: `${userName} memperbarui berkas`,
-          desc: typeof p === 'string' ? p : (p.catatan || p.nama_dokumen || p.judul_rancangan || 'Pembaruan data permohonan harmonisasi.'),
+          icon: isDelete ? Trash2 : isCreate ? PlusCircle : History,
+          badge: badgeLabel,
+          badgeClass: badgeColor,
+          title: titleText,
+          desc: typeof p === 'string' ? p : (p.catatan || p.keterangan || p.nama_dokumen || p.judul_rancangan || (isDelete ? 'Berkas telah dihapus dari sistem.' : 'Aktivitas sistem tercatat.')),
         };
+      }
     }
   };
 
@@ -232,6 +316,7 @@ export const HomePage = ({
       timestamp: act.created_at ? new Date(act.created_at).toLocaleString('id-ID') : '-',
       regulationTitle: act.payload?.judul_rancangan || act.payload?.nama_dokumen || null,
       description: typeof act.payload === 'string' ? act.payload : JSON.stringify(act.payload, null, 2),
+      detail: typeof act.payload === 'string' ? act.payload : JSON.stringify(act.payload, null, 2),
     });
   };
 

@@ -249,7 +249,30 @@ class HomeController extends Controller
                   ->orWhere('user_id', $user->user_id);
             });
         }
-        $recentActivities = $auditQuery->limit(5)->get();
+        $recentActivities = $auditQuery->limit(5)->get()->map(function ($act) {
+            $data = $act->toArray();
+            $action = strtoupper(trim((string) ($act->action ?? '')));
+            $userName = $act->user?->nama ?? ($act->user?->name ?? 'Sistem');
+            $p = is_array($act->payload) ? $act->payload : (json_decode((string) ($act->payload ?? '[]'), true) ?: []);
+
+            $data['formatted_title'] = null;
+            $data['formatted_badge'] = null;
+            $data['formatted_badge_class'] = null;
+            $data['formatted_desc'] = null;
+
+            if (str_contains($action, 'DELETE') || str_contains($action, 'HAPUS') || str_contains($action, 'DESTROY') || str_contains($action, 'REMOVE')) {
+                $data['formatted_title'] = "{$userName} menghapus berkas";
+                $data['formatted_badge'] = 'Hapus';
+                $data['formatted_badge_class'] = 'bg-rose-50 text-rose-700 border-rose-200/70 font-bold';
+                $data['formatted_desc'] = !empty($p['judul_rancangan'])
+                    ? ($p['judul_rancangan'] . (!empty($p['nomor_regulasi']) ? " ({$p['nomor_regulasi']})" : ''))
+                    : ($p['keterangan'] ?? 'Berkas permohonan telah dihapus dari sistem.');
+            }
+
+            return $data;
+        });
+
+        \Illuminate\Support\Facades\Log::info('AUDIT_DEBUG_RECENT_ACTIVITIES', $recentActivities->toArray());
 
         return Inertia::render('HomePage', [
             'metrics' => $metrics,
