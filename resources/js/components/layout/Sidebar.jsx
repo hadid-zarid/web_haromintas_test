@@ -13,6 +13,7 @@ import {
   Users,
   ShieldCheck,
   FileOutput,
+  Layers,
 } from "lucide-react";
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
@@ -39,6 +40,11 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             path: "/draft-generate",
             icon: FileOutput,
             show: isTimKerja,
+        },
+        {
+            label: "Bandingkan Dokumen",
+            path: "/bandingkan-dokumen",
+            icon: Layers,
         },
         {
             label: "Buku Panduan",

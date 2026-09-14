@@ -4,8 +4,11 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Dev\PasalDiffTesterController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Permohonan\DokumenPerbandinganController;
 use App\Http\Controllers\Permohonan\PermohonanController;
+use App\Http\Controllers\Permohonan\UploadPerbandinganController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,6 +35,11 @@ Route::get('/error-preview/{status?}', function ($status = 404) {
         'status' => (int) $status,
     ]);
 })->name('error.preview');
+
+// Tester mandiri perbandingan Pasal-per-Pasal (tanpa login) — hanya aktif di
+// environment local, lihat guard di PasalDiffTesterController.
+Route::get('/test-perbandingan', [PasalDiffTesterController::class, 'show'])->name('test.perbandingan');
+Route::post('/test-perbandingan/compare', [PasalDiffTesterController::class, 'compare'])->name('test.perbandingan.compare');
 
 // ==========================================
 // 2. GUEST AUTH ROUTES (LOGIN, FORGOT PASSWORD & GOOGLE SSO)
@@ -71,6 +79,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/peraturan/{id}/status', [PermohonanController::class, 'updateStatus'])->name('peraturan.status.update');
     Route::get('/dokumen/{dokumen}/view', [PermohonanController::class, 'viewDokumen'])->name('dokumen.view');
     Route::get('/dokumen/{dokumen}/download', [PermohonanController::class, 'downloadDokumen'])->name('dokumen.download');
+
+    // Perbandingan Dokumen Per-Pasal antar dokumen yang sudah ada di suatu berkas permohonan
+    Route::get('/peraturan/{id}/perbandingan', [DokumenPerbandinganController::class, 'show'])->name('peraturan.perbandingan');
+
+    // Perbandingan Pasal-per-Pasal via unggah 2 berkas langsung (tanpa perlu data berkas permohonan)
+    Route::get('/bandingkan-dokumen', [UploadPerbandinganController::class, 'show'])->name('bandingkan.upload');
+    Route::post('/bandingkan-dokumen/compare', [UploadPerbandinganController::class, 'compare'])->name('bandingkan.upload.compare');
 
     // Draft Generate Surat
     Route::get('/draft-generate', function () {

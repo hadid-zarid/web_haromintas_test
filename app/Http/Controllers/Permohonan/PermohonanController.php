@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Permohonan;
 
+use App\Http\Controllers\Concerns\AuthorizesRancanganAccess;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Permohonan\StorePermohonanRequest;
 use App\Http\Requests\Permohonan\UpdatePermohonanRequest;
@@ -15,7 +16,6 @@ use App\Models\Kabupaten;
 use App\Models\RancanganRegulasi;
 use App\Models\StatusRegulasi;
 use App\Models\TimKerja;
-use App\Models\User;
 use App\Services\NotifikasiService;
 use App\Services\PermohonanWorkflowService;
 use Illuminate\Http\RedirectResponse;
@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PermohonanController extends Controller
 {
+    use AuthorizesRancanganAccess;
+
     /**
      * Tampilkan Daftar Permohonan Peraturan dengan Filter & RBAC Scoping
      */
@@ -885,55 +887,6 @@ HTML;
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store, must-revalidate',
         ]);
-    }
-
-    /**
-     * Validasi Hak Akses Rancangan Regulasi (RBAC & IDOR Defense)
-     */
-    private function authorizeRancanganAccess(RancanganRegulasi $rancangan, ?User $user): void
-    {
-        if (! $user) {
-            abort(401, 'Silakan login terlebih dahulu untuk mengakses berkas ini.');
-        }
-
-        // Admin, Biro Hukum, dan Pimpinan dapat mengakses seluruh berkas regulasi daerah se-Riau
-        if ($user->isAdmin() || $user->isBiroHukum() || $user->isPimpinan()) {
-            return;
-        }
-
-        // Jika Tim Kerja, batasi hanya pada wilayah binaannya
-        if ($user->isTimKerja() && $user->tim_kerja_id) {
-            if ((int) $rancangan->tim_kerja_id === (int) $user->tim_kerja_id) {
-                return;
-            }
-        }
-
-        abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang untuk membuka atau mengubah berkas di luar wilayah binaan Tim Kerja Anda.');
-    }
-
-    /**
-     * Validasi Hak Akses Dokumen Rahasia (RBAC Scoping)
-     */
-    private function authorizeDocumentAccess(Dokumen $dokumen, ?User $user): void
-    {
-        if (! $user) {
-            abort(401, 'Silakan login terlebih dahulu untuk mengakses dokumen ini.');
-        }
-
-        // Admin, Biro Hukum, dan Pimpinan dapat mengakses seluruh dokumen regulasi
-        if ($user->isAdmin() || $user->isBiroHukum() || $user->isPimpinan()) {
-            return;
-        }
-
-        // Jika Tim Kerja, harus sesuai dengan wilayah binaan Tim Kerja miliknya
-        $rancangan = $dokumen->rancanganRegulasi;
-        if ($rancangan && $user->isTimKerja() && $user->tim_kerja_id) {
-            if ((int) $rancangan->tim_kerja_id === (int) $user->tim_kerja_id) {
-                return;
-            }
-        }
-
-        abort(403, 'Akses Ditolak: Dokumen ini bersifat RAHASIA dan berada di luar wewenang wilayah binaan Tim Kerja Anda.');
     }
 
     /**

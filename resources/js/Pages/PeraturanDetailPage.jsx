@@ -608,6 +608,16 @@ export const PeraturanDetailPage = ({
                 <Sparkles className="w-3.5 h-3.5 text-[#FFD82B]" />
                 <span>Uji Format Dokumen via AI</span>
               </Link>
+
+              {(permohonan.dokumens?.length || 0) >= 2 && (
+                <Link
+                  href={`/peraturan/${permohonan.rancangan_id}/perbandingan`}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                >
+                  <Layers className="w-3.5 h-3.5 text-[#FFD82B]" />
+                  <span>Bandingkan Dokumen Per-Pasal</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>
