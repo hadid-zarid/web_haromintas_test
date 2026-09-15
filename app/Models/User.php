@@ -26,6 +26,7 @@ class User extends Authenticatable
         'nip',
         'no_hp',
         'tim_kerja_id',
+        'wilayah_biro_hukum_id',
         'status',
         'google_id',
         'avatar_path',
@@ -47,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'wilayah_biro_hukum_id' => 'integer',
         ];
     }
 
@@ -127,6 +129,15 @@ class User extends Authenticatable
     public function isPimpinan(): bool
     {
         return $this->role_id === 4 || ($this->roleRelation?->nama_role === 'PIMPINAN');
+    }
+
+    /**
+     * Wilayah kerja Biro Hukum milik user ini.
+     * NULL jika bukan Biro Hukum, atau Biro Hukum yang belum ditetapkan wilayahnya.
+     */
+    public function wilayahBiroHukumId(): ?int
+    {
+        return $this->isBiroHukum() ? $this->wilayah_biro_hukum_id : null;
     }
 
     public function isActive(): bool

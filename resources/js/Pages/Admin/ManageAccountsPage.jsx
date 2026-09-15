@@ -25,16 +25,99 @@ import {
   ArrowDown,
   ChevronLeft,
   ChevronRight,
-  SlidersHorizontal
+  SlidersHorizontal,
+  MapPin,
+  Check
 } from 'lucide-react';
 
-export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], filters = {} }) => {
+// Pilihan Wilayah Penugasan Biro Hukum (kartu radio, menggantikan <select> agar daftar kabupaten terbaca)
+const WilayahBiroHukumPicker = ({ name, value, onChange, options = [], error }) => (
+  <fieldset>
+    <legend className="block text-xs font-extrabold text-[#2B3056] mb-1">
+      Wilayah Penugasan Biro Hukum <span className="text-rose-500">*</span>
+    </legend>
+    <p className="text-[10px] text-slate-500 font-semibold mb-2">
+      Berkas Pemerintah Provinsi Riau dapat ditangani oleh seluruh wilayah.
+    </p>
+    <div className="grid grid-cols-1 gap-2" role="radiogroup">
+      {options.map((w) => {
+        const id = Number(w.wilayah_biro_hukum_id);
+        const selected = Number(value) === id;
+        return (
+          <label
+            key={id}
+            className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-all focus-within:ring-2 focus-within:ring-[#FFD82B] ${
+              selected
+                ? 'border-[#2B3056] bg-[#2B3056]/[0.04] shadow-2xs'
+                : 'border-slate-200 bg-slate-50 hover:border-[#2B3056]/40 hover:bg-white'
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={id}
+              checked={selected}
+              onChange={() => onChange(id)}
+              required
+              className="sr-only"
+            />
+            <span
+              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+                selected ? 'border-[#2B3056] bg-[#2B3056] text-[#FFD82B]' : 'border-slate-200 bg-white text-slate-500'
+              }`}
+            >
+              <MapPin className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center justify-between gap-2">
+                <span className="text-xs font-extrabold text-[#2B3056]">{w.nama_wilayah}</span>
+                <span
+                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                    selected ? 'border-[#2B3056] bg-[#2B3056]' : 'border-slate-300 bg-white'
+                  }`}
+                >
+                  {selected && <Check className="h-2.5 w-2.5 text-[#FFD82B]" strokeWidth={4} />}
+                </span>
+              </span>
+              <span className="mt-1.5 flex flex-wrap gap-1">
+                {(w.kabupatens || []).map((k) => (
+                  <span
+                    key={k}
+                    className="rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                  >
+                    {k.replace(/^Kabupaten /, 'Kab. ')}
+                  </span>
+                ))}
+              </span>
+            </span>
+          </label>
+        );
+      })}
+    </div>
+    {error && <p className="mt-1 text-[10px] text-rose-600 font-bold">{error}</p>}
+  </fieldset>
+);
+
+export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], wilayahBiroHukums = [], filters = {} }) => {
   const { auth, flash } = usePage().props;
   const currentAdminId = auth?.user?.user_id || auth?.user?.id;
 
   // Normalisasi list unit tim kerja
   const unitList = (timKerjas && timKerjas.length > 0) ? timKerjas : pokjas;
   const rawUsers = Array.isArray(users) ? users : (users?.data || []);
+
+  const isBiroHukumUser = (u) => u.role === 'BIRO_HUKUM' || Number(u.role_id) === 3;
+
+  // Label wilayah kerja Biro Hukum (kosong = belum ditetapkan admin)
+  const getWilayahBiroLabel = (u) => {
+    if (!isBiroHukumUser(u)) return '';
+    const wilayah = wilayahBiroHukums.find((w) => Number(w.wilayah_biro_hukum_id) === Number(u.wilayah_biro_hukum_id));
+    return wilayah ? `Biro Hukum ${wilayah.nama_wilayah}` : 'Wilayah belum ditetapkan';
+  };
+
+  const getWilayahBadgeClass = (u) => (u.wilayah_biro_hukum_id
+    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+    : 'bg-amber-50 text-amber-800 border-amber-200');
 
   // Filter & Sorting States (Pure React In-Memory State untuk Instant Filter tanpa Reload)
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
@@ -59,7 +142,8 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
         const noHp = (u.no_hp || '').toLowerCase();
         const timName = (u.tim_kerja?.nama_tim_kerja || u.timKerja?.nama_tim_kerja || '').toLowerCase();
         const roleName = (u.role || u.role_relation?.nama_role || '').toLowerCase();
-        return name.includes(term) || email.includes(term) || nip.includes(term) || noHp.includes(term) || timName.includes(term) || roleName.includes(term);
+        const wilayahName = getWilayahBiroLabel(u).toLowerCase();
+        return name.includes(term) || email.includes(term) || nip.includes(term) || noHp.includes(term) || timName.includes(term) || roleName.includes(term) || wilayahName.includes(term);
       });
     }
 
@@ -156,6 +240,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
     no_hp: '',
     role_id: 2, // Default: Tim Kerja
     tim_kerja_id: unitList[0]?.tim_kerja_id || unitList[0]?.id || 1,
+    wilayah_biro_hukum_id: '', // Wajib dipilih jika role Biro Hukum
   });
 
   // Form: Edit Akun
@@ -168,6 +253,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
     role_id: 2,
     status: 'ACTIVE',
     tim_kerja_id: '',
+    wilayah_biro_hukum_id: '',
   });
 
   const [showAddPassword, setShowAddPassword] = useState(false);
@@ -200,6 +286,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
       role_id: user.role_id || (user.role === 'ADMIN' ? 1 : user.role === 'BIRO_HUKUM' ? 3 : user.role === 'PIMPINAN' ? 4 : 2),
       status: user.status || 'ACTIVE',
       tim_kerja_id: user.tim_kerja_id || user.pokja_id || unitList[0]?.tim_kerja_id || unitList[0]?.id || '',
+      wilayah_biro_hukum_id: user.wilayah_biro_hukum_id ?? '',
     });
   };
 
@@ -585,10 +672,11 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                                 {u.tim_kerja?.keterangan || u.timKerja?.keterangan}
                               </p>
                             )}
-                            {(u.role === 'BIRO_HUKUM' || u.role_id === 3) && (
-                              <p className="text-[10px] text-slate-500 font-semibold mt-1">
-                                Biro Hukum Provinsi Riau
-                              </p>
+                            {isBiroHukumUser(u) && (
+                              <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${getWilayahBadgeClass(u)}`}>
+                                <MapPin className="w-3 h-3" />
+                                {getWilayahBiroLabel(u)}
+                              </span>
                             )}
                           </div>
                         </td>
@@ -729,10 +817,16 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                     {/* Middle Info: Role & Contact */}
                     <div className="space-y-1.5 text-[11px] bg-slate-50/70 p-2.5 rounded-xl border border-slate-200/70">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <RoleBadge 
-                          role={u.role || u.role_relation?.nama_role} 
-                          timKerjaName={timName} 
+                        <RoleBadge
+                          role={u.role || u.role_relation?.nama_role}
+                          timKerjaName={timName}
                         />
+                        {isBiroHukumUser(u) && (
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${getWilayahBadgeClass(u)}`}>
+                            <MapPin className="w-3 h-3" />
+                            {getWilayahBiroLabel(u)}
+                          </span>
+                        )}
                       </div>
                       <p className="font-medium text-slate-600 flex items-center gap-1.5 truncate">
                         <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -921,7 +1015,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                       required
                       value={addForm.data.email}
                       onChange={(e) => addForm.setData('email', e.target.value)}
-                      placeholder="email@harmonitas.go.id"
+                      placeholder="nama.pegawai@gmail.com"
                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
                     />
                     {addForm.errors.email && (
@@ -1020,6 +1114,17 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                       <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.tim_kerja_id}</p>
                     )}
                   </div>
+                )}
+
+                {/* Conditional Field Wilayah Biro Hukum */}
+                {parseInt(addForm.data.role_id) === 3 && (
+                  <WilayahBiroHukumPicker
+                    name="add_wilayah_biro_hukum_id"
+                    value={addForm.data.wilayah_biro_hukum_id}
+                    onChange={(id) => addForm.setData('wilayah_biro_hukum_id', id)}
+                    options={wilayahBiroHukums}
+                    error={addForm.errors.wilayah_biro_hukum_id}
+                  />
                 )}
 
                 {/* Password Input & Realtime Security Checklist */}
@@ -1263,6 +1368,17 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                       })}
                     </select>
                   </div>
+                )}
+
+                {/* Conditional Wilayah Biro Hukum */}
+                {parseInt(editForm.data.role_id) === 3 && (
+                  <WilayahBiroHukumPicker
+                    name="edit_wilayah_biro_hukum_id"
+                    value={editForm.data.wilayah_biro_hukum_id}
+                    onChange={(id) => editForm.setData('wilayah_biro_hukum_id', id)}
+                    options={wilayahBiroHukums}
+                    error={editForm.errors.wilayah_biro_hukum_id}
+                  />
                 )}
 
                 {/* Status Akun */}

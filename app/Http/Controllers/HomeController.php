@@ -50,6 +50,14 @@ class HomeController extends Controller
             $query->where('tim_kerja_id', $user->tim_kerja_id);
         }
 
+        // Jika Biro Hukum, hanya ambil kabupaten dalam wilayah kerjanya (+ Pemprov Riau)
+        $isBiroHukum = $user && $user->isBiroHukum();
+        $wilayahBiroId = $user?->wilayahBiroHukumId();
+        $wilayahBiroNama = Kabupaten::namaWilayahBiroHukum($wilayahBiroId);
+        if ($isBiroHukum) {
+            $query->dalamCakupanBiroHukum($wilayahBiroId);
+        }
+
         // Apply year filter
         $query->whereRaw('YEAR(COALESCE(tanggal_dibuat, created_at)) = ?', [$selectedYear]);
 
@@ -123,12 +131,15 @@ class HomeController extends Controller
             ],
         ];
 
-        // Sebaran Wilayah Sesuai Cakupan Tim Kerja:
+        // Sebaran Wilayah Sesuai Cakupan Tim Kerja / Biro Hukum:
         // Jika Tim Kerja: ambil seluruh Kabupaten yang menjadi tanggung jawab timnya
-        // Jika Admin/Biro Hukum/Pimpinan: ambil seluruh Kabupaten di Provinsi Riau
+        // Jika Biro Hukum berwilayah: ambil Kabupaten wilayah kerjanya (+ Pemprov Riau)
+        // Jika Admin/Pimpinan: ambil seluruh Kabupaten di Provinsi Riau
         $kabupatenQuery = Kabupaten::with('timKerja');
         if ($isTim) {
             $kabupatenQuery->where('tim_kerja_id', $user->tim_kerja_id);
+        } elseif ($isBiroHukum) {
+            $kabupatenQuery->dalamCakupanBiroHukum($wilayahBiroId);
         }
         $kabupatens = $kabupatenQuery->get();
 
@@ -166,12 +177,13 @@ class HomeController extends Controller
                     'color' => 'bg-rose-500 text-white',
                 ],
             ];
-        } elseif ($user && $user->isBiroHukum()) {
+        } elseif ($isBiroHukum) {
+            $cakupanBiro = $wilayahBiroNama ? "Biro Hukum {$wilayahBiroNama}" : 'Biro Hukum (wilayah belum ditetapkan)';
             $taskNotifications = [
                 [
                     'id' => 1,
                     'title' => 'Berkas Masuk Siap Difasilitasi',
-                    'desc' => 'Dokumen 1-5 Kanwil lengkap (5/5), menunggu telaah Biro Hukum.',
+                    'desc' => "Dokumen 1-5 Kanwil lengkap (5/5), menunggu telaah dalam cakupan {$cakupanBiro}.",
                     'count' => $fasilitasi,
                     'link' => '/peraturan?status_id=3',
                     'color' => 'bg-sky-600 text-white',
@@ -242,7 +254,7 @@ class HomeController extends Controller
             ->where('action', '!=', 'PREVIEW_CONFIDENTIAL_DOKUMEN')
             ->latest('created_at');
 
-        if ($isTim) {
+        if ($isTim || $isBiroHukum) {
             $rancanganIds = $allData->pluck('rancangan_id')->map(fn($id) => (string) $id)->toArray();
             $auditQuery->where(function ($q) use ($rancanganIds, $user) {
                 $q->whereIn('target_id', $rancanganIds)
@@ -287,6 +299,9 @@ class HomeController extends Controller
             'userScope' => [
                 'isTimKerja' => $isTim,
                 'timKerjaNama' => $user->timKerja?->nama_tim_kerja ?? null,
+                'isBiroHukum' => $isBiroHukum,
+                'wilayahBiroHukumId' => $wilayahBiroId,
+                'wilayahBiroHukumNama' => $wilayahBiroNama,
             ],
         ]);
     }

@@ -119,10 +119,26 @@ export const HomePage = ({
   // Role display name helper
   const getRoleDisplayName = () => {
     if (userScope.isTimKerja) return userScope.timKerjaNama || 'Tim Kerja Kanwil';
-    if (isBiroHukum) return 'Biro Hukum Provinsi Riau';
+    if (isBiroHukum) return 'Biro Hukum Setda Provinsi Riau';
     if (isAdmin) return 'Administrator Sistem';
     if (isPimpinan) return 'Pimpinan Kanwil Kemenkum';
     return user?.role?.name || user?.unit || 'Operator Resmi';
+  };
+
+  // Cakupan wilayah kerja Biro Hukum (null = wilayah belum ditetapkan admin)
+  const wilayahBiroLabel = userScope.wilayahBiroHukumNama
+    ? `Biro Hukum ${userScope.wilayahBiroHukumNama}`
+    : 'Biro Hukum (wilayah belum ditetapkan)';
+
+  const getUnitSubtitle = () => {
+    if (userScope.isBiroHukum) return userScope.wilayahBiroHukumNama || 'Wilayah belum ditetapkan';
+    return 'Kanwil Kementerian Hukum Riau';
+  };
+
+  const getScopeDescription = (timKerjaText, biroText, defaultText) => {
+    if (userScope.isTimKerja) return timKerjaText;
+    if (userScope.isBiroHukum) return biroText;
+    return defaultText;
   };
 
   // Helper Formatter Riwayat Aktivitas
@@ -349,7 +365,7 @@ export const HomePage = ({
                     ke-wrap terpisah (bullet nyasar sendirian di barisnya sendiri). */}
                 <span className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-500">
                   <span className="text-slate-400 hidden sm:inline">•</span>
-                  Kanwil Kementerian Hukum Riau
+                  {getUnitSubtitle()}
                 </span>
               </div>
 
@@ -358,9 +374,11 @@ export const HomePage = ({
               </h1>
 
               <p className="text-xs text-slate-500 font-normal max-w-2xl leading-relaxed">
-                {userScope.isTimKerja
-                  ? `Ruang kendali harmonisasi regulasi untuk cakupan ${userScope.timKerjaNama || 'Tim Kerja'}.`
-                  : 'Pusat pemantauan dan kendali terpadu seluruh tahapan harmonisasi regulasi daerah di Provinsi Riau.'}
+                {getScopeDescription(
+                  `Ruang kendali harmonisasi regulasi untuk cakupan ${userScope.timKerjaNama || 'Tim Kerja'}.`,
+                  `Ruang kendali fasilitasi regulasi untuk cakupan ${wilayahBiroLabel}.`,
+                  'Pusat pemantauan dan kendali terpadu seluruh tahapan harmonisasi regulasi daerah di Provinsi Riau.'
+                )}
               </p>
             </div>
 
@@ -485,9 +503,11 @@ export const HomePage = ({
                     <span>Distribusi Tahapan Alur Harmonisasi</span>
                   </h2>
                   <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {userScope.isTimKerja
-                      ? `Cakupan wilayah: ${userScope.timKerjaNama || 'Tim Kerja'}`
-                      : 'Distribusi permohonan aktif pada setiap tahapan SOP harmonisasi'}
+                    {getScopeDescription(
+                      `Cakupan wilayah: ${userScope.timKerjaNama || 'Tim Kerja'}`,
+                      `Cakupan wilayah: ${wilayahBiroLabel}`,
+                      'Distribusi permohonan aktif pada setiap tahapan SOP harmonisasi'
+                    )}
                   </p>
                 </div>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70 text-[10px] font-bold">
@@ -546,9 +566,11 @@ export const HomePage = ({
                     <span>Sebaran Wilayah Administrasi ({wilayahStats.length})</span>
                   </h2>
                   <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {userScope.isTimKerja
-                      ? `Wilayah binaan ${userScope.timKerjaNama}`
-                      : 'Distribusi permohonan regulasi di seluruh Kabupaten / Kota se-Riau'}
+                    {getScopeDescription(
+                      `Wilayah binaan ${userScope.timKerjaNama}`,
+                      `Wilayah kerja ${wilayahBiroLabel}, termasuk Pemprov Riau`,
+                      'Distribusi permohonan regulasi di seluruh Kabupaten / Kota se-Riau'
+                    )}
                   </p>
                 </div>
 

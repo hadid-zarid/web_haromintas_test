@@ -13,14 +13,20 @@ use Illuminate\Support\Facades\Mail;
 class NotifikasiService
 {
     /**
-     * Kirim notifikasi ke Biro Hukum Provinsi Riau (role_id = 3)
+     * Kirim notifikasi ke Biro Hukum Provinsi Riau (role_id = 3) sesuai wilayah kerja kabupaten berkas:
+     * - Kabupaten berwilayah: hanya petugas Biro Hukum wilayah tersebut.
+     * - Kabupaten tanpa wilayah (mis. Pemprov Riau): seluruh petugas Biro Hukum.
      * Admin (role_id = 1) TIDAK menerima notifikasi ini.
      */
     public static function notifyBiroHukum(RancanganRegulasi $rancangan, string $judul, string $pesan): array
     {
+        $rancangan->loadMissing('kabupaten');
+        $wilayahId = $rancangan->kabupaten?->wilayah_biro_hukum_id;
+
         $users = User::with(['roleRelation'])
             ->where('role_id', 3)
             ->where('status', 'ACTIVE')
+            ->when($wilayahId !== null, fn ($query) => $query->where('wilayah_biro_hukum_id', $wilayahId))
             ->get();
 
         return self::createNotificationsForUsers($users, $rancangan, $judul, $pesan, 'Pemberitahuan Biro Hukum');

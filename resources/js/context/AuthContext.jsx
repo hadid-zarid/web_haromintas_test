@@ -27,7 +27,9 @@ export const useAuth = () => {
   if ((authUser?.role === 'TIM_KERJA' || authUser?.role === 'POKJA') && authUser.tim_kerja) {
     unit = `Kanwil Riau - ${authUser.tim_kerja.nama_tim_kerja}`;
   } else if (authUser?.role === 'BIRO_HUKUM') {
-    unit = 'Biro Hukum Provinsi Riau';
+    unit = authUser.wilayah_biro_hukum_nama
+      ? `Biro Hukum Setda Provinsi Riau - ${authUser.wilayah_biro_hukum_nama}`
+      : 'Biro Hukum Setda Provinsi Riau';
   } else if (authUser?.role === 'ADMIN') {
     unit = 'Administrator Sistem Kanwil Riau';
   } else if (authUser?.role === 'PIMPINAN') {

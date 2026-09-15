@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\AuditLog;
+use App\Models\Kabupaten;
 use App\Models\Role;
 use App\Models\TimKerja;
 use App\Models\User;
@@ -44,10 +45,24 @@ class AdminUserController extends Controller
         $timKerjas = TimKerja::select('tim_kerja_id', 'nama_tim_kerja', 'keterangan')->get();
         $roles = Role::select('role_id', 'nama_role')->get();
 
+        // Opsi Wilayah Kerja Biro Hukum beserta daftar kabupaten binaannya
+        $kabupatenPerWilayah = Kabupaten::whereNotNull('wilayah_biro_hukum_id')
+            ->orderBy('kabupaten_id')
+            ->get(['nama_kabupaten', 'wilayah_biro_hukum_id'])
+            ->groupBy('wilayah_biro_hukum_id');
+        $wilayahBiroHukums = collect(Kabupaten::WILAYAH_BIRO_HUKUM)
+            ->map(fn ($nama, $id) => [
+                'wilayah_biro_hukum_id' => $id,
+                'nama_wilayah' => $nama,
+                'kabupatens' => ($kabupatenPerWilayah[$id] ?? collect())->pluck('nama_kabupaten')->values(),
+            ])
+            ->values();
+
         return Inertia::render('Admin/ManageAccountsPage', [
             'users' => $users,
             'stats' => $stats,
             'timKerjas' => $timKerjas,
+            'wilayahBiroHukums' => $wilayahBiroHukums,
             'roles' => $roles,
             'filters' => [
                 'search' => $search ?? '',
@@ -76,6 +91,7 @@ class AdminUserController extends Controller
             'role_id' => $roleId,
             'status' => 'ACTIVE', // Otomatis aktif saat dibuat
             'tim_kerja_id' => $roleId === 2 ? ($validated['tim_kerja_id'] ?? null) : null,
+            'wilayah_biro_hukum_id' => $roleId === 3 ? ($validated['wilayah_biro_hukum_id'] ?? null) : null,
         ]);
 
         AuditLog::create([
@@ -89,6 +105,7 @@ class AdminUserController extends Controller
                 'created_user_id' => $user->user_id,
                 'email' => $user->email,
                 'role_id' => $user->role_id,
+                'wilayah_biro_hukum_id' => $user->wilayah_biro_hukum_id,
             ],
             'created_at' => now(),
         ]);
@@ -124,6 +141,7 @@ class AdminUserController extends Controller
             'role_id' => $roleId,
             'status' => $validated['status'],
             'tim_kerja_id' => $roleId === 2 ? ($validated['tim_kerja_id'] ?? null) : null,
+            'wilayah_biro_hukum_id' => $roleId === 3 ? ($validated['wilayah_biro_hukum_id'] ?? null) : null,
         ];
 
         // Jika password diisi, update password
@@ -144,6 +162,7 @@ class AdminUserController extends Controller
                 'updated_user_id' => $user->user_id,
                 'email' => $user->email,
                 'role_id' => $user->role_id,
+                'wilayah_biro_hukum_id' => $user->wilayah_biro_hukum_id,
                 'status' => $user->status,
                 'password_changed' => ! empty($validated['password']),
             ],

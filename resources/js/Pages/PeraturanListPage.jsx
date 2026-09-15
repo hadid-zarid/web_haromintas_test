@@ -396,11 +396,15 @@ export const PeraturanListPage = ({
                 <option value="ALL">
                   {isTimKerja
                     ? `Semua Wilayah (${user?.tim_kerja?.nama_tim_kerja || 'Tim Kerja Anda'})`
-                    : 'Semua Kabupaten / Kota'}
+                    : isBiroHukum
+                      ? `Semua Wilayah (Biro Hukum ${user?.wilayah_biro_hukum_nama || 'Anda'})`
+                      : 'Semua Kabupaten / Kota'}
                 </option>
                 {availableKabupatens.map((k) => (
                   <option key={k.kabupaten_id} value={k.kabupaten_id}>
-                    {k.nama_kabupaten} {(!isTimKerja && k.tim_kerja?.nama_tim_kerja) ? `(${k.tim_kerja.nama_tim_kerja})` : ''}
+                    {k.nama_kabupaten} {isBiroHukum
+                      ? (k.wilayah_biro_hukum_id ? `(Wilayah ${k.wilayah_biro_hukum_id})` : '(Semua Wilayah)')
+                      : (!isTimKerja && k.tim_kerja?.nama_tim_kerja) ? `(${k.tim_kerja.nama_tim_kerja})` : ''}
                   </option>
                 ))}
               </select>

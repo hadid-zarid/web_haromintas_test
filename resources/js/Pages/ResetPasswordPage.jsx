@@ -149,7 +149,7 @@ export const ResetPasswordPage = ({ token, email }) => {
                   required
                   value={data.email}
                   onChange={(e) => setData('email', e.target.value)}
-                  placeholder="nama@harmonitas.go.id"
+                  placeholder="nama.pegawai@gmail.com"
                   className="w-full pl-10 pr-4 py-3 bg-slate-50/70 border border-slate-200 rounded-2xl text-xs font-semibold text-[#2B3056] focus:outline-none"
                 />
               </div>

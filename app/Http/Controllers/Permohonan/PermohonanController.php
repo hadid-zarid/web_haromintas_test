@@ -77,6 +77,13 @@ class PermohonanController extends Controller
             $query->where('tim_kerja_id', $timKerjaFilter);
         }
 
+        // RBAC Scoping: Biro Hukum hanya melihat berkas dari kabupaten wilayah kerjanya (+ Pemprov Riau)
+        $isBiroHukum = $user && $user->isBiroHukum();
+        $wilayahBiroId = $user?->wilayahBiroHukumId();
+        if ($isBiroHukum) {
+            $query->dalamCakupanBiroHukum($wilayahBiroId);
+        }
+
         // Filter Pencarian (Judul / Nomor)
         if (! empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -105,10 +112,16 @@ class PermohonanController extends Controller
         // Master Data untuk Dropdown & Filter
         $allKabupatens = Kabupaten::with('timKerja')->orderBy('kabupaten_id')->get();
         
-        // Kabupaten yang dapat dipilih saat Tambah Permohonan oleh user saat ini
-        $availableKabupatens = ($user && $user->isTimKerja() && $user->tim_kerja_id)
-            ? $allKabupatens->where('tim_kerja_id', $user->tim_kerja_id)->values()
-            : $allKabupatens;
+        // Kabupaten yang dapat dipilih (tambah permohonan & filter) oleh user saat ini
+        if ($user && $user->isTimKerja() && $user->tim_kerja_id) {
+            $availableKabupatens = $allKabupatens->where('tim_kerja_id', $user->tim_kerja_id)->values();
+        } elseif ($isBiroHukum) {
+            $availableKabupatens = $allKabupatens
+                ->filter(fn ($k) => $k->wilayah_biro_hukum_id === null || $k->wilayah_biro_hukum_id === $wilayahBiroId)
+                ->values();
+        } else {
+            $availableKabupatens = $allKabupatens;
+        }
 
         $jenisRegulasis = JenisRegulasi::orderBy('jenis_regulasi_id')->get();
         $statuses = StatusRegulasi::orderBy('urutan')->get();
@@ -118,6 +131,8 @@ class PermohonanController extends Controller
         $baseStatQuery = RancanganRegulasi::query();
         if ($user && $user->isTimKerja() && $user->tim_kerja_id) {
             $baseStatQuery->where('tim_kerja_id', $user->tim_kerja_id);
+        } elseif ($isBiroHukum) {
+            $baseStatQuery->dalamCakupanBiroHukum($wilayahBiroId);
         }
 
         $stats = [
@@ -311,6 +326,12 @@ class PermohonanController extends Controller
 
         $validated = $request->validated();
         $kabupaten = Kabupaten::findOrFail($validated['kabupaten_id']);
+
+        // Biro Hukum tidak boleh memindahkan berkas ke kabupaten di luar wilayah kerjanya
+        $wilayahBiroId = $user->wilayahBiroHukumId();
+        if ($user->isBiroHukum() && $kabupaten->wilayah_biro_hukum_id !== null && $kabupaten->wilayah_biro_hukum_id !== $wilayahBiroId) {
+            abort(403, 'Akses Ditolak: Anda hanya dapat memilih kabupaten dalam wilayah kerja Biro Hukum Anda.');
+        }
 
         $payloadUpdate = [
             'judul_rancangan' => $validated['judul_rancangan'],

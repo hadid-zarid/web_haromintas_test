@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +38,15 @@ class RancanganRegulasi extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Batasi rancangan pada cakupan wilayah kerja Biro Hukum tertentu
+     * (ditentukan dari kabupaten asal permohonan, bukan dari Tim Kerja Kanwil).
+     */
+    public function scopeDalamCakupanBiroHukum(Builder $query, ?int $wilayahId): Builder
+    {
+        return $query->whereHas('kabupaten', fn (Builder $q) => $q->dalamCakupanBiroHukum($wilayahId));
+    }
 
     /**
      * Relasi ke Master Jenis Regulasi (Ranperda / Ranperkada)

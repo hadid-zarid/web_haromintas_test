@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Kabupaten;
 use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -53,6 +54,7 @@ class StoreUserRequest extends FormRequest
             'no_hp' => ['nullable', 'string', 'max:13', 'regex:/^[0-9]+$/'],
             'role_id' => ['required', 'integer', Rule::in([1, 2, 3, 4])],
             'tim_kerja_id' => ['nullable', 'required_if:role_id,2', 'exists:tim_kerja,tim_kerja_id'],
+            'wilayah_biro_hukum_id' => ['nullable', 'required_if:role_id,3', 'integer', Rule::in(array_keys(Kabupaten::WILAYAH_BIRO_HUKUM))],
         ];
     }
 
@@ -70,6 +72,8 @@ class StoreUserRequest extends FormRequest
             'no_hp.regex' => 'Nomor WhatsApp / HP hanya boleh berupa digit angka.',
             'role_id.required' => 'Hak akses / role akun wajib dipilih.',
             'tim_kerja_id.required_if' => 'Untuk role Tim Kerja Kanwil, unit Tim Kerja wajib dipilih.',
+            'wilayah_biro_hukum_id.required_if' => 'Untuk role Biro Hukum, wilayah penugasan wajib dipilih.',
+            'wilayah_biro_hukum_id.in' => 'Wilayah kerja Biro Hukum tidak valid.',
         ];
     }
 }

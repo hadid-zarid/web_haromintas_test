@@ -192,7 +192,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
                   required
                   value={data.email}
                   onChange={(e) => setData('email', e.target.value)}
-                  placeholder="nama@harmonitas.go.id"
+                  placeholder="nama.pegawai@gmail.com"
                   className={`w-full pl-10 pr-4 py-3 bg-slate-50/70 border rounded-2xl text-xs font-semibold text-[#2B3056] placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#2B3056]/10 focus:border-[#2B3056] transition-all ${
                     errors.email ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
                   }`}
