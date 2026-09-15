@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '../components/layout/AppLayout';
 import HarmonitasLoader from '../components/common/HarmonitasLoader';
@@ -7,14 +7,27 @@ import {
   Upload,
   FileText,
   ShieldCheck,
-  AlertCircle,
   CheckCircle2,
   X,
   Search,
   FileCheck2,
   Info,
   Sparkles,
-  CheckCircle,
+  Layers,
+  AlertTriangle,
+  SpellCheck,
+  Bug,
+  Quote,
+  BookOpenText,
+  AlignLeft,
+  Download,
+  ChevronDown,
+  Code2,
+  Highlighter,
+  ScrollText,
+  Bot,
+  Send,
+  Loader2,
 } from 'lucide-react';
 
 // URL backend AI Document Checker (di-hosting di Render, service ai-document-checker).
@@ -31,7 +44,9 @@ const ERROR_TYPE_LABELS = {
 
 function mapCheckReportToAnalysisResult(report) {
   const summary = report.summary || {};
-  const score = Math.round(report.compliance_score?.overall_score ?? 0);
+  const compliance = report.compliance_score || {};
+  const subScores = compliance.sub_scores || {};
+  const score = Math.round(compliance.overall_score ?? 0);
   const totalErrors = summary.total_span_errors ?? 0;
   const writingErrors =
     (summary.errors_ejaan ?? 0) + (summary.errors_tanda_baca ?? 0) + (summary.errors_kosa_kata ?? 0);
@@ -53,19 +68,53 @@ function mapCheckReportToAnalysisResult(report) {
 
   return {
     score,
+    grade: compliance.grade || '-',
+    predicate: compliance.predicate || '',
+    subScores: {
+      pedoman: Math.round(subScores.pedoman_score ?? 100),
+      ejaan: Math.round(subScores.ejaan_score ?? 100),
+      punct: Math.round(subScores.tanda_baca_kosa_kata_score ?? 100),
+      struct: Math.round(subScores.struktur_hukum_score ?? 100),
+    },
+    totalBlocks: summary.total_blocks ?? 0,
+    sesuai: summary.sesuai ?? 0,
+    longSentences: report.legal_metrics?.long_sentences_count ?? 0,
     totalErrors,
     writingErrors,
     structureErrors,
     formatErrors,
     recommendations,
+    errorsEjaanTandaBaca: summary.ejaan_tanda_baca ?? 0,
+    errorsTandaBaca: summary.errors_tanda_baca ?? 0,
+    errorsKosaKata: summary.errors_kosa_kata ?? 0,
     errors: errors.slice(0, 30),
+    rawReport: report,
   };
+}
+
+function buildDocumentContext(report) {
+  return (report.blocks || [])
+    .map((b) => b.original_text)
+    .filter(Boolean)
+    .join('\n')
+    .slice(0, 3000);
 }
 
 const AIAssistantPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportingMode, setExportingMode] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatLoading]);
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -150,6 +199,95 @@ const AIAssistantPage = () => {
       alert(`Gagal menganalisis dokumen: ${error.message}`);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleExport = async (mode) => {
+    if (!analysisResult?.rawReport) return;
+    setExportOpen(false);
+    setExportingMode(mode);
+
+    try {
+      const res = await fetch(`${AI_API_BASE_URL}/api/export-docx`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report: analysisResult.rawReport, mode }),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.detail || 'Gagal membuat dokumen ekspor.');
+      }
+
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="?([^"]+)"?/);
+      const filename = match ? match[1] : `hasil-analisa-${mode}.docx`;
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert(`Gagal mengekspor dokumen: ${error.message}`);
+    } finally {
+      setExportingMode(null);
+    }
+  };
+
+  const handleExportJson = () => {
+    if (!analysisResult?.rawReport) return;
+    setExportOpen(false);
+    const blob = new Blob([JSON.stringify(analysisResult.rawReport, null, 2)], {
+      type: 'application/json',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'hasil-analisa-data.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleSendChat = async () => {
+    const message = chatInput.trim();
+    if (!message || chatLoading) return;
+
+    const nextMessages = [...chatMessages, { role: 'user', content: message }];
+    setChatMessages(nextMessages);
+    setChatInput('');
+    setChatLoading(true);
+
+    try {
+      const res = await fetch(`${AI_API_BASE_URL}/api/assistant/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          chat_history: chatMessages,
+          document_context: analysisResult?.rawReport
+            ? buildDocumentContext(analysisResult.rawReport)
+            : undefined,
+        }),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.detail || 'Asisten AI gagal merespons.');
+      }
+      const data = await res.json();
+      setChatMessages([...nextMessages, { role: 'assistant', content: data.reply }]);
+    } catch (error) {
+      setChatMessages([
+        ...nextMessages,
+        { role: 'assistant', content: `Maaf, terjadi kesalahan: ${error.message}` },
+      ]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -259,7 +397,7 @@ const AIAssistantPage = () => {
 
             {/* Analysis Result Section */}
             <section className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-              <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#2B3056] shrink-0">
                     <Search className="w-5 h-5 text-[#2B3056]" />
@@ -274,19 +412,80 @@ const AIAssistantPage = () => {
                   </div>
                 </div>
 
-                {isAnalyzing ? (
-                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-700 border border-amber-200 animate-pulse shrink-0">
-                    Sedang Memindai
-                  </span>
-                ) : analysisResult ? (
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200 shrink-0">
-                    Selesai Dipindai
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-500 border border-slate-200 shrink-0">
-                    Menunggu Dokumen
-                  </span>
-                )}
+                <div className="flex items-center gap-2 shrink-0">
+                  {analysisResult && (
+                    <>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setExportOpen((o) => !o)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2B3056] hover:bg-[#232849] text-white text-[11px] font-bold transition-colors cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Export
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                        {exportOpen && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setExportOpen(false)} />
+                            <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-20 overflow-hidden py-1">
+                              <ExportMenuItem
+                                icon={FileText}
+                                iconClass="text-blue-600"
+                                label="Naskah Bersih (Word .docx)"
+                                loading={exportingMode === 'clean'}
+                                onClick={() => handleExport('clean')}
+                              />
+                              <ExportMenuItem
+                                icon={Highlighter}
+                                iconClass="text-orange-600"
+                                label="Mode Track Changes (Coret/Tambah)"
+                                loading={exportingMode === 'track_changes'}
+                                onClick={() => handleExport('track_changes')}
+                              />
+                              <ExportMenuItem
+                                icon={ScrollText}
+                                iconClass="text-emerald-600"
+                                label="Laporan Audit Eksekutif (.docx)"
+                                loading={exportingMode === 'audit_report'}
+                                onClick={() => handleExport('audit_report')}
+                              />
+                              <ExportMenuItem
+                                icon={Code2}
+                                iconClass="text-slate-500"
+                                label="Data Mentah (JSON)"
+                                onClick={handleExportJson}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setChatOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-[#2B3056] text-[11px] font-bold transition-colors cursor-pointer"
+                      >
+                        <Bot className="w-3.5 h-3.5" />
+                        Tanya Asisten AI
+                      </button>
+                    </>
+                  )}
+
+                  {isAnalyzing ? (
+                    <span className="px-2.5 py-1 rounded-full bg-amber-50 text-[11px] font-bold text-amber-700 border border-amber-200 animate-pulse shrink-0">
+                      Sedang Memindai
+                    </span>
+                  ) : analysisResult ? (
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-[11px] font-bold text-emerald-700 border border-emerald-200 shrink-0">
+                      Selesai Dipindai
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-500 border border-slate-200 shrink-0">
+                      Menunggu Dokumen
+                    </span>
+                  )}
+                </div>
               </div>
 
               {isAnalyzing ? (
@@ -318,48 +517,34 @@ const AIAssistantPage = () => {
                 </div>
               ) : (
                 <div className="p-4 sm:p-6 space-y-6">
-                  {/* Score Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="rounded-2xl bg-[#2B3056] p-5 text-white">
-                      <p className="text-xs text-slate-300 font-medium">
-                        Kesesuaian Format
-                      </p>
-                      <div className="flex items-baseline gap-1 mt-1">
-                        <span className="text-3xl font-bold text-[#FFD82B]">
-                          {analysisResult.score}
-                        </span>
-                        <span className="text-sm text-slate-300 font-medium">/ 100</span>
+                  {/* Score Banner */}
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 flex flex-col sm:flex-row sm:items-center gap-5">
+                    <div className="relative shrink-0 mx-auto sm:mx-0">
+                      <div className="w-20 h-20 rounded-full bg-[#2B3056] flex items-center justify-center text-white text-2xl font-extrabold shadow-inner">
+                        {analysisResult.score}
                       </div>
-                      <p className="text-[11px] text-slate-300 mt-2">
-                        Skor keselarasan sistematika peraturan
-                      </p>
+                      <div
+                        className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold text-white border-2 border-white ${gradeBadgeClass(
+                          analysisResult.grade
+                        )}`}
+                      >
+                        {analysisResult.grade}
+                      </div>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 p-5 bg-white">
-                      <p className="text-xs text-slate-500 font-medium">
-                        Temuan Perbaikan
+                    <div className="min-w-0 text-center sm:text-left">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        Skor Kepatuhan & Kualitas Naskah
                       </p>
-                      <p className="text-3xl font-bold text-[#2B3056] mt-1">
-                        {analysisResult.totalErrors}
+                      <p className="text-sm font-bold text-[#2B3056] mt-0.5">
+                        Grade {analysisResult.grade} – {analysisResult.predicate}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-2">
-                        Poin pasal yang perlu ditinjau
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 p-5 bg-white">
-                      <p className="text-xs text-slate-500 font-medium">
-                        Status Validasi
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-bold text-[#2B3056]">
-                          Perlu Review
-                        </span>
+                      <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-3">
+                        <SubPill icon={ShieldCheck} label="Pedoman" value={analysisResult.subScores.pedoman} />
+                        <SubPill icon={SpellCheck} label="Ejaan" value={analysisResult.subScores.ejaan} />
+                        <SubPill icon={Quote} label="Tanda Baca & Kosa Kata" value={analysisResult.subScores.punct} />
+                        <SubPill icon={FileCheck2} label="Struktur UU" value={analysisResult.subScores.struct} />
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-2">
-                        Memerlukan konfirmasi Tim Kerja
-                      </p>
                     </div>
                   </div>
 
@@ -369,10 +554,14 @@ const AIAssistantPage = () => {
                       Klasifikasi Temuan
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <ResultStat title="Penulisan" value={analysisResult.writingErrors} icon={AlertCircle} />
-                      <ResultStat title="Struktur" value={analysisResult.structureErrors} icon={FileCheck2} />
-                      <ResultStat title="Format" value={analysisResult.formatErrors} icon={ShieldCheck} />
-                      <ResultStat title="Rekomendasi" value={analysisResult.recommendations} icon={CheckCircle2} />
+                      <ResultStat title="Total Blok" value={analysisResult.totalBlocks} icon={Layers} color="blue" />
+                      <ResultStat title="Sesuai" value={analysisResult.sesuai} icon={CheckCircle2} color="emerald" />
+                      <ResultStat title="Pedoman/UU" value={analysisResult.recommendations} icon={AlertTriangle} color="red" />
+                      <ResultStat title="Ejaan & Tanda Baca" value={analysisResult.errorsEjaanTandaBaca} icon={SpellCheck} color="amber" />
+                      <ResultStat title="Total Kesalahan" value={analysisResult.totalErrors} icon={Bug} color="sky" />
+                      <ResultStat title="Tanda Baca" value={analysisResult.errorsTandaBaca} icon={Quote} color="orange" />
+                      <ResultStat title="Kosa Kata" value={analysisResult.errorsKosaKata} icon={BookOpenText} color="purple" />
+                      <ResultStat title="Kalimat Panjang" value={analysisResult.longSentences} icon={AlignLeft} color="slate" />
                     </div>
                   </div>
 
@@ -464,18 +653,156 @@ const AIAssistantPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Tanya Asisten AI - Chat Drawer */}
+      {chatOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-6">
+          <div className="absolute inset-0 bg-slate-900/40" onClick={() => setChatOpen(false)} />
+          <div className="relative w-full sm:w-[26rem] h-[85vh] sm:h-[36rem] bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-[#2B3056]">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-[#FFD82B]" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-white truncate">Tanya Asisten AI</h3>
+                  <p className="text-[10px] text-slate-300">Seputar hasil analisa naskah ini</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChatOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+              {chatMessages.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="mx-auto w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
+                    <Bot className="w-5 h-5" />
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-[15rem] mx-auto">
+                    Tanyakan apa saja soal hasil analisa naskah ini, misalnya alasan sebuah temuan atau saran perbaikannya.
+                  </p>
+                </div>
+              ) : (
+                chatMessages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-wrap ${
+                        msg.role === 'user'
+                          ? 'bg-[#2B3056] text-white rounded-br-sm'
+                          : 'bg-white border border-slate-200 text-slate-700 rounded-bl-sm'
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                ))
+              )}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-3.5 py-2.5">
+                    <Loader2 className="w-3.5 h-3.5 text-[#2B3056] animate-spin" />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            <div className="p-3 border-t border-slate-100 bg-white">
+              <div className="flex items-end gap-2">
+                <textarea
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendChat();
+                    }
+                  }}
+                  rows={1}
+                  placeholder="Tulis pertanyaan..."
+                  className="flex-1 resize-none rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2B3056]/20 focus:border-[#2B3056]"
+                />
+                <button
+                  type="button"
+                  onClick={handleSendChat}
+                  disabled={!chatInput.trim() || chatLoading}
+                  className="w-9 h-9 shrink-0 rounded-xl bg-[#2B3056] hover:bg-[#232849] text-[#FFD82B] flex items-center justify-center disabled:opacity-40 transition-colors cursor-pointer"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 };
 
-const ResultStat = ({ title, value, icon: Icon }) => (
-  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl">
+const STAT_ICON_COLORS = {
+  blue: 'bg-blue-50 text-blue-600',
+  emerald: 'bg-emerald-50 text-emerald-600',
+  red: 'bg-red-50 text-red-600',
+  amber: 'bg-amber-50 text-amber-600',
+  sky: 'bg-sky-50 text-sky-600',
+  orange: 'bg-orange-50 text-orange-600',
+  purple: 'bg-purple-50 text-purple-600',
+  slate: 'bg-slate-100 text-slate-500',
+};
+
+const ResultStat = ({ title, value, icon: Icon, color = 'blue' }) => (
+  <div className="p-3 bg-white border border-slate-200/80 rounded-xl">
     <div className="flex items-center justify-between">
       <span className="text-[11px] text-slate-500 font-medium">{title}</span>
-      <Icon className="w-3.5 h-3.5 text-[#2B3056]" />
+      <span className={`w-6 h-6 rounded-lg flex items-center justify-center ${STAT_ICON_COLORS[color] || STAT_ICON_COLORS.blue}`}>
+        <Icon className="w-3.5 h-3.5" />
+      </span>
     </div>
     <p className="text-lg font-bold text-[#2B3056] mt-1">{value}</p>
   </div>
+);
+
+const SubPill = ({ icon: Icon, label, value }) => (
+  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-semibold text-slate-600">
+    <Icon className="w-3 h-3 text-[#2B3056]" />
+    {label}: <strong className="text-[#2B3056]">{value}%</strong>
+  </span>
+);
+
+function gradeBadgeClass(grade) {
+  const map = {
+    A: 'bg-emerald-500',
+    B: 'bg-sky-500',
+    C: 'bg-amber-500',
+    D: 'bg-orange-500',
+    E: 'bg-red-500',
+  };
+  return map[grade] || 'bg-slate-400';
+}
+
+const ExportMenuItem = ({ icon: Icon, iconClass, label, loading, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={loading}
+    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+  >
+    {loading ? (
+      <Loader2 className="w-4 h-4 text-slate-400 animate-spin shrink-0" />
+    ) : (
+      <Icon className={`w-4 h-4 shrink-0 ${iconClass || 'text-slate-500'}`} />
+    )}
+    {label}
+  </button>
 );
 
 const ErrorItem = ({ number, type, severity, page, description }) => {
