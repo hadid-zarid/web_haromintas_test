@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Struktur disesuaikan dengan database HARMONITAS (harmonitas_fix).
+ *
+ * Tabel dilewati jika sudah ada, karena database yang berjalan (lokal/Railway)
+ * dibuat dari import SQL sebelum migration ini disesuaikan.
  */
 return new class extends Migration
 {
@@ -14,6 +17,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('audit_logs')) {
+            return;
+        }
+
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->nullable()->index();
@@ -29,9 +36,12 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * Sengaja tidak menghapus tabel: berisi log audit live. Untuk mengulang
+     * database lokal dari nol gunakan `migrate:fresh`.
      */
     public function down(): void
     {
-        Schema::dropIfExists('audit_logs');
+        //
     }
 };
