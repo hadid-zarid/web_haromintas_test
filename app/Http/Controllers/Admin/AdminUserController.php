@@ -42,7 +42,19 @@ class AdminUserController extends Controller
             'pimpinan' => User::where('role_id', 4)->count(),
         ];
 
-        $timKerjas = TimKerja::select('tim_kerja_id', 'nama_tim_kerja', 'keterangan')->get();
+        // Opsi Tim Kerja Kanwil beserta daftar kabupaten binaannya
+        $kabupatenPerTimKerja = Kabupaten::whereNotNull('tim_kerja_id')
+            ->orderBy('kabupaten_id')
+            ->get(['nama_kabupaten', 'tim_kerja_id'])
+            ->groupBy('tim_kerja_id');
+        $timKerjas = TimKerja::select('tim_kerja_id', 'nama_tim_kerja', 'keterangan')
+            ->get()
+            ->map(fn ($tk) => [
+                'tim_kerja_id' => $tk->tim_kerja_id,
+                'nama_tim_kerja' => $tk->nama_tim_kerja,
+                'keterangan' => $tk->keterangan,
+                'kabupatens' => ($kabupatenPerTimKerja[$tk->tim_kerja_id] ?? collect())->pluck('nama_kabupaten')->values(),
+            ]);
         $roles = Role::select('role_id', 'nama_role')->get();
 
         // Opsi Wilayah Kerja Biro Hukum beserta daftar kabupaten binaannya

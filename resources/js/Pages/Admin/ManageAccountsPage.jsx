@@ -98,6 +98,79 @@ const WilayahBiroHukumPicker = ({ name, value, onChange, options = [], error }) 
   </fieldset>
 );
 
+// Pilihan Penugasan Tim Kerja Kanwil (kartu radio, menggantikan <select> agar daftar kabupaten binaan terbaca jelas)
+const TimKerjaPicker = ({ name, value, onChange, options = [], error }) => (
+  <fieldset>
+    <legend className="block text-xs font-extrabold text-[#2B3056] mb-1">
+      Pilih Penugasan Tim Kerja Kanwil <span className="text-rose-500">*</span>
+    </legend>
+    <p className="text-[10px] text-slate-500 font-semibold mb-2">
+      Pilih tim kerja yang membina wilayah kabupaten/kota terkait.
+    </p>
+    <div className="grid grid-cols-1 gap-2" role="radiogroup">
+      {options.map((t) => {
+        const id = Number(t.tim_kerja_id || t.id);
+        const nameText = t.nama_tim_kerja || t.nama_pokja || `Tim Kerja ${id}`;
+        const selected = Number(value) === id;
+        const kabupatens = Array.isArray(t.kabupatens) && t.kabupatens.length > 0
+          ? t.kabupatens
+          : (t.keterangan ? t.keterangan.replace(/^Membina\s+/i, '').split(',').map((s) => s.trim()).filter(Boolean) : []);
+
+        return (
+          <label
+            key={id}
+            className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-all focus-within:ring-2 focus-within:ring-[#FFD82B] ${
+              selected
+                ? 'border-[#2B3056] bg-[#2B3056]/[0.04] shadow-2xs'
+                : 'border-slate-200 bg-slate-50 hover:border-[#2B3056]/40 hover:bg-white'
+            }`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={id}
+              checked={selected}
+              onChange={() => onChange(id)}
+              required
+              className="sr-only"
+            />
+            <span
+              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+                selected ? 'border-[#2B3056] bg-[#2B3056] text-[#FFD82B]' : 'border-slate-200 bg-white text-slate-500'
+              }`}
+            >
+              <Users className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center justify-between gap-2">
+                <span className="text-xs font-extrabold text-[#2B3056]">{nameText}</span>
+                <span
+                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                    selected ? 'border-[#2B3056] bg-[#2B3056]' : 'border-slate-300 bg-white'
+                  }`}
+                >
+                  {selected && <Check className="h-2.5 w-2.5 text-[#FFD82B]" strokeWidth={4} />}
+                </span>
+              </span>
+              <span className="mt-1.5 flex flex-wrap gap-1">
+                {kabupatens.map((k) => (
+                  <span
+                    key={k}
+                    className="rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                  >
+                    {k.replace(/^Kabupaten /, 'Kab. ')}
+                  </span>
+                ))}
+              </span>
+            </span>
+          </label>
+        );
+      })}
+    </div>
+    {error && <p className="mt-1 text-[10px] text-rose-600 font-bold">{error}</p>}
+  </fieldset>
+);
+
 export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], wilayahBiroHukums = [], filters = {} }) => {
   const { auth, flash } = usePage().props;
   const currentAdminId = auth?.user?.user_id || auth?.user?.id;
@@ -1089,31 +1162,13 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
                 {/* Conditional Field Tim Kerja */}
                 {parseInt(addForm.data.role_id) === 2 && (
-                  <div>
-                    <label className="block text-xs font-extrabold text-[#2B3056] mb-1">
-                      Pilih Penugasan Tim Kerja Kanwil <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={addForm.data.tim_kerja_id}
-                      onChange={(e) => addForm.setData('tim_kerja_id', parseInt(e.target.value))}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
-                    >
-                      <option value="">-- Pilih Tim Kerja --</option>
-                      {unitList.map((p) => {
-                        const pId = p.tim_kerja_id || p.id;
-                        const pName = p.nama_tim_kerja || p.nama_pokja;
-                        return (
-                          <option key={pId} value={pId}>
-                            {pName} - ({p.keterangan})
-                          </option>
-                        );
-                      })}
-                    </select>
-                    {addForm.errors.tim_kerja_id && (
-                      <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.tim_kerja_id}</p>
-                    )}
-                  </div>
+                  <TimKerjaPicker
+                    name="add_tim_kerja_id"
+                    value={addForm.data.tim_kerja_id}
+                    onChange={(id) => addForm.setData('tim_kerja_id', id)}
+                    options={unitList}
+                    error={addForm.errors.tim_kerja_id}
+                  />
                 )}
 
                 {/* Conditional Field Wilayah Biro Hukum */}
@@ -1346,28 +1401,13 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
                 {/* Conditional Tim Kerja */}
                 {parseInt(editForm.data.role_id) === 2 && (
-                  <div>
-                    <label className="block text-xs font-extrabold text-[#2B3056] mb-1">
-                      Pilih Penugasan Tim Kerja Kanwil <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      required
-                      value={editForm.data.tim_kerja_id}
-                      onChange={(e) => editForm.setData('tim_kerja_id', parseInt(e.target.value))}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
-                    >
-                      <option value="">-- Pilih Tim Kerja --</option>
-                      {unitList.map((p) => {
-                        const pId = p.tim_kerja_id || p.id;
-                        const pName = p.nama_tim_kerja || p.nama_pokja;
-                        return (
-                          <option key={pId} value={pId}>
-                            {pName} - ({p.keterangan})
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
+                  <TimKerjaPicker
+                    name="edit_tim_kerja_id"
+                    value={editForm.data.tim_kerja_id}
+                    onChange={(id) => editForm.setData('tim_kerja_id', id)}
+                    options={unitList}
+                    error={editForm.errors.tim_kerja_id}
+                  />
                 )}
 
                 {/* Conditional Wilayah Biro Hukum */}
