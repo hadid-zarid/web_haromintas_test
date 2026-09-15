@@ -30,12 +30,15 @@ import {
   SlidersHorizontal,
   FileCheck2,
   Lock,
-  RefreshCw
+  RefreshCw,
+  ExternalLink,
+  X
 } from 'lucide-react';
 
 export const PanduanPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next');
+  const [showPdfModal, setShowPdfModal] = useState(false);
 
   const guideSlides = [
     {
@@ -74,7 +77,7 @@ export const PanduanPage = () => {
     {
       id: 2,
       badge: 'Panduan 2: Input Permohonan',
-      title: 'Cara Mengajukan Permohonan Regulasi Baru',
+      title: 'Cara Mengajukan Permohonan Harmonisasi Baru',
       subtitle: 'Langkah mudah mengajukan rancangan peraturan daerah (Ranperda) atau peraturan kepala daerah (Ranperkada).',
       icon: PlusCircle,
       color: 'from-amber-500 to-orange-600',
@@ -522,15 +525,129 @@ export const PanduanPage = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 shadow-2xs cursor-pointer shrink-0"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-500" />
-            <span>Cetak Panduan Lengkap</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowPdfModal(true)}
+              className="px-4 py-2.5 rounded-xl border border-[#2B3056] bg-[#2B3056] hover:bg-[#3A4070] text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-2xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#FFD82B]" />
+              <span>Baca Panduan Lengkap</span>
+            </button>
+
+            <a
+              href="/panduan/unduh"
+              download="Buku Petunjuk Penggunaan HARMONITAS.pdf"
+              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-[#2B3056] text-xs font-bold transition flex items-center justify-center gap-2 shadow-2xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span>Unduh Panduan Lengkap</span>
+            </a>
+          </div>
         </div>
+
+        {/* =========================================================================
+            MODAL: BACA PANDUAN LENGKAP (PDF VIEWER)
+            ========================================================================= */}
+        {showPdfModal && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#2B3056]/70 backdrop-blur-xs"
+            onClick={() => setShowPdfModal(false)}
+          >
+            <div 
+              className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header Modal */}
+              <div className="bg-[#2B3056] px-5 py-3.5 flex items-center justify-between gap-4 text-white shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-[#FFD82B] shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs sm:text-sm font-extrabold text-white truncate">
+                        Buku Petunjuk Penggunaan HARMONITAS
+                      </h3>
+                      <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-[#FFD82B]/20 text-[#FFD82B] text-[10px] font-black uppercase tracking-wider border border-[#FFD82B]/30">
+                        PDF Resmi
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-medium truncate">
+                      Panduan Lengkap Tata Kelola Harmonisasi & Fasilitasi Regulasi Daerah
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <a
+                    href="/panduan/unduh"
+                    download="Buku Petunjuk Penggunaan HARMONITAS.pdf"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15 cursor-pointer"
+                    title="Unduh Berkas PDF"
+                  >
+                    <Download className="w-3.5 h-3.5 text-[#FFD82B]" />
+                    <span>Unduh PDF</span>
+                  </a>
+
+                  <a
+                    href="/panduan/baca"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                    title="Buka di Tab Baru"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPdfModal(false)}
+                    className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                    title="Tutup Modal"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content: Iframe PDF Reader */}
+              <div className="flex-1 bg-slate-100 relative overflow-hidden">
+                <iframe
+                  src="/panduan/baca#toolbar=1&navpanes=1"
+                  className="w-full h-full border-none"
+                  title="Buku Petunjuk Penggunaan HARMONITAS"
+                />
+              </div>
+
+              {/* Footer Modal */}
+              <div className="bg-white px-5 py-2.5 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-semibold shrink-0">
+                <span className="flex items-center gap-1.5 text-slate-600">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span className="hidden sm:inline">Dokumen Panduan Resmi Sistem HARMONITAS — Kanwil Kemenkumham & Biro Hukum Riau</span>
+                  <span className="sm:hidden">Panduan Resmi HARMONITAS</span>
+                </span>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/panduan/unduh"
+                    download="Buku Petunjuk Penggunaan HARMONITAS.pdf"
+                    className="sm:hidden px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+                  >
+                    Unduh
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowPdfModal(false)}
+                    className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition cursor-pointer"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );

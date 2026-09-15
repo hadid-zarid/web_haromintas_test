@@ -30,6 +30,46 @@ Route::get('/panduan', function () {
     return Inertia::render('PanduanPage');
 })->name('panduan');
 
+Route::get('/panduan/baca', function () {
+    $candidates = [
+        base_path('docs/Buku Petunjuk Penggunaan HARMONITAS .pdf'),
+        base_path('docs/Buku Petunjuk Penggunaan HARMONITAS.pdf'),
+        public_path('docs/buku-panduan-harmonitas.pdf'),
+    ];
+    $path = null;
+    foreach ($candidates as $candidate) {
+        if (file_exists($candidate)) {
+            $path = $candidate;
+            break;
+        }
+    }
+    abort_unless($path, 404, 'Dokumen panduan tidak ditemukan.');
+    return response()->file($path, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="Buku Petunjuk Penggunaan HARMONITAS.pdf"',
+        'X-Frame-Options' => 'SAMEORIGIN',
+    ]);
+})->name('panduan.baca');
+
+Route::get('/panduan/unduh', function () {
+    $candidates = [
+        base_path('docs/Buku Petunjuk Penggunaan HARMONITAS .pdf'),
+        base_path('docs/Buku Petunjuk Penggunaan HARMONITAS.pdf'),
+        public_path('docs/buku-panduan-harmonitas.pdf'),
+    ];
+    $path = null;
+    foreach ($candidates as $candidate) {
+        if (file_exists($candidate)) {
+            $path = $candidate;
+            break;
+        }
+    }
+    abort_unless($path, 404, 'Dokumen panduan tidak ditemukan.');
+    return response()->download($path, 'Buku Petunjuk Penggunaan HARMONITAS.pdf', [
+        'Content-Type' => 'application/pdf',
+    ]);
+})->name('panduan.unduh');
+
 Route::get('/error-preview/{status?}', function ($status = 404) {
     return Inertia::render('ErrorPage', [
         'status' => (int) $status,
