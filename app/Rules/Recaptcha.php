@@ -18,6 +18,9 @@ class Recaptcha implements ValidationRule
 {
     private const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
+    // Test secret resmi Google untuk development (lihat config/services.php)
+    private const GOOGLE_TEST_SECRET = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || trim($value) === '') {
@@ -46,6 +49,14 @@ class Recaptcha implements ValidationRule
 
         if (! $response->successful() || $response->json('success') !== true) {
             $fail('Verifikasi CAPTCHA tidak valid atau sudah kedaluwarsa. Silakan centang ulang.');
+            return;
+        }
+
+        // Pastikan CAPTCHA diselesaikan di domain aplikasi ini, bukan di situs lain yang memakai site key sama.
+        // Test key Google selalu mengembalikan hostname "testkey.google.com", jadi dilewati.
+        if ($secret !== self::GOOGLE_TEST_SECRET && $response->json('hostname') !== request()->getHost()) {
+            Log::warning('[Recaptcha] Hostname tidak cocok: ' . $response->json('hostname') . ' vs ' . request()->getHost());
+            $fail('Verifikasi CAPTCHA tidak valid untuk domain ini. Silakan centang ulang.');
         }
     }
 }
