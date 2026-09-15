@@ -3,6 +3,7 @@ import { Head, router, useForm, usePage, Link } from '@inertiajs/react';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/layout/AppLayout';
 import StatusBadge from '../components/common/StatusBadge';
+import FlashAlert from '../components/common/FlashAlert';
 import { 
   ArrowLeft, 
   Upload, 
@@ -509,19 +510,7 @@ export const PeraturanDetailPage = ({
 
       <div className="space-y-6">
         {/* Flash Notifications */}
-        {flash?.success && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold shadow-xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <p>{flash.success}</p>
-          </div>
-        )}
-
-        {flash?.error && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold shadow-xs">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <p>{flash.error}</p>
-          </div>
-        )}
+        <FlashAlert flash={flash} />
 
         {/* TOP BREADCRUMB & NAVIGATION BAR */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">

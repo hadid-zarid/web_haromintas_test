@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/layout/AppLayout";
 import StatusBadge from "../components/common/StatusBadge";
 import EmptyState from "../components/common/EmptyState";
+import FlashAlert from "../components/common/FlashAlert";
 import {
   Search,
   PlusCircle,
@@ -284,19 +285,7 @@ export const PeraturanListPage = ({
 
       <div className="space-y-6">
         {/* Flash Notifications */}
-        {flash?.success && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold shadow-xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <p>{flash.success}</p>
-          </div>
-        )}
-
-        {flash?.error && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold shadow-xs">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <p>{flash.error}</p>
-          </div>
-        )}
+        <FlashAlert flash={flash} />
 
         {/* 5 BENTO STATS METRICS BAR */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">

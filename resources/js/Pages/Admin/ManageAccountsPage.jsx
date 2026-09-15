@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '../../components/layout/AppLayout';
 import RoleBadge from '../../components/common/RoleBadge';
+import FlashAlert from '../../components/common/FlashAlert';
 import { 
   Users, 
   UserPlus, 
@@ -425,19 +426,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
       <div className="space-y-6">
         {/* Flash Notifications */}
-        {flash?.success && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-emerald-800 text-xs font-bold shadow-2xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <p>{flash.success}</p>
-          </div>
-        )}
-
-        {flash?.error && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-bold shadow-2xs">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <p>{flash.error}</p>
-          </div>
-        )}
+        <FlashAlert flash={flash} />
 
         {/* 4 BENTO SUMMARY STATS CARDS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
