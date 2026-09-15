@@ -33,7 +33,8 @@ import {
   Scale,
   Clock,
   Building2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Folder
 } from "lucide-react";
 
 export const PeraturanListPage = ({
@@ -592,13 +593,14 @@ export const PeraturanListPage = ({
                             <span>{item.uploader?.nama || "Petugas Kanwil"}</span>
                           </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${docCount >= 7
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${docCount >= 7
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                               : docCount > 0
                                 ? 'bg-amber-50 text-amber-800 border-amber-200'
                                 : 'bg-slate-50 text-slate-500 border-slate-200'
                               }`}>
-                              📁 {docCount}/7 Dokumen
+                              <Folder className="w-3 h-3 shrink-0" />
+                              <span>{docCount}/7 Dokumen</span>
                             </span>
                           </div>
                         </td>
@@ -714,13 +716,14 @@ export const PeraturanListPage = ({
 
                     {/* Footer Row: Dokumen Badge & Action Buttons */}
                     <div className="flex items-center justify-between pt-1 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${docCount >= 7
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${docCount >= 7
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : docCount > 0
                           ? 'bg-amber-50 text-amber-800 border-amber-200'
                           : 'bg-slate-50 text-slate-500 border-slate-200'
                         }`}>
-                        📁 {docCount}/7 Dokumen
+                        <Folder className="w-3 h-3 shrink-0" />
+                        <span>{docCount}/7 Dokumen</span>
                       </span>
 
                       <div className="flex items-center gap-1.5">
