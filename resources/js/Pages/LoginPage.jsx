@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import HarmonitasLoader from '../components/common/HarmonitasLoader';
+import FlashAlert from '../components/common/FlashAlert';
 import { 
   Lock, 
   Mail, 
@@ -9,8 +10,7 @@ import {
   Sparkles, 
   Eye, 
   EyeOff, 
-  ShieldCheck, 
-  CheckCircle2, 
+  ShieldCheck,
   AlertCircle,
   Building,
   KeyRound,
@@ -19,20 +19,78 @@ import {
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman.png';
 
-export const LoginPage = ({ demoUsers = [] }) => {
+const RECAPTCHA_SCRIPT_ID = 'google-recaptcha-script';
+
+export const LoginPage = ({ demoUsers = [], recaptchaSiteKey = null }) => {
   const { flash } = usePage().props;
   const [showPassword, setShowPassword] = useState(false);
+  const recaptchaContainerRef = useRef(null);
+  const recaptchaWidgetIdRef = useRef(null);
 
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
     email: '',
     password: '',
     remember: false,
+    recaptcha_token: '',
   });
+
+  // Muat & render widget Google reCAPTCHA v2 (checkbox) untuk login email/password
+  useEffect(() => {
+    if (!recaptchaSiteKey) return;
+
+    const renderWidget = () => {
+      if (!recaptchaContainerRef.current || recaptchaWidgetIdRef.current !== null) return;
+      recaptchaWidgetIdRef.current = window.grecaptcha.render(recaptchaContainerRef.current, {
+        sitekey: recaptchaSiteKey,
+        callback: (token) => {
+          setData('recaptcha_token', token);
+          clearErrors('recaptcha_token');
+        },
+        'expired-callback': () => setData('recaptcha_token', ''),
+        'error-callback': () => setData('recaptcha_token', ''),
+      });
+    };
+
+    if (window.grecaptcha?.render) {
+      window.grecaptcha.ready(renderWidget);
+    } else {
+      window.onHarmonitasRecaptchaLoad = renderWidget;
+      if (!document.getElementById(RECAPTCHA_SCRIPT_ID)) {
+        const script = document.createElement('script');
+        script.id = RECAPTCHA_SCRIPT_ID;
+        script.src = 'https://www.google.com/recaptcha/api.js?onload=onHarmonitasRecaptchaLoad&render=explicit&hl=id';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }
+
+    return () => {
+      recaptchaWidgetIdRef.current = null;
+    };
+  }, [recaptchaSiteKey]);
+
+  // Token reCAPTCHA hanya berlaku sekali: reset widget setelah setiap percobaan login
+  const resetRecaptcha = () => {
+    if (recaptchaWidgetIdRef.current !== null && window.grecaptcha?.reset) {
+      window.grecaptcha.reset(recaptchaWidgetIdRef.current);
+    }
+    setData('recaptcha_token', '');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (recaptchaSiteKey && !data.recaptcha_token) {
+      setError('recaptcha_token', 'Silakan centang kotak "Saya bukan robot" terlebih dahulu.');
+      return;
+    }
+
     post('/login', {
-      onFinish: () => reset('password'),
+      onFinish: () => {
+        reset('password');
+        resetRecaptcha();
+      },
     });
   };
 
@@ -127,23 +185,7 @@ export const LoginPage = ({ demoUsers = [] }) => {
         </div>
 
         {/* Flash Notifications */}
-        {flash?.success && (
-          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold text-center">
-            <p>{flash.success}</p>
-          </div>
-        )}
-
-        {flash?.info && (
-          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold text-center">
-            <p>{flash.info}</p>
-          </div>
-        )}
-
-        {flash?.error && (
-          <div className="mx-6 mt-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-semibold text-center">
-            <p>{flash.error}</p>
-          </div>
-        )}
+        <FlashAlert flash={flash} className="mx-6 mt-6" />
 
         {/* Form Body */}
         <div className="p-6 sm:p-8 space-y-5">
@@ -260,6 +302,25 @@ export const LoginPage = ({ demoUsers = [] }) => {
                 Lupa Kata Sandi?
               </Link>
             </div>
+
+            {/* Google reCAPTCHA v2 (checkbox) */}
+            {recaptchaSiteKey && (
+              <div>
+                {/* Widget Google berukuran tetap 304px: diperkecil sedikit pada layar sempit agar tidak terpotong */}
+                <div className="flex justify-center">
+                  <div
+                    ref={recaptchaContainerRef}
+                    className="min-h-[78px] origin-center max-[400px]:scale-[0.9]"
+                  />
+                </div>
+                {errors.recaptcha_token && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center justify-center gap-1 text-center">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {errors.recaptcha_token}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Submit Button with Kemenkumham Gold Gradient */}
             <button

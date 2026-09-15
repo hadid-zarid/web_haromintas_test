@@ -7,11 +7,11 @@ import {
   KeyRound,
   Eye,
   EyeOff,
-  CheckCircle2,
   AlertCircle,
   ShieldCheck,
   Check
 } from 'lucide-react';
+import FlashAlert from '../components/common/FlashAlert';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman.png';
 
@@ -122,12 +122,7 @@ export const ResetPasswordPage = ({ token, email }) => {
         </div>
 
         {/* Flash Notifications */}
-        {flash?.error && (
-          <div className="mx-6 mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-xs font-semibold shadow-xs">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-            <p>{flash.error}</p>
-          </div>
-        )}
+        <FlashAlert flash={flash} className="mx-6 mt-6" />
 
         {/* Form Content */}
         <div className="p-6 sm:p-8 space-y-5">

@@ -41,4 +41,16 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback'),
     ],
 
+    /*
+     * Google reCAPTCHA v2 (checkbox "Saya bukan robot") untuk login email/password.
+     * Di luar production, jika key kosong dipakai test key resmi Google (selalu lolos,
+     * widget menampilkan peringatan "for testing purposes only").
+     * Di production key WAJIB diisi; jika kosong login email/password akan ditolak.
+     */
+    'recaptcha' => [
+        'enabled' => (bool) env('RECAPTCHA_ENABLED', true),
+        'site_key' => env('RECAPTCHA_SITE_KEY') ?: (env('APP_ENV') === 'production' ? null : '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY') ?: (env('APP_ENV') === 'production' ? null : '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'),
+    ],
+
 ];

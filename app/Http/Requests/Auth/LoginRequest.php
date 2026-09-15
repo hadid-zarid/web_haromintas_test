@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Rules\Recaptcha;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -19,11 +20,18 @@ class LoginRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
             'remember' => ['nullable', 'boolean'],
         ];
+
+        // CAPTCHA wajib untuk login email/password (standar Pusdatin); login Google SSO tidak melewati request ini
+        if (config('services.recaptcha.enabled')) {
+            $rules['recaptcha_token'] = ['bail', 'required', 'string', new Recaptcha()];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -32,6 +40,8 @@ class LoginRequest extends FormRequest
             'email.required' => 'Email kedinasan wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Kata sandi / password wajib diisi.',
+            'recaptcha_token.required' => 'Silakan centang kotak "Saya bukan robot" terlebih dahulu.',
+            'recaptcha_token.string' => 'Verifikasi CAPTCHA tidak valid. Silakan centang ulang.',
         ];
     }
 

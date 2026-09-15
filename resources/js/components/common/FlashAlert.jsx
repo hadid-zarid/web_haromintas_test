@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
-export const FlashAlert = ({ flash }) => {
+export const FlashAlert = ({ flash, className = '' }) => {
   const [showSuccess, setShowSuccess] = useState(Boolean(flash?.success));
   const [showError, setShowError] = useState(Boolean(flash?.error));
   const [showInfo, setShowInfo] = useState(Boolean(flash?.info));
@@ -28,7 +28,7 @@ export const FlashAlert = ({ flash }) => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${className}`}>
       {/* Success Notification */}
       {showSuccess && flash?.success && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start justify-between gap-3 text-emerald-800 text-xs font-bold shadow-xs transition-all duration-200">

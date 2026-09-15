@@ -59,6 +59,8 @@ class AuthController extends Controller
 
         return Inertia::render('LoginPage', [
             'demoUsers' => [], // Dinonaktifkan untuk keamanan (cegah kebocoran kredensial via Inertia props)
+            // Site key bersifat publik (dipakai widget di browser); secret key tetap di server
+            'recaptchaSiteKey' => config('services.recaptcha.enabled') ? config('services.recaptcha.site_key') : null,
         ]);
     }
 
