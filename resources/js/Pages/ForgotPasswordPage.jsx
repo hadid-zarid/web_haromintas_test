@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
   Mail,
@@ -12,16 +12,75 @@ import FlashAlert from '../components/common/FlashAlert';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman.png';
 
-export const ForgotPasswordPage = () => {
-  const { flash } = usePage().props;
+const RECAPTCHA_SCRIPT_ID = 'google-recaptcha-script';
 
-  const { data, setData, post, processing, errors } = useForm({
+export const ForgotPasswordPage = ({ recaptchaSiteKey = null }) => {
+  const { flash } = usePage().props;
+  const recaptchaContainerRef = useRef(null);
+  const recaptchaWidgetIdRef = useRef(null);
+
+  const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
     email: '',
+    recaptcha_token: '',
   });
+
+  // Muat & render widget Google reCAPTCHA v2 (checkbox) untuk pemulihan kata sandi
+  useEffect(() => {
+    if (!recaptchaSiteKey) return;
+
+    const renderWidget = () => {
+      if (!recaptchaContainerRef.current || recaptchaWidgetIdRef.current !== null) return;
+      recaptchaWidgetIdRef.current = window.grecaptcha.render(recaptchaContainerRef.current, {
+        sitekey: recaptchaSiteKey,
+        callback: (token) => {
+          setData('recaptcha_token', token);
+          clearErrors('recaptcha_token');
+        },
+        'expired-callback': () => setData('recaptcha_token', ''),
+        'error-callback': () => setData('recaptcha_token', ''),
+      });
+    };
+
+    if (window.grecaptcha?.render) {
+      window.grecaptcha.ready(renderWidget);
+    } else {
+      window.onHarmonitasRecaptchaLoad = renderWidget;
+      if (!document.getElementById(RECAPTCHA_SCRIPT_ID)) {
+        const script = document.createElement('script');
+        script.id = RECAPTCHA_SCRIPT_ID;
+        script.src = 'https://www.google.com/recaptcha/api.js?onload=onHarmonitasRecaptchaLoad&render=explicit&hl=id';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }
+
+    return () => {
+      recaptchaWidgetIdRef.current = null;
+    };
+  }, [recaptchaSiteKey]);
+
+  // Token reCAPTCHA hanya berlaku sekali: reset widget setelah setiap percobaan kirim
+  const resetRecaptcha = () => {
+    if (recaptchaWidgetIdRef.current !== null && window.grecaptcha?.reset) {
+      window.grecaptcha.reset(recaptchaWidgetIdRef.current);
+    }
+    setData('recaptcha_token', '');
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post('/forgot-password');
+
+    if (recaptchaSiteKey && !data.recaptcha_token) {
+      setError('recaptcha_token', 'Silakan centang kotak "Saya bukan robot" terlebih dahulu.');
+      return;
+    }
+
+    post('/forgot-password', {
+      onFinish: () => {
+        resetRecaptcha();
+      },
+    });
   };
 
   return (
@@ -136,6 +195,25 @@ export const ForgotPasswordPage = () => {
                 </p>
               )}
             </div>
+
+            {/* Google reCAPTCHA v2 (checkbox) */}
+            {recaptchaSiteKey && (
+              <div>
+                {/* Widget Google berukuran tetap 304px: diperkecil sedikit pada layar sempit agar tidak terpotong */}
+                <div className="flex justify-center">
+                  <div
+                    ref={recaptchaContainerRef}
+                    className="min-h-[78px] origin-center max-[400px]:scale-[0.9]"
+                  />
+                </div>
+                {errors.recaptcha_token && (
+                  <p className="mt-1.5 text-xs text-rose-600 font-semibold flex items-center justify-center gap-1 text-center">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {errors.recaptcha_token}
+                  </p>
+                )}
+              </div>
+            )}
 
             <button
               type="submit"

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\ResetPasswordMail;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Rules\Recaptcha;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,9 @@ class PasswordResetController extends Controller
      */
     public function showForgotPassword(): Response
     {
-        return Inertia::render('ForgotPasswordPage');
+        return Inertia::render('ForgotPasswordPage', [
+            'recaptchaSiteKey' => config('services.recaptcha.enabled') ? config('services.recaptcha.site_key') : null,
+        ]);
     }
 
     /**
@@ -33,12 +36,23 @@ class PasswordResetController extends Controller
      */
     public function sendResetLinkEmail(Request $request): RedirectResponse
     {
-        $request->validate([
+        $rules = [
             'email' => ['required', 'email'],
-        ], [
+        ];
+
+        $messages = [
             'email.required' => 'Alamat email kedinasan wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
-        ]);
+            'recaptcha_token.required' => 'Silakan centang kotak "Saya bukan robot" terlebih dahulu.',
+            'recaptcha_token.string' => 'Verifikasi CAPTCHA tidak valid. Silakan centang ulang.',
+        ];
+
+        // CAPTCHA wajib untuk proteksi form kirim email reset password
+        if (config('services.recaptcha.enabled')) {
+            $rules['recaptcha_token'] = ['bail', 'required', 'string', new Recaptcha()];
+        }
+
+        $request->validate($rules, $messages);
 
         $throttleKey = 'reset-password|' . $request->ip();
 
