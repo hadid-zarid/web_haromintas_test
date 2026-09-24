@@ -539,6 +539,13 @@ class PermohonanController extends Controller
         $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($allUploadedDocIds);
         $isFasilitasiComplete = PermohonanWorkflowService::isFasilitasiComplete($allUploadedDocIds);
 
+        // Tonggak Harmonisasi Selesai: catat waktu penyelesaian satu kali dan auditabel
+        if ($isHarmonisasiComplete && ! $rancangan->harmonisasi_completed_at) {
+            $rancangan->update([
+                'harmonisasi_completed_at' => now(),
+            ]);
+        }
+
         if ($isFasilitasiComplete) {
             // Dokumen 6 bersifat opsional. Dokumen 1-5 dan Dokumen 7 lengkap -> Status beralih ke SELESAI (4)
             if ($rancangan->status_id !== 4) {

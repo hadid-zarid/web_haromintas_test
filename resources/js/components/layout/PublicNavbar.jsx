@@ -27,11 +27,12 @@ export const PublicNavbar = () => {
 
   const navLinks = [
     { name: 'Beranda', href: '#beranda' },
-    { name: 'Tentang Sistem', href: '#tentang' },
-    { name: 'Alur & Dokumen', href: '#alur' },
-    { name: 'Fitur Penunjang', href: '#fitur' },
-    { name: 'Wilayah Tim Kerja', href: '#wilayah' },
-    { name: 'Kontak Kami', href: '#kontak' },
+    { name: 'Statistik & Data', href: '#statistik' },
+    { name: 'Tentang', href: '#tentang' },
+    { name: 'Alur Berkas', href: '#alur' },
+    { name: 'Fitur', href: '#fitur' },
+    { name: 'Wilayah', href: '#wilayah' },
+    { name: 'Kontak', href: '#kontak' },
   ];
 
   return (
@@ -56,20 +57,20 @@ export const PublicNavbar = () => {
       <div
         className={`z-50 transition-all duration-300 font-sans ${
           isScrolled
-            ? 'fixed top-2.5 sm:top-3 inset-x-3 sm:inset-x-6 max-w-6xl mx-auto'
+            ? 'fixed top-2.5 sm:top-3 inset-x-2 sm:inset-x-6 max-w-7xl mx-auto'
             : 'sticky top-0 w-full'
         }`}
       >
         <header
           className={`w-full transition-all duration-300 ${
             isScrolled
-              ? 'rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xl shadow-xl shadow-slate-900/5 px-4 sm:px-5'
+              ? 'rounded-2xl border border-slate-200/90 bg-white/95 backdrop-blur-xl shadow-xl shadow-slate-900/5 px-3 sm:px-5'
               : 'border-b border-slate-200 bg-white'
           }`}
         >
           <div
             className={`mx-auto flex items-center justify-between transition-all duration-300 ${
-              isScrolled ? 'h-[56px] max-w-6xl' : 'h-[64px] max-w-7xl px-4 sm:px-6 lg:px-8'
+              isScrolled ? 'h-[56px] max-w-7xl' : 'h-[64px] max-w-7xl px-4 sm:px-6 lg:px-8'
             }`}
           >
             {/* Logo and Brand */}
@@ -100,37 +101,30 @@ export const PublicNavbar = () => {
                 />
               </span>
 
-              <span className="min-w-0">
-                <span className="flex items-center gap-1.5">
-                  <span
-                    className={`font-extrabold tracking-wide text-[#2B3056] transition-all whitespace-nowrap ${
-                      isScrolled ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
-                    }`}
-                  >
-                    HARMONITAS
-                  </span>
-                  <span className="rounded-md border border-[#FFD82B]/80 bg-[#FFF9DF] px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-[#2B3056]">
-                    Riau
-                  </span>
+              <span className="min-w-0 flex items-center gap-1.5">
+                <span
+                  className={`font-extrabold tracking-wide text-[#2B3056] transition-all whitespace-nowrap ${
+                    isScrolled ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
+                  }`}
+                >
+                  HARMONITAS
                 </span>
-                {!isScrolled && (
-                  <span className="hidden xl:block truncate text-[10.5px] font-medium tracking-wide text-slate-500 max-w-[260px]">
-                    Harmonisasi dan Fasilitasi Ranperda dan Ranperkada Tuntas
-                  </span>
-                )}
+                <span className="rounded-md border border-[#FFD82B]/80 bg-[#FFF9DF] px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-[#2B3056]">
+                  Riau
+                </span>
               </span>
             </Link>
 
-            {/* Desktop Nav Links (Clean, Balanced Size, No Text-Wrap) */}
-            <nav className="hidden items-center gap-3.5 xl:gap-5 lg:flex">
+            {/* Desktop Nav Links (Clean, Balanced Spacing, No Overflow) */}
+            <nav className="hidden items-center gap-1 xl:gap-2.5 lg:flex">
               {navLinks.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative py-1.5 text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-[#2B3056] whitespace-nowrap transition-colors"
+                  className="group relative px-2.5 py-1.5 rounded-lg text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-[#2B3056] hover:bg-slate-100/70 whitespace-nowrap transition-all duration-150"
                 >
                   {item.name}
-                  <span className="absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 w-0 rounded-full bg-[#FFC800] transition-all duration-200 group-hover:w-full" />
+                  <span className="absolute inset-x-2.5 -bottom-0.5 mx-auto h-0.5 w-0 rounded-full bg-[#FFC800] transition-all duration-200 group-hover:w-[calc(100%-20px)]" />
                 </a>
               ))}
             </nav>
@@ -140,7 +134,7 @@ export const PublicNavbar = () => {
               {user ? (
                 <Link
                   href="/home"
-                  className="inline-flex h-9 px-4 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-xs text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap cursor-pointer"
+                  className="inline-flex h-9 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-xs text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap cursor-pointer"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   <span>Ke Dashboard</span>
@@ -149,7 +143,7 @@ export const PublicNavbar = () => {
               ) : (
                 <Link
                   href="/login"
-                  className="inline-flex h-9 px-4 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-xs text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap cursor-pointer"
+                  className="inline-flex h-9 px-3.5 sm:px-4 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] hover:brightness-105 font-bold text-xs text-[#2B3056] shadow-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap cursor-pointer"
                 >
                   <LogIn className="h-3.5 w-3.5" />
                   <span>Masuk Petugas</span>

@@ -186,6 +186,23 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   Admin
                 </span>
               </Link>
+
+              <Link
+                href="/admin/rencana"
+                onClick={() => setIsMobileOpen(false)}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer mt-1 ${currentPath.startsWith("/admin/rencana")
+                  ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileOutput className="w-4 h-4 shrink-0" />
+                  <span className="tracking-wide">Target ProPem &amp; Progsun</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded bg-white/20 text-white text-[9px] font-black uppercase">
+                  Admin
+                </span>
+              </Link>
             </div>
           )}
         </div>

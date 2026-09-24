@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminRencanaController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -9,6 +10,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Permohonan\DokumenPerbandinganController;
 use App\Http\Controllers\Permohonan\PermohonanController;
 use App\Http\Controllers\Permohonan\UploadPerbandinganController;
+use App\Http\Controllers\Public\StatistikHarmonisasiController;
+use App\Services\StatistikHarmonisasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,9 +25,13 @@ use Inertia\Inertia;
 // ==========================================
 // 1. PUBLIC ROUTES
 // ==========================================
-Route::get('/', function () {
-    return Inertia::render('LandingPage');
+Route::get('/', function (StatistikHarmonisasiService $service) {
+    return Inertia::render('LandingPage', [
+        'statistikData' => $service->getStatistik(),
+    ]);
 })->name('landing');
+
+Route::get('/api/statistik-harmonisasi', [StatistikHarmonisasiController::class, 'getStatistik'])->name('api.statistik-harmonisasi');
 
 Route::get('/panduan', function () {
     return Inertia::render('PanduanPage');
@@ -310,5 +317,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+        // Target Rencana ProPem & Progsun (Publikasi Dataset Tahunan)
+        Route::get('/rencana', [AdminRencanaController::class, 'index'])->name('rencana.index');
+        Route::post('/rencana', [AdminRencanaController::class, 'storeOrUpdate'])->name('rencana.store');
+        Route::post('/rencana/publish', [AdminRencanaController::class, 'togglePublishYear'])->name('rencana.publish');
     });
 });

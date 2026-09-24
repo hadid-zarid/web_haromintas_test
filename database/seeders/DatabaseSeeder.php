@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(MasterDataSeeder::class);
+        $this->call(HistorisHarmonisasiSeeder::class);
+        $this->call(RencanaRegulasiSeeder::class);
 
         // Akun default hanya untuk lokal/pengujian. Di production akun dibuat
         // lewat menu Kelola Akun agar tidak ada kata sandi bawaan / tercetak di log deploy.

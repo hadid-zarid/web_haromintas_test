@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import StatistikHarmonisasiSection from '../components/landing/StatistikHarmonisasiSection';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman_official.png';
 import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
@@ -180,7 +181,7 @@ const Reveal = ({ children, className = '', delay = 0, direction = 'up' }) => {
   );
 };
 
-export const LandingPage = () => {
+export const LandingPage = ({ statistikData }) => {
   const { auth } = usePage().props || {};
   const user = auth?.user;
 
@@ -501,7 +502,12 @@ export const LandingPage = () => {
         </section>
 
         {/* =========================================================================
-            SECTION 2: KEUNGGULAN LAYANAN (Enriched with Visual Indicators)
+            SECTION 2: STATISTIK & VISUALISASI PROPEM & PROGSUN HARMONITAS
+            ========================================================================= */}
+        <StatistikHarmonisasiSection initialData={statistikData} />
+
+        {/* =========================================================================
+            SECTION 3: KEUNGGULAN LAYANAN (Enriched with Visual Indicators)
             ========================================================================= */}
         <section id="tentang" className="scroll-mt-28 bg-white py-16 sm:py-20 border-b border-slate-200 overflow-hidden">
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
@@ -1023,7 +1029,7 @@ export const LandingPage = () => {
         </section>
 
         {/* =========================================================================
-            SECTION 6: BANNER CTA
+            SECTION 7: BANNER CTA
             ========================================================================= */}
         <section className="bg-slate-50/70 py-16 sm:py-20 overflow-hidden">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -1141,6 +1147,7 @@ export const LandingPage = () => {
                 <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FFD82B]">Tautan Cepat</h3>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300 font-normal">
                   <li><a href="#beranda" className="hover:text-[#FFD82B] transition">Beranda</a></li>
+                  <li><a href="#statistik" className="hover:text-[#FFD82B] transition">Statistik &amp; Data</a></li>
                   <li><a href="#tentang" className="hover:text-[#FFD82B] transition">Tentang Sistem</a></li>
                   <li><a href="#alur" className="hover:text-[#FFD82B] transition">Alur &amp; Dokumen</a></li>
                   <li><a href="#fitur" className="hover:text-[#FFD82B] transition">Fitur Penunjang</a></li>

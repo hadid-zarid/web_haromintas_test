@@ -31,10 +31,12 @@ class RancanganRegulasi extends Model
         'status_id',
         'keterangan',
         'tanggal_dibuat',
+        'harmonisasi_completed_at',
     ];
 
     protected $casts = [
         'tanggal_dibuat' => 'date',
+        'harmonisasi_completed_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
