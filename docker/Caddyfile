@@ -1,0 +1,26 @@
+# SITE_ADDRESS diisi dari .env:
+#   uji lewat IP (tanpa HTTPS): SITE_ADDRESS=:80
+#   produksi:                   SITE_ADDRESS=harmonitas-riau.web.id, www.harmonitas-riau.web.id
+{$SITE_ADDRESS::80} {
+	encode gzip
+
+	request_body {
+		max_size 60MB
+	}
+
+	# AI Document Checker (container di jaringan Docker yang sama). Prefix /ai-api dibuang.
+	handle_path /ai-api/* {
+		reverse_proxy ai-checker:7860 {
+			flush_interval -1
+			transport http {
+				read_timeout 300s
+			}
+		}
+	}
+
+	handle {
+		root * /var/www/html/public
+		php_fastcgi app:9000
+		file_server
+	}
+}

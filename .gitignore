@@ -28,3 +28,5 @@ Thumbs.db
 *.sql
 database/*.sql
 env
+/data
+/ai-dokumen

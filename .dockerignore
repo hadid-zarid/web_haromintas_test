@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+node_modules
+vendor
+tests
+deploy
+data
+ai-dokumen
+storage/app
+storage/logs
+storage/framework
+public/build
+public/hot
+resp_*.html

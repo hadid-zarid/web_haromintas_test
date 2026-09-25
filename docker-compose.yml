@@ -1,0 +1,59 @@
+# Semua layanan HARMONITAS. Hanya "web" yang membuka port ke internet.
+# Data penting ada di bind mount ./data/* (folder biasa di server, mudah di-backup).
+#
+# Butuh .env di folder ini (nilai dari Railway + DB_HOST=db) dengan tambahan:
+#   DB_ROOT_PASSWORD=...   SITE_ADDRESS=:80
+# AI: clone repo ai-dokumen ke ./ai-dokumen (atau set AI_SRC) dan isi ai-dokumen/.env
+services:
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./data/caddy:/data
+    depends_on:
+      - app
+      - ai-checker
+
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data/storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  ai-checker:
+    build: ${AI_SRC:-./ai-dokumen}
+    restart: unless-stopped
+    env_file: ${AI_SRC:-./ai-dokumen}/.env
+    environment:
+      PORT: "7860"
+    volumes:
+      - ./data/ai-cache:/home/appuser/.cache
