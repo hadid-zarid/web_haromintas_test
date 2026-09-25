@@ -49,6 +49,22 @@ services:
       timeout: 5s
       retries: 30
 
+  # Postgres + pgvector untuk AI (pengganti Supabase): pedoman/vektor, riwayat laporan, glosarium, job.
+  pg:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aidocs
+      POSTGRES_USER: aidocs
+      POSTGRES_PASSWORD: ${AI_PG_PASSWORD:-aidocs_local}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aidocs -d aidocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
   ai-checker:
     build: ${AI_SRC:-./ai-dokumen}
     restart: unless-stopped
@@ -56,5 +72,11 @@ services:
     environment:
       PORT: "7860"
       NO_RELOAD: "1"
+      # Menimpa SUPABASE_DB_URL dari .env AI: pakai Postgres lokal (nama variabelnya
+      # memang masih "SUPABASE_*" di kode AI, tapi isinya Postgres biasa).
+      SUPABASE_DB_URL: postgresql://aidocs:${AI_PG_PASSWORD:-aidocs_local}@pg:5432/aidocs
+    depends_on:
+      pg:
+        condition: service_healthy
     volumes:
       - ./data/ai-cache:/home/appuser/.cache

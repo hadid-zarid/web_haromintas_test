@@ -10,6 +10,7 @@ cd "$APP_DIR"
 
 docker compose exec -T db sh -c 'mysqldump --single-transaction -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' | gzip > "$DEST/db-$STAMP.sql.gz"
 tar -czf "$DEST/storage-$STAMP.tar.gz" -C data/storage app
+docker compose exec -T pg pg_dump -U aidocs -d aidocs --schema=public --no-owner --no-privileges -Fc > "$DEST/ai-postgres-$STAMP.dump"
 
 find "$DEST" -type f -mtime +14 -delete
 
