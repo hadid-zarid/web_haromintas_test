@@ -30,3 +30,4 @@ database/*.sql
 env
 /data
 /ai-dokumen
+.env.docker

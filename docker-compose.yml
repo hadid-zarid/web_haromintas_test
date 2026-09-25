@@ -26,7 +26,7 @@ services:
       context: .
       target: app
     restart: unless-stopped
-    env_file: .env
+    env_file: ${APP_ENV_FILE:-.env}
     volumes:
       - ./data/storage:/var/www/html/storage
     depends_on:
@@ -55,5 +55,6 @@ services:
     env_file: ${AI_SRC:-./ai-dokumen}/.env
     environment:
       PORT: "7860"
+      NO_RELOAD: "1"
     volumes:
       - ./data/ai-cache:/home/appuser/.cache
