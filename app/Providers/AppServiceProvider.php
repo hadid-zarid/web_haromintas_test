@@ -20,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') === 'production') {
+        // Hanya paksa https bila APP_URL memang https, supaya uji lewat http
+        // (localhost / IP server sebelum DNS dipindah) tidak memuat asset dari https.
+        if (config('app.env') === 'production' && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
     }
