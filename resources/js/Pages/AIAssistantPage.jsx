@@ -30,11 +30,10 @@ import {
   Loader2,
 } from 'lucide-react';
 
-// URL sementara (Cloudflare Tunnel) ke backend AI Document Checker yang jalan
-// di laptop - dipakai buat presentasi. Ganti string ini kalau tunnel-nya
-// di-restart (URL berubah tiap restart cloudflared). Balikin ke
-// 'https://ai-document-checker.onrender.com' setelah selesai presentasi.
-const AI_API_BASE_URL = 'https://powerful-penalty-sara-alarm.trycloudflare.com';
+// Backend AI Document Checker berjalan di server yang sama dan diakses lewat
+// path /ai-api (Caddy meneruskannya ke container ai-checker), jadi satu domain
+// tanpa CORS/mixed-content. Lihat docker/Caddyfile.
+const AI_API_BASE_URL = '/ai-api';
 
 // Peta status/error dari AI Document Checker ke bentuk yang dipahami UI ini.
 const SEVERITY_LABELS = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' };
