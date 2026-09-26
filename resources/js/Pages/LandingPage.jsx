@@ -378,7 +378,7 @@ export const LandingPage = ({ statistikData }) => {
           />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-10">
-            <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
 
               {/* Left Column: Hero Content */}
               <div className="lg:col-span-7">
@@ -529,7 +529,7 @@ export const LandingPage = ({ statistikData }) => {
             </Reveal>
 
             {/* 3 Clean Benefit Cards with Visual Footer Seals */}
-            <div className="mt-12 grid gap-8 md:grid-cols-3 relative">
+            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 relative">
               {benefits.map((benefit, idx) => {
                 const Icon = benefit.icon;
 
@@ -579,7 +579,7 @@ export const LandingPage = ({ statistikData }) => {
                       </div>
 
                       {/* Footer Note */}
-                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
                         <span className="flex items-center gap-1.5 text-[#2B3056]">
                           <ShieldCheck className="h-4 w-4 text-[#B3912D]" />
                           <span>{benefit.footerNote}</span>
@@ -621,7 +621,7 @@ export const LandingPage = ({ statistikData }) => {
             </Reveal>
 
             {/* 4 Unified Process & Document Cards */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {unifiedWorkflowSteps.map((step, index) => {
                 const Icon = step.icon;
 
@@ -713,7 +713,7 @@ export const LandingPage = ({ statistikData }) => {
             </Reveal>
 
             {/* 2 Focused Cards with Authentic Visual Mockup Previews */}
-            <div className="grid gap-8 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
 
               {/* Card 1: Asisten AI Pra-Harmonisasi with Document Inspection Mockup */}
               <Reveal direction="left" delay={80} className="h-full">
@@ -747,12 +747,12 @@ export const LandingPage = ({ statistikData }) => {
                       </div>
 
                       <div className="relative z-0">
-                        <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/80">
+                        <div className="flex items-center justify-between gap-2 text-xs pb-2 border-b border-slate-200/80">
                           <span className="font-bold text-[#2B3056] flex items-center gap-1.5">
                             <FileText className="h-3.5 w-3.5 text-[#B3912D]" />
                             Pratinjau Telaah Naskah Digital
                           </span>
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
+                          <span className="inline-flex shrink-0 items-center gap-1.5 text-[10px] font-extrabold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded whitespace-nowrap">
                             <span className="relative flex h-1.5 w-1.5">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
@@ -762,21 +762,21 @@ export const LandingPage = ({ statistikData }) => {
                         </div>
 
                         <div className="mt-3 space-y-2 text-xs">
-                          <div className="flex items-center justify-between text-slate-700">
+                          <div className="flex items-center justify-between gap-3 text-slate-700">
                             <span className="flex items-center gap-1.5">
                               <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
                               Kaidah Penulisan Legal Drafting
                             </span>
                             <span className="font-bold text-slate-800 text-[11px]">Terpenuhi</span>
                           </div>
-                          <div className="flex items-center justify-between text-slate-700">
+                          <div className="flex items-center justify-between gap-3 text-slate-700">
                             <span className="flex items-center gap-1.5">
                               <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
                               Struktur Hierarki Pasal &amp; Ayat
                             </span>
                             <span className="font-bold text-slate-800 text-[11px]">Valid</span>
                           </div>
-                          <div className="flex items-center justify-between text-slate-700">
+                          <div className="flex items-center justify-between gap-3 text-slate-700">
                             <span className="flex items-center gap-1.5">
                               <Check className="h-3.5 w-3.5 text-emerald-600 stroke-[3]" />
                               Kesesuaian Konsiderans Mengingat
@@ -788,12 +788,12 @@ export const LandingPage = ({ statistikData }) => {
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
                     <span className="flex items-center gap-1.5 text-[#2B3056]">
                       <ShieldCheck className="h-4 w-4 text-[#B3912D]" />
                       <span>Alat Bantu Asisten Perancang</span>
                     </span>
-                    <span className="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                    <span className="shrink-0 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                       Sistem Aktif
                     </span>
                   </div>
@@ -825,26 +825,26 @@ export const LandingPage = ({ statistikData }) => {
 
                     {/* Authentic Word Template Preview Box */}
                     <div className="mt-5 rounded-xl border border-blue-200/80 bg-blue-50/40 p-4 relative">
-                      <div className="flex items-center justify-between text-xs pb-2 border-b border-blue-200/60">
+                      <div className="flex items-center justify-between gap-2 text-xs pb-2 border-b border-blue-200/60">
                         <span className="font-bold text-[#2B3056] flex items-center gap-1.5">
                           <FileOutput className="h-3.5 w-3.5 text-blue-700" />
                           Template Surat Selesai Harmonisasi
                         </span>
-                        <span className="text-[10px] font-extrabold text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">
+                        <span className="shrink-0 whitespace-nowrap text-[10px] font-extrabold text-blue-800 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">
                           Format Word (.DOCX)
                         </span>
                       </div>
 
                       <div className="mt-3 space-y-2 text-xs">
-                        <div className="flex items-center justify-between text-slate-700">
+                        <div className="flex items-center justify-between gap-3 text-slate-700">
                           <span>Kop Surat Kedinasan:</span>
                           <span className="font-bold text-[#2B3056] text-[11px]">Kanwil Kemenkum Riau</span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-700">
+                        <div className="flex items-center justify-between gap-3 text-slate-700">
                           <span>Format Penomoran:</span>
                           <span className="font-mono text-[11px] font-bold text-slate-800">W.4-PP.04.02-XXXX</span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-700">
+                        <div className="flex items-center justify-between gap-3 text-slate-700">
                           <span>Pilihan Jenis Regulasi:</span>
                           <span className="font-bold text-slate-800 text-[11px]">PERDA &amp; PERKADA</span>
                         </div>
@@ -852,12 +852,12 @@ export const LandingPage = ({ statistikData }) => {
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
                     <span className="flex items-center gap-1.5 text-[#2B3056]">
                       <FileCheck2 className="h-4 w-4 text-[#B3912D]" />
                       <span>Template Baku Resmi Kanwil</span>
                     </span>
-                    <span className="text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                    <span className="shrink-0 text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
                       Ekspor .DOCX
                     </span>
                   </div>
@@ -934,7 +934,7 @@ export const LandingPage = ({ statistikData }) => {
             </Reveal>
 
             {/* 3 Clean Team Cards */}
-            <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
               {teamWorkAreas.map((team, idx) => (
                 <Reveal key={team.name} direction="up" delay={idx * 100 + 100} className="h-full">
                   <div className="interactive-card flex flex-col justify-between h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-xs hover:border-[#2B3056]/30 hover:shadow-md transition-all duration-200">
@@ -1035,7 +1035,7 @@ export const LandingPage = ({ statistikData }) => {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal direction="scale" delay={50}>
               <div className="rounded-2xl border border-[#3A4070] bg-gradient-to-r from-[#2B3056] via-[#323963] to-[#2B3056] p-8 sm:p-10 lg:p-12 text-white shadow-xl">
-                <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
 
                   {/* Headline & Action Buttons */}
                   <div className="lg:col-span-8 space-y-4 text-center lg:text-left">
@@ -1112,7 +1112,7 @@ export const LandingPage = ({ statistikData }) => {
       <footer id="kontak" className="bg-[#2B3056] text-white pt-14 pb-8 border-t border-[#3A4070] overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal direction="up" delay={50}>
-            <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-12 text-xs sm:text-sm">
+            <div className="grid grid-cols-1 gap-10 border-b border-white/10 pb-10 md:grid-cols-12 text-xs sm:text-sm">
 
               {/* Brand & Identity Column */}
               <div className="md:col-span-5 space-y-4">
@@ -1164,9 +1164,9 @@ export const LandingPage = ({ statistikData }) => {
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[#FFD82B]">
                       <Mail className="h-4 w-4" />
                     </span>
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-semibold text-white">Email Resmi:</p>
-                      <span className="text-slate-300">harmonitas.kanwil@kemenkum.go.id</span>
+                      <span className="text-slate-300 break-all">harmonitas.kanwil@kemenkum.go.id</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-2.5">

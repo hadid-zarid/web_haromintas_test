@@ -99,12 +99,18 @@ export const RiauMapVisualization = ({
   const handleMouseMove = (e, geo) => {
     if (!mapContainerRef.current) return;
     const rect = mapContainerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    // Jaga tooltip (w-72 = 288px) tetap di dalam kanvas agar tidak terpotong di tepi
+    const halfTooltip = 152;
+    const rawX = e.clientX - rect.left;
+    const x = rect.width > halfTooltip * 2
+      ? Math.min(Math.max(rawX, halfTooltip), rect.width - halfTooltip)
+      : rect.width / 2;
     const y = e.clientY - rect.top;
 
     setTooltipPos({
       x,
       y,
+      below: y < 240,
       visible: true,
     });
     setHoveredWilayahId(geo.id);
@@ -144,7 +150,7 @@ export const RiauMapVisualization = ({
               onSelectWilayah(1);
             }
           }}
-          className={`group relative overflow-hidden rounded-2xl p-4 sm:p-4.5 border transition-all duration-300 cursor-pointer ${
+          className={`group relative overflow-hidden rounded-2xl p-3.5 sm:p-4.5 border transition-all duration-300 cursor-pointer ${
             selectedWilayahId === 1
               ? 'bg-gradient-to-r from-[#1E2342] via-[#2B3056] to-[#1E2342] border-[#FFD82B] text-white shadow-lg ring-2 ring-[#FFD82B]/40'
               : 'bg-gradient-to-r from-white via-slate-50 to-white border-slate-200/90 hover:border-slate-300 text-slate-800 shadow-2xs hover:shadow-sm'
@@ -155,27 +161,27 @@ export const RiauMapVisualization = ({
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 relative z-10">
             {/* Title & Badge */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
+                className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
                   selectedWilayahId === 1
                     ? 'bg-[#FFD82B] text-[#2B3056] shadow-xs'
                     : 'bg-[#2B3056] text-[#FFD82B]'
                 }`}
               >
-                <Landmark className="h-5 w-5" />
+                <Landmark className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
               </span>
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <h4
-                    className={`text-sm sm:text-base font-black leading-tight ${
+                    className={`text-xs sm:text-base font-black leading-tight ${
                       selectedWilayahId === 1 ? 'text-white' : 'text-[#2B3056]'
                     }`}
                   >
                     Pemerintah Provinsi Riau
                   </h4>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10.5px] font-extrabold ${
+                    className={`rounded-full px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[10.5px] font-extrabold ${
                       selectedWilayahId === 1
                         ? 'bg-[#FFD82B]/20 text-[#FFD82B] border border-[#FFD82B]/40'
                         : 'bg-amber-100 text-amber-900 border border-amber-200'
@@ -185,7 +191,7 @@ export const RiauMapVisualization = ({
                   </span>
                 </div>
                 <p
-                  className={`text-xs mt-0.5 ${
+                  className={`text-[10.5px] sm:text-xs mt-0.5 ${
                     selectedWilayahId === 1 ? 'text-slate-300' : 'text-slate-500'
                   }`}
                 >
@@ -195,16 +201,16 @@ export const RiauMapVisualization = ({
             </div>
 
             {/* Quick Metrics for Provinsi Riau */}
-            <div className="flex items-center gap-3 self-end sm:self-auto">
+            <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 sm:gap-3 mt-1 sm:mt-0 pt-2 sm:pt-0 border-t border-slate-200/60 sm:border-0">
               <div
-                className={`text-right px-3 py-1.5 rounded-xl border ${
+                className={`text-left sm:text-right px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border flex-1 sm:flex-initial ${
                   selectedWilayahId === 1
                     ? 'bg-white/10 border-white/15'
                     : 'bg-slate-100/80 border-slate-200'
                 }`}
               >
                 <span
-                  className={`text-[10px] font-bold block uppercase tracking-wider ${
+                  className={`text-[9.5px] sm:text-[10px] font-bold block uppercase tracking-wider ${
                     selectedWilayahId === 1 ? 'text-slate-300' : 'text-slate-500'
                   }`}
                 >
@@ -214,9 +220,9 @@ export const RiauMapVisualization = ({
                     ? 'Ranperkada (Progsun)'
                     : 'Total Gabungan'}
                 </span>
-                <div className="flex items-baseline gap-1 justify-end font-mono">
+                <div className="flex items-baseline gap-1 justify-start sm:justify-end font-mono">
                   <span
-                    className={`text-sm sm:text-base font-black ${
+                    className={`text-xs sm:text-base font-black ${
                       selectedWilayahId === 1 ? 'text-white' : 'text-[#2B3056]'
                     }`}
                   >
@@ -227,7 +233,7 @@ export const RiauMapVisualization = ({
                       : `${provData.total.harmonisasi}/${provData.total.rencana}`}
                   </span>
                   <span
-                    className={`text-xs font-bold ${
+                    className={`text-[10px] sm:text-xs font-bold ${
                       selectedWilayahId === 1 ? 'text-slate-300' : 'text-slate-500'
                     }`}
                   >
@@ -238,7 +244,7 @@ export const RiauMapVisualization = ({
 
               {/* Rasio Badge */}
               <span
-                className={`px-3 py-2 rounded-xl text-xs font-black font-mono shadow-xs border ${
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black font-mono shadow-xs border shrink-0 whitespace-nowrap ${
                   selectedWilayahId === 1
                     ? 'bg-[#FFD82B] text-[#2B3056] border-[#FFD82B]'
                     : 'bg-[#2B3056] text-[#FFD82B] border-[#2B3056]'
@@ -262,49 +268,49 @@ export const RiauMapVisualization = ({
       {/* =========================================================================
           MAP CONTROLS TOOLBAR: INFO & NAVIGATION ZOOM
           ========================================================================= */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 sm:p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 bg-white p-2.5 sm:p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs">
         {/* Left: Tim Kerja Kanwil Information Title */}
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
-            <Building2 className="h-4 w-4" />
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] shadow-2xs">
+            <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </span>
-          <div>
+          <div className="min-w-0">
             <span className="text-xs sm:text-sm font-black text-[#2B3056] block leading-tight">
-              Peta Pembagian Wilayah Tim Kerja Kanwil Kemenkum Riau
+              Peta Wilayah Tim Kerja Kanwil
             </span>
-            <span className="text-[11px] text-slate-500 font-medium">
-              3 Tim Kerja Perancang memfasilitasi pembentukan regulasi di 13 entitas daerah
+            <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
+              3 Tim Kerja Perancang memfasilitasi 13 entitas di Riau
             </span>
           </div>
         </div>
 
         {/* Right: Map Navigation Tools */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <button
             type="button"
             onClick={() => setZoomLevel((z) => Math.min(1.4, z + 0.12))}
-            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition cursor-pointer"
+            className="p-1 sm:p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition cursor-pointer"
             title="Perbesar Peta"
             aria-label="Perbesar Peta"
           >
-            <ZoomIn className="h-4 w-4" />
+            <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             type="button"
             onClick={() => setZoomLevel((z) => Math.max(0.88, z - 0.12))}
-            className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition cursor-pointer"
+            className="p-1 sm:p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition cursor-pointer"
             title="Perkecil Peta"
             aria-label="Perkecil Peta"
           >
-            <ZoomOut className="h-4 w-4" />
+            <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             type="button"
             onClick={() => setZoomLevel(1)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition cursor-pointer"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] sm:text-xs font-bold shadow-2xs transition cursor-pointer"
             title="Kembalikan Tampilan Normal"
           >
-            <RotateCcw className="h-3.5 w-3.5 text-slate-400" />
+            <RotateCcw className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
             <span className="hidden sm:inline">Reset</span>
           </button>
         </div>
@@ -315,7 +321,7 @@ export const RiauMapVisualization = ({
           ========================================================================= */}
       <div
         ref={mapContainerRef}
-        className="relative w-full rounded-3xl border border-slate-200/90 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] p-4 sm:p-6 shadow-sm overflow-hidden min-h-[520px] sm:min-h-[620px] select-none"
+        className="relative w-full rounded-3xl border border-slate-200/90 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] p-2.5 sm:p-6 shadow-sm overflow-hidden min-h-[380px] sm:min-h-[620px] select-none"
       >
         {/* Soft Decorative Grid Texture */}
         <div
@@ -327,7 +333,7 @@ export const RiauMapVisualization = ({
         />
 
         {/* Coastal Ocean Watermark / Compass Badge */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2 rounded-xl bg-white/90 backdrop-blur-md px-3.5 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 shadow-2xs pointer-events-none">
+        <div className="absolute top-4 right-4 z-10 hidden sm:flex items-center gap-2 rounded-xl bg-white/90 backdrop-blur-md px-3.5 py-1.5 border border-slate-200 text-xs font-bold text-slate-600 shadow-2xs pointer-events-none">
           <Compass className="h-4 w-4 text-blue-600" />
           <span>Selat Malaka &amp; Pesisir Riau</span>
         </div>
@@ -496,7 +502,9 @@ export const RiauMapVisualization = ({
             ========================================================================= */}
         {tooltipPos.visible && activeWilayah && (
           <div
-            className="pointer-events-none absolute z-40 w-72 -translate-x-1/2 -translate-y-full transform pb-3 transition-all duration-75"
+            className={`pointer-events-none absolute z-40 hidden sm:block w-72 -translate-x-1/2 transform transition-all duration-75 ${
+              tooltipPos.below ? 'translate-y-0 pt-4' : '-translate-y-full pb-3'
+            }`}
             style={{
               left: `${tooltipPos.x}px`,
               top: `${tooltipPos.y}px`,
@@ -600,32 +608,32 @@ export const RiauMapVisualization = ({
         {/* =========================================================================
             BOTTOM MAP LEGEND: PEMBAGIAN ZONA TIM KERJA KANWIL
             ========================================================================= */}
-        <div className="absolute bottom-4 left-4 z-10 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 rounded-2xl bg-white/95 backdrop-blur-md px-4 py-2.5 border border-slate-200 text-xs font-bold text-slate-700 shadow-md max-w-[94%]">
-          <span className="text-[11px] font-black text-[#2B3056] uppercase tracking-wider shrink-0">
+        <div className="relative mt-2.5 sm:mt-0 sm:absolute sm:bottom-4 sm:left-4 z-10 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 rounded-2xl bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 border border-slate-200 text-xs font-bold text-slate-700 shadow-2xs sm:shadow-md sm:max-w-[94%]">
+          <span className="text-[10px] sm:text-[11px] font-black text-[#2B3056] uppercase tracking-wider shrink-0">
             Zona Tim Kerja Kanwil:
           </span>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1">
             {/* Tim 1 */}
-            <div className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-sm bg-gradient-to-br from-blue-400 to-blue-700 shadow-2xs" />
-              <span className="text-[11px] text-slate-800">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-gradient-to-br from-blue-400 to-blue-700 shadow-2xs" />
+              <span className="text-[10.5px] sm:text-[11px] text-slate-800">
                 <strong className="text-blue-900 font-black">Tim Kerja 1</strong>
               </span>
             </div>
 
             {/* Tim 2 */}
-            <div className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-sm bg-gradient-to-br from-amber-300 to-amber-600 shadow-2xs" />
-              <span className="text-[11px] text-slate-800">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-gradient-to-br from-amber-300 to-amber-600 shadow-2xs" />
+              <span className="text-[10.5px] sm:text-[11px] text-slate-800">
                 <strong className="text-amber-950 font-black">Tim Kerja 2</strong>
               </span>
             </div>
 
             {/* Tim 3 */}
-            <div className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-sm bg-gradient-to-br from-emerald-300 to-emerald-600 shadow-2xs" />
-              <span className="text-[11px] text-slate-800">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-gradient-to-br from-emerald-300 to-emerald-600 shadow-2xs" />
+              <span className="text-[10.5px] sm:text-[11px] text-slate-800">
                 <strong className="text-emerald-950 font-black">Tim Kerja 3</strong>
               </span>
             </div>
@@ -636,18 +644,18 @@ export const RiauMapVisualization = ({
       {/* =========================================================================
           QUICK REGION SELECTOR CHIPS (COVERS ALL 13 ENTITIES)
           ========================================================================= */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white p-3.5 shadow-2xs space-y-2">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+      <div className="rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-3.5 shadow-2xs space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-bold text-slate-500">
           <span className="flex items-center gap-1.5 text-[#2B3056] font-black">
             <Layers className="h-3.5 w-3.5 text-[#FFC800]" />
             Daftar Lengkap 13 Wilayah di Riau:
           </span>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[10.5px] sm:text-[11px] text-slate-400">
             {wilayahList.length} Entitas Terdaftar
           </span>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-200">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 pt-0.5 scrollbar-thin scrollbar-thumb-slate-200 overscroll-x-contain -mx-0.5 px-0.5">
           {wilayahList.map((w) => {
             const isSelected = selectedWilayahId === w.kabupaten_id;
             const regData =
@@ -666,7 +674,7 @@ export const RiauMapVisualization = ({
                 onClick={() => onSelectWilayah(w.kabupaten_id)}
                 onMouseEnter={() => setHoveredWilayahId(w.kabupaten_id)}
                 onMouseLeave={() => setHoveredWilayahId(null)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                className={`min-h-[34px] flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                   isSelected
                     ? 'bg-[#2B3056] text-[#FFD82B] shadow-xs ring-2 ring-[#2B3056]/20 font-black'
                     : w.kelompok === 'Provinsi'
@@ -676,7 +684,7 @@ export const RiauMapVisualization = ({
               >
                 {/* Tim Kerja Color Dot */}
                 <span
-                  className={`h-2 w-2 rounded-full ${
+                  className={`h-2 w-2 rounded-full shrink-0 ${
                     timId === 1 ? 'bg-blue-600' : timId === 2 ? 'bg-amber-500' : 'bg-emerald-500'
                   }`}
                   title={`Zona Tim Kerja ${timId}`}

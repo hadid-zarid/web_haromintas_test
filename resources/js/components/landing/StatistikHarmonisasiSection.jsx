@@ -63,17 +63,17 @@ const ScrollReveal = ({
     if (isVisible) return 'translate3d(0, 0, 0) scale(1)';
     switch (direction) {
       case 'up':
-        return 'translate3d(0, 28px, 0) scale(0.985)';
+        return 'translate3d(0, 24px, 0) scale(0.985)';
       case 'down':
-        return 'translate3d(0, -28px, 0) scale(0.985)';
+        return 'translate3d(0, -24px, 0) scale(0.985)';
       case 'left':
-        return 'translate3d(-32px, 0, 0) scale(0.985)';
+        return 'translate3d(-20px, 0, 0) scale(0.985)';
       case 'right':
-        return 'translate3d(32px, 0, 0) scale(0.985)';
+        return 'translate3d(20px, 0, 0) scale(0.985)';
       case 'scale':
-        return 'translate3d(0, 16px, 0) scale(0.94)';
+        return 'translate3d(0, 14px, 0) scale(0.95)';
       default:
-        return 'translate3d(0, 28px, 0) scale(0.985)';
+        return 'translate3d(0, 24px, 0) scale(0.985)';
     }
   };
 
@@ -321,12 +321,12 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 pb-1 border-t border-slate-200/80">
         {/* Info Text & Page Size Selector */}
-        <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-500 font-medium">
-          <span>
+        <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 sm:gap-2.5 text-xs text-slate-500 font-medium w-full sm:w-auto">
+          <span className="text-[11px] sm:text-xs">
             Menampilkan <strong className="text-[#2B3056] font-extrabold">{totalItems > 0 ? startIndex + 1 : 0}–{endIndex}</strong> dari <strong className="text-[#2B3056] font-extrabold">{totalItems}</strong> wilayah
           </span>
           <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
-            <span className="text-[11px] text-slate-400 font-semibold">Tampilkan:</span>
+            <span className="text-[10.5px] sm:text-[11px] text-slate-400 font-semibold">Tampilkan:</span>
             {[5, 10, 'all'].map((sz) => {
               const isSelected = (sz === 'all' && isAll) || pageSize === sz;
               return (
@@ -337,7 +337,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     setPageSize(sz);
                     setCurrentPage(1);
                   }}
-                  className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`px-2 py-0.5 rounded text-[10.5px] sm:text-[11px] font-bold transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-[#2B3056] text-[#FFD82B] shadow-2xs font-black'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
@@ -352,7 +352,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
 
         {/* Page Navigation Buttons */}
         {totalPages > 1 && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-center sm:justify-end gap-1.5 w-full sm:w-auto">
             <button
               type="button"
               disabled={safeCurrentPage <= 1}
@@ -472,113 +472,113 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
     <>
       {/* Inspector Card */}
       {selectedWilayah && (
-        <div className="rounded-3xl border border-[#2B3056]/20 bg-gradient-to-b from-white via-slate-50/50 to-white p-6 shadow-sm space-y-5">
-          <div className="border-b border-slate-200/80 pb-4">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              <Landmark className="h-3.5 w-3.5 text-[#B3912D]" />
+        <div className="rounded-3xl border border-[#2B3056]/20 bg-gradient-to-b from-white via-slate-50/50 to-white p-3.5 sm:p-6 shadow-sm space-y-3.5 sm:space-y-5">
+          <div className="border-b border-slate-200/80 pb-3 sm:pb-4">
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <Landmark className="h-3.5 w-3.5 text-[#B3912D] shrink-0" />
               Kartu Rincian Wilayah Terpilih
             </span>
-            <h4 className="mt-1 text-xl font-black text-[#2B3056]">
+            <h4 className="mt-1 text-lg sm:text-xl font-black text-[#2B3056] break-words">
               {selectedWilayah.nama_kabupaten}
             </h4>
-            <p className="text-xs text-slate-600 font-medium">
+            <p className="text-[11px] sm:text-xs text-slate-600 font-medium">
               Binaan {selectedWilayah.tim_kerja_nama} • Kategori {selectedWilayah.kelompok}
             </p>
           </div>
 
           {/* Ranperda Details for Selected Region */}
-          <div className="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-blue-950 uppercase tracking-wide">
+          <div className="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-3 sm:p-4 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <span className="text-[11px] sm:text-xs font-black text-blue-950 uppercase tracking-wide">
                 Ranperda (ProPem)
               </span>
-              <span className="text-xs font-mono font-bold text-blue-900 bg-blue-100/80 px-2 py-0.5 rounded">
+              <span className="text-[10.5px] sm:text-xs font-mono font-bold text-blue-900 bg-blue-100/80 px-2 py-0.5 rounded whitespace-nowrap">
                 Rasio {numberFormat(selectedWilayah.ranperda.rasio)}%
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-              <div>
-                <span className="text-slate-500 font-medium block">
-                  {data?.is_live ? 'Permohonan Masuk:' : 'Target ProPem:'}
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
+                  {data?.is_live ? 'Permohonan:' : 'Target ProPem:'}
                 </span>
-                <span className="text-base font-mono font-black text-[#2B3056]">
+                <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.ranperda.rencana}
                 </span>
               </div>
-              <div>
-                <span className="text-slate-500 font-medium block">Diharmonisasi:</span>
-                <span className="text-base font-mono font-black text-blue-700">
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">Diharmonisasi:</span>
+                <span className="text-base sm:text-lg font-mono font-black text-blue-700">
                   {selectedWilayah.ranperda.harmonisasi}
                 </span>
               </div>
             </div>
 
             {selectedWilayah.ranperda.surplus && (
-              <p className="text-[11px] text-emerald-800 font-semibold bg-emerald-50 rounded-lg p-2 border border-emerald-200 mt-2">
+              <p className="text-[10.5px] sm:text-[11px] text-emerald-800 font-semibold bg-emerald-50 rounded-lg p-2 border border-emerald-200 mt-2">
                 Realisasi Ranperda melampaui target rencana (+{selectedWilayah.ranperda.surplus_selisih} regulasi).
               </p>
             )}
           </div>
 
           {/* Ranperkada Details for Selected Region */}
-          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-amber-950 uppercase tracking-wide">
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-3 sm:p-4 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <span className="text-[11px] sm:text-xs font-black text-amber-950 uppercase tracking-wide">
                 Ranperkada (Progsun)
               </span>
-              <span className="text-xs font-mono font-bold text-amber-950 bg-amber-100/80 px-2 py-0.5 rounded">
+              <span className="text-[10.5px] sm:text-xs font-mono font-bold text-amber-950 bg-amber-100/80 px-2 py-0.5 rounded whitespace-nowrap">
                 Rasio {numberFormat(selectedWilayah.ranperkada.rasio)}%
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-              <div>
-                <span className="text-slate-500 font-medium block">
-                  {data?.is_live ? 'Permohonan Masuk:' : 'Target Progsun:'}
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
+                  {data?.is_live ? 'Permohonan:' : 'Target Progsun:'}
                 </span>
-                <span className="text-base font-mono font-black text-[#2B3056]">
+                <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.ranperkada.rencana}
                 </span>
               </div>
-              <div>
-                <span className="text-slate-500 font-medium block">Diharmonisasi:</span>
-                <span className="text-base font-mono font-black text-amber-900">
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">Diharmonisasi:</span>
+                <span className="text-base sm:text-lg font-mono font-black text-amber-900">
                   {selectedWilayah.ranperkada.harmonisasi}
                 </span>
               </div>
             </div>
 
             {selectedWilayah.ranperkada.surplus && (
-              <p className="text-[11px] text-emerald-800 font-semibold bg-emerald-50 rounded-lg p-2 border border-emerald-200 mt-2">
+              <p className="text-[10.5px] sm:text-[11px] text-emerald-800 font-semibold bg-emerald-50 rounded-lg p-2 border border-emerald-200 mt-2">
                 Realisasi Ranperkada melampaui target rencana (+{selectedWilayah.ranperkada.surplus_selisih} regulasi).
               </p>
             )}
           </div>
 
           {/* Combined Region Total */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-[#2B3056] uppercase tracking-wide">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <span className="text-[11px] sm:text-xs font-black text-[#2B3056] uppercase tracking-wide">
                 Akumulasi Regulasi
               </span>
-              <span className="text-xs font-mono font-black text-[#2B3056]">
+              <span className="text-[10.5px] sm:text-xs font-mono font-black text-[#2B3056] whitespace-nowrap">
                 Rasio Total {numberFormat(selectedWilayah.total.rasio)}%
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-              <div>
-                <span className="text-slate-500 font-medium block">
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
                   {data?.is_live ? 'Total Permohonan:' : 'Total Rencana:'}
                 </span>
-                <span className="text-lg font-mono font-black text-[#2B3056]">
+                <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.total.rencana}
                 </span>
               </div>
-              <div>
-                <span className="text-slate-500 font-medium block">Total Selesai:</span>
-                <span className="text-lg font-mono font-black text-emerald-700">
+              <div className="min-w-0">
+                <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">Total Selesai:</span>
+                <span className="text-base sm:text-lg font-mono font-black text-emerald-700">
                   {selectedWilayah.total.harmonisasi}
                 </span>
               </div>
@@ -588,30 +588,30 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
       )}
 
       {/* Informative Glossary Card */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 space-y-3.5 shadow-2xs text-xs">
+      <div className="rounded-3xl border border-slate-200 bg-white p-3.5 sm:p-5 space-y-3 shadow-2xs text-xs">
         <div className="flex items-center gap-2 font-extrabold text-[#2B3056] border-b border-slate-100 pb-2.5">
-          <HelpCircle className="h-4 w-4 text-[#B3912D]" />
+          <HelpCircle className="h-4 w-4 text-[#B3912D] shrink-0" />
           <span>Panduan Membaca Data</span>
         </div>
 
-        <div className="space-y-3 text-slate-600 leading-relaxed">
+        <div className="space-y-3 text-slate-600 leading-relaxed text-[11px] sm:text-[11.5px]">
           <div>
             <p className="font-bold text-[#2B3056]">Apa itu ProPem &amp; Progsun?</p>
-            <p className="mt-0.5 text-[11.5px]">
+            <p className="mt-0.5">
               <strong>ProPem</strong> adalah Program Pembentukan Peraturan Daerah (Ranperda). <strong>Progsun</strong> adalah Program Penyusunan Peraturan Kepala Daerah (Ranperkada). Keduanya merupakan daftar target rencana tahunan resmi daerah, bukan ramalan sistem.
             </p>
           </div>
 
           <div>
             <p className="font-bold text-[#2B3056]">Kapan Berkas Dihitung Selesai?</p>
-            <p className="mt-0.5 text-[11.5px]">
+            <p className="mt-0.5">
               Hanya dihitung setelah seluruh dokumen wajib harmonisasi 1–5 lengkap dan surat hasil harmonisasi resmi disahkan oleh Kanwil Kemenkum Riau. Status proses berjalan tidak dihitung sebagai selesai.
             </p>
           </div>
 
           <div>
             <p className="font-bold text-[#2B3056]">Mengapa Rasio Bisa Melebihi 100%?</p>
-            <p className="mt-0.5 text-[11.5px]">
+            <p className="mt-0.5">
               Pemerintah Daerah dapat mengajukan regulasi di luar daftar rencana tahunan akibat keadaan darurat/mendesak, instruksi pemerintah pusat, tindak lanjut putusan pengadilan, atau perubahan APBD.
             </p>
           </div>
@@ -623,14 +623,14 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
   return (
     <section
       id="statistik"
-      className="scroll-mt-24 border-b border-slate-200 bg-[#FBFBFE] py-16 sm:py-24 overflow-hidden relative"
+      className="scroll-mt-24 border-b border-slate-200 bg-[#FBFBFE] py-12 sm:py-20 lg:py-24 overflow-hidden relative"
       aria-labelledby="statistik-heading"
     >
       {/* Background Decorative Accents */}
       <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-gradient-to-b from-[#2B3056]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 -z-10 w-[450px] h-[450px] bg-gradient-to-t from-[#FFD82B]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
 
         {/* =========================================================================
             1. EDITORIAL HEADER & METADATA BADGES (WITH SCROLL REVEAL ANIMATION)
@@ -648,7 +648,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 {/* Year Selector Filter */}
                 {data?.available_years && data.available_years.length > 1 ? (
-                  <div className="flex items-center gap-1 rounded-xl border border-slate-300 bg-white p-1 shadow-xs">
+                  <div className="flex flex-wrap items-center gap-1 rounded-xl border border-slate-300 bg-white p-1 shadow-xs max-w-full">
                     <span className="text-[11px] font-bold text-slate-400 px-2 items-center gap-1 hidden sm:flex">
                       <Calendar className="h-3.5 w-3.5 text-slate-400" />
                       Pilih Tahun:
@@ -662,7 +662,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                           key={y.tahun}
                           type="button"
                           onClick={() => handleYearChange(y.tahun)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             isActive
                               ? 'bg-[#2B3056] text-white shadow-xs font-black'
                               : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-100'
@@ -724,26 +724,26 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             <div className="max-w-4xl">
               <h2
                 id="statistik-heading"
-                className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#2B3056] leading-[1.2]"
+                className="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#2B3056] leading-[1.2]"
               >
                 Rencana dan Hasil Harmonisasi Regulasi Daerah
               </h2>
-              <p className="mt-2.5 text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="mt-2 text-xs sm:text-base text-slate-600 leading-relaxed">
                 Membandingkan target perencanaan program regulasi (<strong>ProPem</strong> untuk Ranperda dan <strong>Progsun</strong> untuk Ranperkada) dengan capaian rancangan yang telah selesai diharmonisasi oleh Kantor Wilayah Kementerian Hukum Riau.
               </p>
             </div>
 
             {/* Fetch Error Notice (if any) */}
             {fetchError && (
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                <div className="flex items-start sm:items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
                   <span>Pembaruan otomatis sementara tertunda: {fetchError}. Angka yang ditampilkan tetap menggunakan data valid terakhir.</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => fetchData(activeYear, false)}
-                  className="font-bold underline hover:text-amber-950 shrink-0 cursor-pointer"
+                  className="font-bold underline hover:text-amber-950 shrink-0 cursor-pointer self-end sm:self-auto"
                 >
                   Coba Lagi
                 </button>
@@ -755,80 +755,80 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
         {/* =========================================================================
             2. DUA PANEL RINGKASAN ASIMETRIS (WITH STAGGERED SCROLL REVEAL & COUNTUP)
             ========================================================================= */}
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 
           {/* Panel Ranperda (ProPem) - 6 Cols on LG */}
-          <ScrollReveal direction="up" delay={80} className="lg:col-span-6">
-            <div className="h-full rounded-3xl border border-blue-200/80 bg-gradient-to-br from-white via-blue-50/20 to-white p-6 sm:p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+          <ScrollReveal direction="up" delay={80} className="min-w-0 lg:col-span-6">
+            <div className="h-full rounded-3xl border border-blue-200/80 bg-gradient-to-br from-white via-blue-50/20 to-white p-4 sm:p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
               <div className="absolute top-0 right-0 h-28 w-28 bg-blue-500/5 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500" />
 
-              <div className="flex items-start justify-between gap-3 pb-4 border-b border-blue-100">
+              <div className="flex items-start justify-between gap-3 pb-3 sm:pb-4 border-b border-blue-100">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-blue-900">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-blue-900">
                     <span className="h-2 w-2 rounded-xs bg-blue-600" />
                     Ranperda (Peraturan Daerah)
                   </span>
-                  <h3 className="mt-1 text-lg sm:text-xl font-black text-[#2B3056]">
+                  <h3 className="mt-1 text-base sm:text-xl font-black text-[#2B3056]">
                     ProPem Ranperda
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
                     Program Pembentukan Peraturan Daerah
                   </p>
                 </div>
 
-                <span className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-mono font-black text-blue-900">
+                <span className="shrink-0 whitespace-nowrap rounded-xl border border-blue-200 bg-blue-50 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-black text-blue-900">
                   13 Wilayah
                 </span>
               </div>
 
               {/* Asymmetrical Metric Comparison with Animated Numbers */}
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 transition-colors">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4">
+                <div className="rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-2xs hover:border-slate-300 min-w-0 transition-colors">
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-snug">
                     {ringkasan.ranperda.label_target || 'Target Direncanakan'}
                   </p>
-                  <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-black text-[#2B3056] font-mono tracking-tight">
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1 sm:gap-x-1.5">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#2B3056] font-mono tracking-tight">
                       <AnimatedNumber value={ringkasan.ranperda.rencana} />
                     </span>
-                    <span className="text-xs font-bold text-slate-500">Ranperda</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-500">Ranperda</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-500 font-medium">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-slate-500 font-medium leading-snug">
                     {ringkasan.ranperda.sublabel_target || 'Target kesepakatan Pemda & DPRD'}
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-blue-300/80 bg-blue-600 text-white p-4 shadow-sm hover:bg-blue-700 transition-colors">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-blue-100">
+                <div className="rounded-2xl border border-blue-300/80 bg-blue-600 text-white p-3 sm:p-4 min-w-0 shadow-sm hover:bg-blue-700 transition-colors">
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-100 leading-snug">
                     Telah Diharmonisasi
                   </p>
-                  <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight">
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1 sm:gap-x-1.5">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-white font-mono tracking-tight">
                       <AnimatedNumber value={ringkasan.ranperda.harmonisasi} />
                     </span>
-                    <span className="text-xs font-bold text-blue-100">Selesai</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-blue-100">Selesai</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-blue-100/90 font-medium">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-blue-100/90 font-medium leading-snug">
                     Pengesahan surat hasil Kanwil
                   </p>
                 </div>
               </div>
 
               {/* Honest Ratio Indicator Bar */}
-              <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-slate-700">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
-                  <span className="font-mono text-blue-900 text-sm font-black">
+              <div className="mt-4 sm:mt-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-3 sm:p-4 space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs font-bold">
+                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
+                  <span className="shrink-0 font-mono text-blue-900 text-sm font-black">
                     <AnimatedNumber value={ringkasan.ranperda.rasio} formatDecimal={true} />%
                   </span>
                 </div>
-                <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden p-0.5">
+                <div className="h-2.5 sm:h-3 w-full bg-slate-200 rounded-full overflow-hidden p-0.5">
                   <div
                     className="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${Math.min(ringkasan.ranperda.rasio, 100)}%` }}
                   />
                 </div>
-                <p className="text-[10.5px] text-slate-500 italic">
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 italic">
                   * Rasio agregat seluruh wilayah Riau ({ringkasan.ranperda.harmonisasi} dari {ringkasan.ranperda.rencana} {ringkasan.ranperda.footnote_target || 'target program'}).
                 </p>
               </div>
@@ -836,77 +836,77 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
           </ScrollReveal>
 
           {/* Panel Ranperkada (Progsun) - 6 Cols on LG */}
-          <ScrollReveal direction="up" delay={160} className="lg:col-span-6">
-            <div className="h-full rounded-3xl border border-amber-200/80 bg-gradient-to-br from-white via-amber-50/20 to-white p-6 sm:p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+          <ScrollReveal direction="up" delay={160} className="min-w-0 lg:col-span-6">
+            <div className="h-full rounded-3xl border border-amber-200/80 bg-gradient-to-br from-white via-amber-50/20 to-white p-4 sm:p-7 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
               <div className="absolute top-0 right-0 h-28 w-28 bg-amber-500/5 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500" />
 
-              <div className="flex items-start justify-between gap-3 pb-4 border-b border-amber-100">
+              <div className="flex items-start justify-between gap-3 pb-3 sm:pb-4 border-b border-amber-100">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-amber-900">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-900">
                     <span className="h-2 w-2 rounded-xs bg-[#FFC800]" />
                     Ranperkada (Peraturan Kepala Daerah)
                   </span>
-                  <h3 className="mt-1 text-lg sm:text-xl font-black text-[#2B3056]">
+                  <h3 className="mt-1 text-base sm:text-xl font-black text-[#2B3056]">
                     Progsun Ranperkada
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
                     Program Penyusunan Peraturan Kepala Daerah
                   </p>
                 </div>
 
-                <span className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-mono font-black text-amber-900">
+                <span className="shrink-0 whitespace-nowrap rounded-xl border border-amber-200 bg-amber-50 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-black text-amber-900">
                   13 Wilayah
                 </span>
               </div>
 
               {/* Asymmetrical Metric Comparison with Animated Numbers */}
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 transition-colors">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4">
+                <div className="rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-4 shadow-2xs hover:border-slate-300 min-w-0 transition-colors">
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-snug">
                     {ringkasan.ranperkada.label_target || 'Target Direncanakan'}
                   </p>
-                  <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-black text-[#2B3056] font-mono tracking-tight">
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1 sm:gap-x-1.5">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#2B3056] font-mono tracking-tight">
                       <AnimatedNumber value={ringkasan.ranperkada.rencana} />
                     </span>
-                    <span className="text-xs font-bold text-slate-500">Ranperkada</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-500">Ranperkada</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-500 font-medium">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-slate-500 font-medium leading-snug">
                     {ringkasan.ranperkada.sublabel_target || 'Rencana tahunan Pergub / Perbup / Perwali'}
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#FFD82B] bg-[#2B3056] text-white p-4 shadow-sm hover:bg-[#353B6A] transition-colors">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#FFD82B]">
+                <div className="rounded-2xl border border-[#FFD82B] bg-[#2B3056] text-white p-3 sm:p-4 min-w-0 shadow-sm hover:bg-[#353B6A] transition-colors">
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#FFD82B] leading-snug">
                     Telah Diharmonisasi
                   </p>
-                  <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-black text-[#FFD82B] font-mono tracking-tight">
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1 sm:gap-x-1.5">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#FFD82B] font-mono tracking-tight">
                       <AnimatedNumber value={ringkasan.ranperkada.harmonisasi} />
                     </span>
-                    <span className="text-xs font-bold text-white/90">Selesai</span>
+                    <span className="text-[11px] sm:text-xs font-bold text-white/90">Selesai</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-white/80 font-medium">
+                  <p className="mt-1 text-[10px] sm:text-[11px] text-white/80 font-medium leading-snug">
                     Tuntas diharmonisasi Kanwil Riau
                   </p>
                 </div>
               </div>
 
               {/* Honest Ratio Indicator Bar */}
-              <div className="mt-5 rounded-2xl border border-amber-100 bg-amber-50/50 p-4 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-slate-700">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
-                  <span className="font-mono text-amber-950 text-sm font-black">
+              <div className="mt-4 sm:mt-5 rounded-2xl border border-amber-100 bg-amber-50/50 p-3 sm:p-4 space-y-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs font-bold">
+                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
+                  <span className="shrink-0 font-mono text-amber-950 text-sm font-black">
                     <AnimatedNumber value={ringkasan.ranperkada.rasio} formatDecimal={true} />%
                   </span>
                 </div>
-                <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden p-0.5">
+                <div className="h-2.5 sm:h-3 w-full bg-slate-200 rounded-full overflow-hidden p-0.5">
                   <div
                     className="h-full bg-gradient-to-r from-[#FFC800] to-[#E5A500] rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${Math.min(ringkasan.ranperkada.rasio, 100)}%` }}
                   />
                 </div>
-                <p className="text-[10.5px] text-slate-500 italic">
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 italic">
                   * Rasio agregat seluruh wilayah Riau ({ringkasan.ranperkada.harmonisasi} dari {ringkasan.ranperkada.rencana} {ringkasan.ranperkada.footnote_target || 'target program'}).
                 </p>
               </div>
@@ -919,19 +919,19 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             3. KONTROL EKSPLORASI (USER-FRIENDLY & INTUITIF UNTUK SEMUA PENGGUNA)
             ========================================================================= */}
         <ScrollReveal direction="up" delay={120}>
-          <div className="rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm space-y-5">
+          <div className="rounded-3xl border border-slate-200/90 bg-white p-3.5 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
             
             {/* Header Kontrol */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3 sm:pb-3.5">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2B3056]/10 text-[#2B3056]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#2B3056]/10 text-[#2B3056]">
                   <Layers className="h-4 w-4" />
                 </span>
-                <div>
+                <div className="min-w-0">
                   <h3 className="text-sm sm:text-base font-black text-[#2B3056]">
                     Eksplorasi Data &amp; Pilihan Tampilan
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
                     Sesuaikan format visual, jenis regulasi, dan wilayah yang ingin Anda tinjau.
                   </p>
                 </div>
@@ -941,7 +941,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               <button
                 type="button"
                 onClick={handleExportCSV}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#2B3056] transition shadow-2xs cursor-pointer self-start sm:self-auto"
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3.5 py-2 sm:py-1.5 text-xs font-bold text-slate-700 hover:text-[#2B3056] transition shadow-2xs cursor-pointer"
                 title="Unduh seluruh data dalam format CSV / Excel"
               >
                 <Download className="h-3.5 w-3.5 text-slate-500" />
@@ -950,26 +950,26 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             </div>
 
             {/* Grid Kontrol 2 Tingkat */}
-            <div className="space-y-4">
+            <div className="space-y-3.5 sm:space-y-4">
               
               {/* TINGKAT 1: PILIHAN FORMAT TAMPILAN (3 KARTU BESAR JELAS) */}
               <div>
-                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-2">
+                <span className="text-[10.5px] sm:text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-2">
                   Langkah 1: Pilih Format Tampilan
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5">
                   {/* Mode Peta */}
                   <button
                     type="button"
                     onClick={() => setViewMode('map')}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-2xl border transition-all text-left cursor-pointer ${
                       viewMode === 'map'
                         ? 'bg-[#2B3056] text-white border-[#2B3056] shadow-sm ring-2 ring-[#2B3056]/20'
                         : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                     }`}
                   >
                     <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl ${
                         viewMode === 'map'
                           ? 'bg-[#FFD82B] text-[#2B3056]'
                           : 'bg-white text-slate-600 border border-slate-200'
@@ -977,11 +977,11 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     >
                       <MapIcon className="h-4 w-4" />
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span className={`text-xs font-black block leading-tight ${viewMode === 'map' ? 'text-[#FFD82B]' : 'text-[#2B3056]'}`}>
                         Peta Wilayah
                       </span>
-                      <span className={`text-[11px] font-medium truncate block ${viewMode === 'map' ? 'text-slate-300' : 'text-slate-500'}`}>
+                      <span className={`text-[10.5px] sm:text-[11px] font-medium truncate block ${viewMode === 'map' ? 'text-slate-300' : 'text-slate-500'}`}>
                         Visualisasi peta 13 daerah
                       </span>
                     </div>
@@ -991,14 +991,14 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                   <button
                     type="button"
                     onClick={() => setViewMode('chart')}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-2xl border transition-all text-left cursor-pointer ${
                       viewMode === 'chart'
                         ? 'bg-[#2B3056] text-white border-[#2B3056] shadow-sm ring-2 ring-[#2B3056]/20'
                         : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                     }`}
                   >
                     <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl ${
                         viewMode === 'chart'
                           ? 'bg-[#FFD82B] text-[#2B3056]'
                           : 'bg-white text-slate-600 border border-slate-200'
@@ -1006,11 +1006,11 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     >
                       <BarChart3 className="h-4 w-4" />
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span className={`text-xs font-black block leading-tight ${viewMode === 'chart' ? 'text-[#FFD82B]' : 'text-[#2B3056]'}`}>
                         Jalur Visual
                       </span>
-                      <span className={`text-[11px] font-medium truncate block ${viewMode === 'chart' ? 'text-slate-300' : 'text-slate-500'}`}>
+                      <span className={`text-[10.5px] sm:text-[11px] font-medium truncate block ${viewMode === 'chart' ? 'text-slate-300' : 'text-slate-500'}`}>
                         Grafik perbandingan capaian
                       </span>
                     </div>
@@ -1020,14 +1020,14 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                   <button
                     type="button"
                     onClick={() => setViewMode('table')}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer ${
+                    className={`flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-2xl border transition-all text-left cursor-pointer ${
                       viewMode === 'table'
                         ? 'bg-[#2B3056] text-white border-[#2B3056] shadow-sm ring-2 ring-[#2B3056]/20'
                         : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                     }`}
                   >
                     <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl ${
                         viewMode === 'table'
                           ? 'bg-[#FFD82B] text-[#2B3056]'
                           : 'bg-white text-slate-600 border border-slate-200'
@@ -1035,11 +1035,11 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     >
                       <TableIcon className="h-4 w-4" />
                     </span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span className={`text-xs font-black block leading-tight ${viewMode === 'table' ? 'text-[#FFD82B]' : 'text-[#2B3056]'}`}>
                         Tabel Rekap
                       </span>
-                      <span className={`text-[11px] font-medium truncate block ${viewMode === 'table' ? 'text-slate-300' : 'text-slate-500'}`}>
+                      <span className={`text-[10.5px] sm:text-[11px] font-medium truncate block ${viewMode === 'table' ? 'text-slate-300' : 'text-slate-500'}`}>
                         Tabel angka resmi 13 wilayah
                       </span>
                     </div>
@@ -1048,29 +1048,29 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               </div>
 
               {/* TINGKAT 2: PILIHAN REGULASI & FILTER DAERAH */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 pt-1">
                 
-                {/* Jenis Regulasi (6 Cols on LG) */}
-                <div className="lg:col-span-5 space-y-1.5">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
+                {/* Jenis Regulasi (6 Cols on LG, full on small tablet) */}
+                <div className="sm:col-span-2 lg:col-span-5 space-y-1">
+                  <span className="text-[10.5px] sm:text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                     Langkah 2: Jenis Regulasi
                   </span>
                   <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200">
                     <button
                       type="button"
                       onClick={() => setActiveRegulasi('gabungan')}
-                      className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                      className={`flex-1 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-extrabold leading-tight text-center transition-all cursor-pointer truncate ${
                         activeRegulasi === 'gabungan'
                           ? 'bg-white text-[#2B3056] shadow-xs'
                           : 'text-slate-600 hover:text-[#2B3056]'
                       }`}
                     >
-                      Semua Regulasi
+                      Semua<span className="hidden sm:inline"> Regulasi</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveRegulasi('ranperda')}
-                      className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                      className={`flex-1 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-extrabold leading-tight text-center transition-all cursor-pointer truncate ${
                         activeRegulasi === 'ranperda'
                           ? 'bg-blue-600 text-white shadow-xs'
                           : 'text-slate-600 hover:text-blue-900'
@@ -1081,7 +1081,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     <button
                       type="button"
                       onClick={() => setActiveRegulasi('ranperkada')}
-                      className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                      className={`flex-1 px-1.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-extrabold leading-tight text-center transition-all cursor-pointer truncate ${
                         activeRegulasi === 'ranperkada'
                           ? 'bg-amber-600 text-white shadow-xs'
                           : 'text-slate-600 hover:text-amber-950'
@@ -1093,8 +1093,8 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                 </div>
 
                 {/* Filter Kelompok Wilayah (4 Cols on LG) */}
-                <div className="lg:col-span-4 space-y-1.5">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
+                <div className="sm:col-span-1 lg:col-span-4 space-y-1">
+                  <span className="text-[10.5px] sm:text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                     Filter Kelompok Wilayah
                   </span>
                   <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-bold">
@@ -1103,7 +1103,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                         key={k}
                         type="button"
                         onClick={() => setActiveKelompok(k)}
-                        className={`flex-1 px-2 py-1.5 rounded-lg transition-colors cursor-pointer text-center ${
+                        className={`flex-1 px-1 sm:px-2 py-1.5 rounded-lg transition-colors cursor-pointer text-center text-[10.5px] sm:text-xs truncate ${
                           activeKelompok === k
                             ? 'bg-white text-[#2B3056] shadow-2xs font-black'
                             : 'text-slate-600 hover:text-[#2B3056]'
@@ -1116,16 +1116,16 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                 </div>
 
                 {/* Urutkan Berdasarkan (3 Cols on LG) */}
-                <div className="lg:col-span-3 space-y-1.5">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
+                <div className="sm:col-span-1 lg:col-span-3 space-y-1">
+                  <span className="text-[10.5px] sm:text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                     Urutan Data
                   </span>
-                  <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-2xs">
+                  <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-2 text-xs font-bold text-slate-700 shadow-2xs">
                     <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full bg-transparent font-bold text-[#2B3056] focus:outline-hidden cursor-pointer"
+                      className="w-full bg-transparent font-bold text-[#2B3056] text-[11px] sm:text-xs focus:outline-hidden cursor-pointer"
                       aria-label="Urutkan data wilayah"
                     >
                       <option value="default">Urutan Baku Rekap</option>
@@ -1142,23 +1142,23 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             </div>
 
             {/* Active Legend Indicator */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3.5 border-t border-slate-100 text-xs">
-              <div className="flex flex-wrap items-center gap-4 text-slate-600 font-semibold">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-3.5 border-t border-slate-100 text-xs">
+              <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-slate-600 font-semibold text-[10.5px] sm:text-xs">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-5 rounded-xs bg-[#3A4070]" />
+                  <span className="h-2.5 w-4 sm:h-3 sm:w-5 rounded-xs bg-[#3A4070] shrink-0" />
                   <span>{data?.is_live ? 'Permohonan Masuk' : 'Direncanakan'} ({data?.is_live ? 'Diajukan' : 'Target'} {activeRegulasi === 'ranperda' ? 'ProPem' : activeRegulasi === 'ranperkada' ? 'Progsun' : 'Total'})</span>
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-5 rounded-xs bg-[#FFC800]" />
+                  <span className="h-2.5 w-4 sm:h-3 sm:w-5 rounded-xs bg-[#FFC800] shrink-0" />
                   <span>Telah Selesai Diharmonisasi Kanwil</span>
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
                   <span>Capaian Melebihi Rencana (Surplus)</span>
                 </span>
               </div>
 
-              <span className="text-slate-500 font-mono text-[11px] font-bold">
+              <span className="text-slate-500 font-mono text-[10.5px] sm:text-[11px] font-bold self-start md:self-auto">
                 Menampilkan {totalItems > 0 ? `${startIndex + 1}–${endIndex}` : '0'} dari {totalItems} wilayah di Riau
               </span>
             </div>
@@ -1172,9 +1172,9 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
           /* =========================================================================
               VIEW MODE 1: INTERACTIVE RIAU MAP VISUALIZATION (WITH BIDIRECTIONAL SCROLL REVEAL)
              ========================================================================= */
-          <div className="grid gap-8 lg:grid-cols-12 items-start">
+          <div className="grid grid-cols-1 gap-6 lg:gap-8 lg:grid-cols-12 items-start">
             {/* Left Column (8 cols on LG): Interactive SVG Riau Map */}
-            <ScrollReveal direction="left" delay={80} className="lg:col-span-8 space-y-4">
+            <ScrollReveal direction="left" delay={80} className="min-w-0 lg:col-span-8 space-y-4">
               <RiauMapVisualization
                 wilayahList={filteredAndSortedWilayah.length ? filteredAndSortedWilayah : (data?.wilayah || [])}
                 selectedWilayahId={selectedWilayahId}
@@ -1185,7 +1185,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             </ScrollReveal>
 
             {/* Right Column (4 cols on LG): Sticky Region Detail Inspector & Glossary */}
-            <ScrollReveal direction="right" delay={160} className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+            <ScrollReveal direction="right" delay={160} className="min-w-0 lg:col-span-4 space-y-6 lg:sticky lg:top-24">
               {renderInspectorAndGlossary()}
             </ScrollReveal>
           </div>
@@ -1193,9 +1193,9 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
           /* =========================================================================
               VIEW MODE 2: PAIRED HORIZONTAL COMPARISON LANES (JALUR VISUAL)
              ========================================================================= */
-          <div className="grid gap-8 lg:grid-cols-12 items-start">
+          <div className="grid grid-cols-1 gap-6 lg:gap-8 lg:grid-cols-12 items-start">
             {/* Left Column (8 cols): Atlas Jalur Perbandingan Wilayah */}
-            <ScrollReveal direction="left" delay={80} className="lg:col-span-8 space-y-3">
+            <ScrollReveal direction="left" delay={80} className="min-w-0 lg:col-span-8 space-y-3">
               {paginatedWilayah.map((w, idx) => {
                 const regData =
                   activeRegulasi === 'ranperda'
@@ -1224,15 +1224,15 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     tabIndex={0}
                     role="button"
                     aria-label={`Rincian wilayah ${w.nama_kabupaten}: Rencana ${regData.rencana}, Harmonisasi ${regData.harmonisasi}`}
-                    className={`group rounded-2xl border p-4 sm:p-4.5 transition-all duration-200 cursor-pointer ${
+                    className={`group rounded-2xl border p-3.5 sm:p-4.5 transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-[#2B3056] bg-white shadow-md ring-2 ring-[#2B3056]/15'
                         : 'border-slate-200/90 bg-white hover:border-slate-300 hover:shadow-xs'
                     }`}
                   >
                     {/* Header Row: Region Name, Type, Surplus Badge, Ratio */}
-                    <div className="flex items-center justify-between gap-3 mb-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2.5">
+                      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
                         <span
                           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
                             w.kelompok === 'Provinsi'
@@ -1252,28 +1252,31 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                         </span>
 
                         <div className="min-w-0">
-                          <span className="font-extrabold text-[#2B3056] text-sm sm:text-base leading-tight truncate block">
+                          <span className="font-extrabold text-[#2B3056] text-xs sm:text-base leading-tight truncate block">
                             {w.nama_kabupaten}
                           </span>
-                          <span className="text-[11px] text-slate-500 font-medium">
+                          <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium block truncate">
                             {w.tim_kerja_nama} • {w.kelompok}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                         {isSurplus && (
                           <span
-                            className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800"
+                            className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-1.5 sm:px-2 py-0.5 text-[9.5px] sm:text-[10px] font-extrabold text-emerald-800 whitespace-nowrap"
                             title="Jumlah harmonisasi melampaui jumlah rencana (dapat terjadi karena permohonan terbuka/mendesak)"
                           >
-                            <Sparkles className="h-3 w-3 text-emerald-600" />
-                            <span>+{regData.surplus_selisih} di atas rencana</span>
+                            <Sparkles className="h-3 w-3 text-emerald-600 shrink-0" />
+                            <span>
+                              +{regData.surplus_selisih}
+                              <span className="hidden sm:inline"> di atas rencana</span>
+                            </span>
                           </span>
                         )}
 
                         <span
-                          className={`rounded-lg px-2.5 py-1 text-xs font-mono font-black ${
+                          className={`rounded-lg px-2 sm:px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono font-black whitespace-nowrap ${
                             isSurplus
                               ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
                               : 'bg-slate-100 text-slate-800'
@@ -1287,29 +1290,29 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     {/* Dual Comparative Horizontal Lanes (Direncanakan vs Diharmonisasi) */}
                     <div className="space-y-1.5 pt-1">
                       {/* Lane 1: Target Rencana (Navy / Indigo) */}
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="w-24 sm:w-28 text-slate-500 font-bold shrink-0 text-[11px] truncate">
+                      <div className="flex items-center gap-1.5 sm:gap-3 text-xs">
+                        <span className="w-20 sm:w-28 text-slate-500 font-bold shrink-0 text-[10px] sm:text-[11px] truncate">
                           {data?.is_live ? 'Permohonan:' : 'Target Rencana:'}
                         </span>
                         <div className="flex-1 h-5 bg-slate-100 rounded-md overflow-hidden p-0.5 relative">
                           <div
-                            className="h-full bg-[#3A4070] rounded-sm transition-all duration-700 flex items-center justify-end pr-2 text-[10px] font-mono font-bold text-white"
+                            className="h-full bg-[#3A4070] rounded-xs sm:rounded-sm transition-all duration-700 flex items-center justify-end pr-1.5 sm:pr-2 text-[9.5px] sm:text-[10px] font-mono font-bold text-white"
                             style={{ width: `${rencanaPct}%` }}
                           />
                         </div>
-                        <span className="w-10 text-right font-mono font-extrabold text-slate-800 shrink-0 text-xs sm:text-sm">
+                        <span className="w-8 sm:w-10 text-right font-mono font-extrabold text-slate-800 shrink-0 text-xs sm:text-sm">
                           {regData.rencana}
                         </span>
                       </div>
 
                       {/* Lane 2: Realisasi Harmonisasi (Gold / Amber) */}
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="w-24 sm:w-28 text-amber-950 font-bold shrink-0 text-[11px] truncate">
+                      <div className="flex items-center gap-1.5 sm:gap-3 text-xs">
+                        <span className="w-20 sm:w-28 text-amber-950 font-bold shrink-0 text-[10px] sm:text-[11px] truncate">
                           Harmonisasi:
                         </span>
                         <div className="flex-1 h-5 bg-amber-50 rounded-md overflow-hidden p-0.5 relative">
                           <div
-                            className={`h-full rounded-sm transition-all duration-700 flex items-center justify-end pr-2 text-[10px] font-mono font-bold ${
+                            className={`h-full rounded-xs sm:rounded-sm transition-all duration-700 flex items-center justify-end pr-1.5 sm:pr-2 text-[9.5px] sm:text-[10px] font-mono font-bold ${
                               isSurplus
                                 ? 'bg-gradient-to-r from-[#FFC800] via-[#E5A500] to-emerald-500 text-[#2B3056]'
                                 : 'bg-[#FFC800] text-[#2B3056]'
@@ -1318,7 +1321,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                           />
                         </div>
                         <span
-                          className={`w-10 text-right font-mono font-black shrink-0 text-xs sm:text-sm ${
+                          className={`w-8 sm:w-10 text-right font-mono font-black shrink-0 text-xs sm:text-sm ${
                             isSurplus ? 'text-emerald-700' : 'text-[#2B3056]'
                           }`}
                         >
@@ -1335,7 +1338,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             </ScrollReveal>
 
             {/* Right Column (4 cols): Sticky Region Detail Inspector & Glossary */}
-            <ScrollReveal direction="right" delay={160} className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+            <ScrollReveal direction="right" delay={160} className="min-w-0 lg:col-span-4 space-y-6 lg:sticky lg:top-24">
               {renderInspectorAndGlossary()}
             </ScrollReveal>
           </div>
@@ -1345,7 +1348,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
              ========================================================================= */
           <ScrollReveal direction="up" delay={80}>
             <div className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/60">
+              <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/60">
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-[#2B3056]">
                     Tabel Rekapitulasi Lengkap Regulasi 13 Wilayah
@@ -1358,12 +1361,17 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                 <button
                   type="button"
                   onClick={handleExportCSV}
-                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2B3056] text-white px-4 text-xs font-bold shadow-xs hover:bg-[#353B6A] transition cursor-pointer self-start sm:self-auto"
+                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-[#2B3056] text-white px-4 text-xs font-bold shadow-xs hover:bg-[#353B6A] transition cursor-pointer"
                 >
                   <Download className="h-3.5 w-3.5" />
                   <span>Unduh Lembar Excel / CSV</span>
                 </button>
               </div>
+
+              <p className="lg:hidden flex items-center gap-1.5 px-4 sm:px-6 py-2 text-[11px] font-semibold text-slate-500 bg-amber-50/50 border-b border-amber-100/60">
+                <ArrowUpDown className="h-3.5 w-3.5 rotate-90 shrink-0 text-amber-700" />
+                Geser tabel ke samping untuk melihat seluruh kolom
+              </p>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
@@ -1506,7 +1514,9 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               </div>
 
               {/* Pagination Controls for Table View */}
-              {renderPagination()}
+              <div className="px-5 sm:px-6 pb-3">
+                {renderPagination()}
+              </div>
             </div>
           </ScrollReveal>
         )}

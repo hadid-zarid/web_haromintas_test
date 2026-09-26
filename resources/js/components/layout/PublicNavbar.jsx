@@ -69,16 +69,16 @@ export const PublicNavbar = () => {
           }`}
         >
           <div
-            className={`mx-auto flex items-center justify-between transition-all duration-300 ${
+            className={`mx-auto flex items-center justify-between gap-2 transition-all duration-300 ${
               isScrolled ? 'h-[56px] max-w-7xl' : 'h-[64px] max-w-7xl px-4 sm:px-6 lg:px-8'
             }`}
           >
             {/* Logo and Brand */}
-            <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5 shrink-0">
+            <Link href="/" className="group flex min-w-0 items-center gap-1.5 sm:gap-2.5 shrink-0">
               {/* Logo Pengayoman (Official Kemenkumham) */}
               <span
                 className={`shrink-0 flex items-center justify-center transition-all ${
-                  isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'
+                  isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-8 w-8 sm:h-10 sm:w-10'
                 }`}
               >
                 <img
@@ -91,7 +91,7 @@ export const PublicNavbar = () => {
               {/* Logo HARMONITAS */}
               <span
                 className={`shrink-0 flex items-center justify-center transition-all ${
-                  isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'
+                  isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-8 w-8 sm:h-10 sm:w-10'
                 }`}
               >
                 <img
@@ -109,7 +109,7 @@ export const PublicNavbar = () => {
                 >
                   HARMONITAS
                 </span>
-                <span className="rounded-md border border-[#FFD82B]/80 bg-[#FFF9DF] px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-[#2B3056]">
+                <span className="hidden sm:inline-block rounded-md border border-[#FFD82B]/80 bg-[#FFF9DF] px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-[#2B3056]">
                   Riau
                 </span>
               </span>
