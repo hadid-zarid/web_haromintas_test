@@ -39,6 +39,8 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8000/auth/google/callback'),
+        // Hanya dihormati di local/testing (lihat GoogleAuthController).
+        'insecure_tls' => filter_var(env('GOOGLE_OAUTH_INSECURE_TLS', false), FILTER_VALIDATE_BOOLEAN),
     ],
 
     /*

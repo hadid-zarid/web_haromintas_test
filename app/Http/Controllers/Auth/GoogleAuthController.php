@@ -34,9 +34,7 @@ class GoogleAuthController extends Controller
             // Verifikasi sertifikat TLS WAJIB aktif di luar lingkungan lokal/testing.
             // Hanya dev lokal yang boleh menonaktifkannya (workaround cURL error 60 di
             // sebagian instalasi PHP Windows) lewat GOOGLE_OAUTH_INSECURE_TLS=true di .env.
-            $verifyTls = app()->environment('local', 'testing')
-                ? filter_var(env('GOOGLE_OAUTH_INSECURE_TLS', false), FILTER_VALIDATE_BOOLEAN)
-                : true;
+            $verifyTls = ! (app()->environment('local', 'testing') && config('services.google.insecure_tls'));
 
             $client = new Client([
                 'verify' => $verifyTls,
