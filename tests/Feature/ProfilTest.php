@@ -181,6 +181,26 @@ class ProfilTest extends TestCase
         $this->gantiPassword(['current_password' => 'Salah@2026'])->assertStatus(429);
     }
 
+    public function test_admin_ganti_password_sendiri_lewat_kelola_akun_tetap_login(): void
+    {
+        $this->user->forceFill(['role_id' => 1])->save();
+
+        $this->loginSungguhan();
+        $this->requestBaru();
+
+        $this->put("/admin/users/{$this->user->user_id}", [
+            'nama' => 'Nama Awal',
+            'email' => 'anggota@harmonitas.go.id',
+            'password' => self::PASSWORD_BARU,
+            'role_id' => 1,
+            'status' => 'ACTIVE',
+        ])->assertSessionHas('success');
+
+        $this->requestBaru();
+        $this->get('/profil')->assertOk();
+        $this->assertTrue(Hash::check(self::PASSWORD_BARU, $this->user->fresh()->password));
+    }
+
     public function test_sesi_lain_keluar_setelah_password_diubah(): void
     {
         // Sesi "perangkat lain" sudah login dan menyimpan hash kata sandi lama.

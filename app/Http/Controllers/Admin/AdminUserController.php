@@ -161,6 +161,12 @@ class AdminUserController extends Controller
 
         $user->update($payloadUpdate);
 
+        // Admin mengedit akunnya sendiri: segarkan user di guard agar middleware auth.session
+        // menyimpan hash kata sandi yang baru, sehingga sesi ini tidak ikut ter-logout.
+        if ($user->user_id === $currentAdminId) {
+            Auth::setUser($user);
+        }
+
         AuditLog::create([
             'user_id' => $currentAdminId,
             'action' => 'ADMIN_UPDATE_USER',
