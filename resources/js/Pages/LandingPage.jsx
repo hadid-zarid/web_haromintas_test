@@ -504,7 +504,8 @@ export const LandingPage = ({ statistikData }) => {
         {/* =========================================================================
             SECTION 2: STATISTIK & VISUALISASI PROPEM & PROGSUN HARMONITAS
             ========================================================================= */}
-        <StatistikHarmonisasiSection initialData={statistikData} />
+        {/* null jika belum ada rekap tahun yang ditayangkan admin */}
+        {statistikData && <StatistikHarmonisasiSection initialData={statistikData} />}
 
         {/* =========================================================================
             SECTION 3: KEUNGGULAN LAYANAN (Enriched with Visual Indicators)

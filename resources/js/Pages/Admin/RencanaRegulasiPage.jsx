@@ -1,432 +1,395 @@
-import React, { useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '../../components/layout/AppLayout';
 import FlashAlert from '../../components/common/FlashAlert';
-import {
-  FileOutput,
-  Save,
-  Globe,
-  Lock,
-  Calendar,
-  AlertCircle,
-  CheckCircle2,
-  HelpCircle,
-  Building2,
-  Landmark,
-  MapPin,
-  ArrowRight,
-  RotateCcw
-} from 'lucide-react';
+import Modal from '../../components/common/Modal';
+import { AlertCircle, Check, EyeOff, Globe, Info, Loader2, Pencil, Plus, Save, Star, Trash2 } from 'lucide-react';
 
-export const RencanaRegulasiPage = ({
-  selectedYear,
-  availableYears,
-  items: initialItems = [],
-  isPublished,
-  publishedAt,
-  sumberResmi: initialSumber = '',
-}) => {
-  const { flash } = usePage().props || {};
-  const [year, setYear] = useState(selectedYear);
-  const [sumberResmi, setSumberResmi] = useState(initialSumber || '');
-  const [items, setItems] = useState(
-    initialItems.map((it) => ({
-      kabupaten_id: it.kabupaten_id,
-      nama_kabupaten: it.nama_kabupaten,
-      nama_singkat: it.nama_singkat,
-      kelompok: it.kelompok,
-      propem: it.propem,
-      progsun: it.progsun,
-      harm_ranperda: it.harm_ranperda,
-      harm_ranperkada: it.harm_ranperkada,
-    }))
-  );
+// Urutan kolom mengikuti lembar rekap Excel.
+const KOLOM = [
+  { key: 'propem', label: 'Jumlah Propem', mobile: 'Propem (Raperda)' },
+  { key: 'harm_ranperda', label: 'Jumlah Harmonisasi', mobile: 'Harmonisasi Raperda' },
+  { key: 'progsun', label: 'Jumlah Progsun', mobile: 'Progsun (Raperkada)' },
+  { key: 'harm_ranperkada', label: 'Jumlah Harmonisasi', mobile: 'Harmonisasi Raperkada' },
+];
+const KELOMPOK = ['Kabupaten', 'Kota', 'Provinsi'];
+const GRID = 'md:grid md:grid-cols-[2.5rem_minmax(9rem,1fr)_repeat(4,minmax(5.5rem,8rem))] md:gap-3 md:items-center';
 
-  const [saving, setSaving] = useState(false);
-  const [togglingPublish, setTogglingPublish] = useState(false);
+const tombol = 'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD82B]/70 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
+const tombolSekunder = `${tombol} border border-slate-300 bg-white text-[#2B3056] hover:bg-slate-50`;
 
-  const handleYearChange = (newYear) => {
-    setYear(newYear);
-    router.get(
-      '/admin/rencana',
-      { tahun: newYear },
-      { preserveState: false, preserveScroll: true }
-    );
+const angka = (v) => Number(v) || 0;
+
+const isianAwal = (rekap) => ({
+  sumber: rekap?.sumber ?? '',
+  items: (rekap?.wilayah ?? []).map(({ kabupaten_id, propem, harm_ranperda, progsun, harm_ranperkada }) => ({
+    kabupaten_id, propem, harm_ranperda, progsun, harm_ranperkada,
+  })),
+});
+
+export const RencanaRegulasiPage = ({ daftarTahun = [], rekap = null }) => {
+  const { flash, errors } = usePage().props;
+  const [konfirmasi, setKonfirmasi] = useState(null); // { judul, pesan, label, bahaya, jalankan }
+  const [processing, setProcessing] = useState(false);
+
+  const form = useForm(isianAwal(rekap));
+  const formTahun = useForm({ tahun: '' });
+
+  // Inertia bisa mempertahankan state halaman saat tahun yang dibuka berganti (misalnya setelah
+  // membuat tahun baru). Isian wajib diganti dengan angka tahun itu agar angka tahun lain tidak ikut tersimpan.
+  useEffect(() => {
+    const awal = isianAwal(rekap);
+    form.setDefaults(awal);
+    form.setData(awal);
+    form.clearErrors();
+  }, [rekap?.tahun]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const catatanBelumDisimpan = (tahun) =>
+    form.isDirty && rekap?.tahun === tahun
+      ? ' Perubahan angka yang belum disimpan tidak ikut; yang dipakai adalah angka terakhir yang disimpan.'
+      : '';
+
+  const jalankan = (kirim, opsi = {}) => {
+    setProcessing(true);
+    kirim({
+      preserveScroll: true,
+      ...opsi,
+      onFinish: () => { setProcessing(false); setKonfirmasi(null); },
+    });
   };
 
-  const handleValueChange = (kabId, field, val) => {
-    const num = val === '' ? 0 : Math.max(0, parseInt(val, 10) || 0);
-    setItems((prev) =>
-      prev.map((row) => (row.kabupaten_id === kabId ? { ...row, [field]: num } : row))
-    );
+  const bukaTahun = (tahun) => {
+    const pindah = () => router.get('/admin/rencana', { tahun }, { preserveScroll: true });
+    if (!form.isDirty) return pindah();
+    setKonfirmasi({
+      judul: 'Perubahan belum disimpan',
+      pesan: `Angka rekap tahun ${rekap.tahun} yang belum disimpan akan hilang jika Anda membuka tahun ${tahun}.`,
+      label: `Buka tahun ${tahun}`,
+      bahaya: true,
+      jalankan: pindah,
+    });
   };
 
-  const handleSaveAll = (e) => {
+  const aksiTahun = {
+    tayangkan: (t) => setKonfirmasi({
+      judul: `Tayangkan rekap ${t}?`,
+      pesan: `Rekap tahun ${t} akan bisa dilihat semua pengunjung landing page.${catatanBelumDisimpan(t)}`,
+      label: 'Tayangkan',
+      jalankan: () => jalankan((o) => router.put(`/admin/rencana/${t}/publikasi`, { is_published: true }, o), { preserveState: true }),
+    }),
+    tarik: (t) => setKonfirmasi({
+      judul: `Tarik rekap ${t}?`,
+      pesan: `Rekap tahun ${t} tidak lagi tampil di landing page dan kembali menjadi draf. Angkanya tetap tersimpan.`,
+      label: 'Tarik dari landing page',
+      bahaya: true,
+      jalankan: () => jalankan((o) => router.put(`/admin/rencana/${t}/publikasi`, { is_published: false }, o), { preserveState: true }),
+    }),
+    utama: (t) => setKonfirmasi({
+      judul: `Tampilkan ${t} pertama?`,
+      pesan: `Saat landing page dibuka, pengunjung langsung melihat rekap tahun ${t}. Tahun lain yang tayang tetap bisa dipilih.`,
+      label: 'Jadikan tampil pertama',
+      jalankan: () => jalankan((o) => router.put(`/admin/rencana/${t}/utama`, {}, o), { preserveState: true }),
+    }),
+    hapus: (t) => setKonfirmasi({
+      judul: `Hapus draf ${t}?`,
+      pesan: `Draf rekap tahun ${t} beserta seluruh angkanya akan dihapus permanen.`,
+      label: 'Hapus draf',
+      bahaya: true,
+      jalankan: () => jalankan((o) => router.delete(`/admin/rencana/${t}`, o)),
+    }),
+  };
+
+  const buatTahun = (e) => {
     e.preventDefault();
-    setSaving(true);
-
-    router.post(
-      '/admin/rencana',
-      {
-        tahun: year,
-        sumber_resmi: sumberResmi,
-        items: items.map((it) => ({
-          kabupaten_id: it.kabupaten_id,
-          propem: it.propem,
-          progsun: it.progsun,
-        })),
-      },
-      {
-        preserveScroll: true,
-        onFinish: () => setSaving(false),
-      }
-    );
+    formTahun.post('/admin/rencana/tahun', { preserveScroll: true, onSuccess: () => formTahun.reset() });
   };
-
-  const handleTogglePublish = () => {
-    const nextState = !isPublished;
-    const confirmMsg = nextState
-      ? `Apakah Anda yakin ingin mempublikasikan dataset target ProPem & Progsun tahun ${year} ke Landing Page publik?`
-      : `Apakah Anda yakin ingin menonaktifkan publikasi tahun ${year}? Tampilan publik akan otomatis kembali ke Data Historis 2025.`;
-
-    if (!window.confirm(confirmMsg)) return;
-
-    setTogglingPublish(true);
-    router.post(
-      '/admin/rencana/publish',
-      {
-        tahun: year,
-        is_published: nextState,
-      },
-      {
-        preserveScroll: true,
-        onFinish: () => setTogglingPublish(false),
-      }
-    );
-  };
-
-  const totalPropem = items.reduce((acc, it) => acc + (it.propem || 0), 0);
-  const totalHarmPerda = items.reduce((acc, it) => acc + (it.harm_ranperda || 0), 0);
-  const totalProgsun = items.reduce((acc, it) => acc + (it.progsun || 0), 0);
-  const totalHarmPerkada = items.reduce((acc, it) => acc + (it.harm_ranperkada || 0), 0);
 
   return (
-    <AppLayout>
-      <Head title={`Kelola Target ProPem & Progsun (${year}) - HARMONITAS Admin`} />
+    <AppLayout
+      title="Target ProPem & Progsun"
+      subtitle="Rekap tahunan ProPem/Progsun dan harmonisasi yang tampil di landing page."
+    >
+      <Head title="Target ProPem & Progsun - HARMONITAS" />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-        {/* Flash Alert */}
+      <div className="space-y-5">
         <FlashAlert flash={flash} />
 
-        {/* Page Header */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#2B3056]/15 bg-[#2B3056]/5 px-2.5 py-1 text-xs font-bold text-[#2B3056]">
-                <FileOutput className="h-3.5 w-3.5 text-[#FFC800]" />
-                Manajemen Data Perencanaan Regulasi
-              </span>
-              <h1 className="mt-2 text-2xl font-black text-[#2B3056] sm:text-3xl">
-                Target ProPem &amp; Progsun Tahunan
-              </h1>
-              <p className="mt-1 text-xs sm:text-sm text-slate-500">
-                Input target resmi ProPem (Ranperda) dan Progsun (Ranperkada) per wilayah, serta atur publikasi dataset ke landing page publik.
+        {/* Penjelasan singkat cara kerja halaman */}
+        <section className="rounded-2xl border border-[#2B3056]/15 bg-[#2B3056]/[0.03] p-4 sm:p-5">
+          <div className="flex gap-3">
+            <Info className="w-5 h-5 text-[#2B3056] shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="space-y-1.5 text-sm text-slate-700 leading-relaxed">
+              <p>
+                Angka di halaman ini adalah angka yang tampil di <strong>landing page, bagian Statistik</strong>.
+                Semua angka <strong>diisi manual</strong> dari rekap resmi (Excel); sistem tidak menghitung apa pun secara otomatis.
+              </p>
+              <p className="text-slate-600">
+                Langkahnya: <strong>buat rekap tahun</strong> → <strong>isi angka</strong> → <strong>Simpan</strong> → <strong>Tayangkan</strong>.
+                Tahun berlabel <strong>Tampil pertama</strong> adalah tahun yang langsung dilihat pengunjung saat landing page dibuka.
               </p>
             </div>
-
-            {/* Year Selector */}
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-bold text-slate-600">Pilih Tahun:</span>
-              <select
-                value={year}
-                onChange={(e) => handleYearChange(parseInt(e.target.value, 10))}
-                className="h-10 rounded-xl border border-slate-300 bg-white px-3.5 text-xs font-bold text-[#2B3056] focus:border-[#2B3056] focus:ring-1 focus:ring-[#2B3056]"
-              >
-                {availableYears.map((y) => (
-                  <option key={y} value={y}>
-                    Tahun {y}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Publication Control Banner */}
-        <div
-          className={`rounded-2xl border p-5 sm:p-6 transition-all ${
-            isPublished
-              ? 'border-emerald-300 bg-emerald-50/60'
-              : 'border-amber-300 bg-amber-50/50'
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start gap-3.5">
-              <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-bold shadow-xs ${
-                  isPublished
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-amber-500 text-white'
-                }`}
-              >
-                {isPublished ? (
-                  <Globe className="h-5 w-5" />
-                ) : (
-                  <Lock className="h-5 w-5" />
-                )}
-              </span>
+        {errors?.rekap && (
+          <p role="alert" className="flex items-start gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-700">
+            <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
+            {errors.rekap}
+          </p>
+        )}
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-extrabold text-[#2B3056]">
-                    Status Publikasi Dataset {year}:
-                  </h3>
-                  <span
-                    className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-extrabold ${
-                      isPublished
-                        ? 'bg-emerald-200 text-emerald-900 border border-emerald-300'
-                        : 'bg-amber-200 text-amber-900 border border-amber-300'
-                    }`}
-                  >
-                    {isPublished ? 'AKTIF DITAYANGKAN' : 'DRAF / BELUM TAYANG'}
-                  </span>
-                </div>
+        {/* Daftar tahun */}
+        <section aria-labelledby="judul-daftar-tahun" className="rounded-2xl border border-[#E2E2DC] bg-white p-4 sm:p-6">
+          <h2 id="judul-daftar-tahun" className="text-base font-bold text-[#2B3056]">Daftar tahun</h2>
+          <p className="text-sm text-slate-500 mb-4">Hanya tahun berstatus <strong>Tayang</strong> yang bisa dilihat pengunjung.</p>
 
-                <p className="mt-1 text-xs text-slate-600 max-w-2xl leading-relaxed">
-                  {isPublished
-                    ? `Dataset tahun berjalan ${year} telah dipublikasikan secara resmi ke landing page publik HARMONITAS. Pengunjung dapat melihat target dan perkembangan harmonisasi real-time.`
-                    : `Dataset tahun ${year} saat ini berstatus draf internal. Landing page publik tetap aman menampilkan Data Historis 2025 secara default hingga Anda mengaktifkannya.`}
-                </p>
+          {daftarTahun.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-500">Belum ada rekap. Buat rekap tahun pertama di bawah.</p>
+          ) : (
+            <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200">
+              {daftarTahun.map((t) => {
+                const sedangDiedit = rekap?.tahun === t.tahun;
+                return (
+                  <li key={t.tahun} className={`flex flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:items-center lg:justify-between ${sedangDiedit ? 'bg-[#FFD82B]/10' : ''}`}>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-base font-extrabold text-[#2B3056]">Tahun {t.tahun}</span>
+                      {t.is_published ? (
+                        <span className="rounded-md border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-800">Tayang</span>
+                      ) : (
+                        <span className="rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">Draf</span>
+                      )}
+                      {t.is_default && (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-800">
+                          <Star className="w-3.5 h-3.5 fill-current" aria-hidden="true" /> Tampil pertama
+                        </span>
+                      )}
+                      {sedangDiedit && <span className="text-xs font-semibold text-slate-500">(sedang dibuka)</span>}
+                    </div>
 
-                {publishedAt && (
-                  <p className="mt-1 text-[11px] font-mono text-slate-500">
-                    Terakhir dipublikasikan pada: {publishedAt}
-                  </p>
-                )}
-              </div>
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                      {!sedangDiedit && (
+                        <button type="button" onClick={() => bukaTahun(t.tahun)} className={tombolSekunder}>
+                          <Pencil className="w-4 h-4" aria-hidden="true" /> Buka
+                        </button>
+                      )}
+                      {t.is_published ? (
+                        <button
+                          type="button"
+                          onClick={() => aksiTahun.tarik(t.tahun)}
+                          disabled={t.is_default}
+                          title={t.is_default ? 'Pilih tahun lain sebagai tampil pertama dulu' : undefined}
+                          className={tombolSekunder}
+                        >
+                          <EyeOff className="w-4 h-4" aria-hidden="true" /> Tarik
+                        </button>
+                      ) : (
+                        <button type="button" onClick={() => aksiTahun.tayangkan(t.tahun)} className={`${tombol} bg-emerald-600 text-white hover:bg-emerald-700`}>
+                          <Globe className="w-4 h-4" aria-hidden="true" /> Tayangkan
+                        </button>
+                      )}
+                      {t.is_published && !t.is_default && (
+                        <button type="button" onClick={() => aksiTahun.utama(t.tahun)} className={tombolSekunder}>
+                          <Star className="w-4 h-4" aria-hidden="true" /> Jadikan tampil pertama
+                        </button>
+                      )}
+                      {!t.is_published && (
+                        <button type="button" onClick={() => aksiTahun.hapus(t.tahun)} className={`${tombol} border border-rose-200 bg-white text-rose-700 hover:bg-rose-50`}>
+                          <Trash2 className="w-4 h-4" aria-hidden="true" /> Hapus
+                        </button>
+                      )}
+                    </div>
+                    {t.is_published && t.is_default && (
+                      <p className="text-xs text-slate-500 lg:hidden">Tahun tampil pertama tidak bisa ditarik. Jadikan tahun lain tampil pertama dulu.</p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <form onSubmit={buatTahun} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end" noValidate>
+            <div className="sm:w-48">
+              <label htmlFor="tahun-baru" className="block text-sm font-semibold text-[#2B3056] mb-1.5">Buat rekap tahun baru</label>
+              <input
+                id="tahun-baru"
+                type="number"
+                inputMode="numeric"
+                min="2020"
+                placeholder={String(new Date().getFullYear())}
+                value={formTahun.data.tahun}
+                onChange={(e) => { formTahun.setData('tahun', e.target.value); formTahun.clearErrors(); }}
+                aria-invalid={Boolean(formTahun.errors.tahun)}
+                aria-describedby={formTahun.errors.tahun ? 'tahun-baru-error' : undefined}
+                className="w-full min-h-[44px] rounded-xl border border-slate-300 px-3.5 text-sm focus:border-[#2B3056] focus:outline-none focus:ring-2 focus:ring-[#2B3056]/30"
+              />
             </div>
-
-            <button
-              type="button"
-              onClick={handleTogglePublish}
-              disabled={togglingPublish}
-              className={`inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-xs font-extrabold shadow-sm transition-all duration-200 cursor-pointer ${
-                isPublished
-                  ? 'bg-white border border-rose-300 text-rose-700 hover:bg-rose-50'
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white hover:brightness-105'
-              } disabled:opacity-50`}
-            >
-              {isPublished ? (
-                <>
-                  <RotateCcw className="h-4 w-4" />
-                  <span>Tarik Publikasi (Kembali ke 2025)</span>
-                </>
-              ) : (
-                <>
-                  <Globe className="h-4 w-4" />
-                  <span>Aktifkan Publikasi ke Publik</span>
-                </>
-              )}
+            <button type="submit" disabled={formTahun.processing || !formTahun.data.tahun} className={`${tombol} w-full sm:w-auto bg-[#2B3056] text-white hover:bg-[#1A1A5E]`}>
+              <Plus className="w-4 h-4" aria-hidden="true" /> Buat sebagai draf
             </button>
+          </form>
+          {formTahun.errors.tahun && <p id="tahun-baru-error" className="mt-1.5 text-xs font-semibold text-rose-600">{formTahun.errors.tahun}</p>}
+        </section>
+
+        {rekap && <EditorRekap rekap={rekap} form={form} />}
+      </div>
+
+      <Modal isOpen={Boolean(konfirmasi)} onClose={() => !processing && setKonfirmasi(null)} title={konfirmasi?.judul} size="sm">
+        <p className="text-sm text-slate-600 leading-relaxed">{konfirmasi?.pesan}</p>
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" onClick={() => setKonfirmasi(null)} disabled={processing} className={tombolSekunder}>Batal</button>
+          <button
+            type="button"
+            onClick={() => konfirmasi?.jalankan()}
+            disabled={processing}
+            className={`${tombol} text-white ${konfirmasi?.bahaya ? 'bg-rose-600 hover:bg-rose-700' : 'bg-[#2B3056] hover:bg-[#1A1A5E]'}`}
+          >
+            {processing && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
+            {konfirmasi?.label}
+          </button>
+        </div>
+      </Modal>
+    </AppLayout>
+  );
+};
+
+// Tabel isian rekap satu tahun. Di layar kecil tiap wilayah tampil sebagai kartu dengan 4 isian.
+const EditorRekap = ({ rekap, form }) => {
+  const { data, setData, errors, clearErrors, processing, isDirty, recentlySuccessful } = form;
+
+  const ubahAngka = (index, key, value) => {
+    setData('items', data.items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
+    clearErrors(`items.${index}.${key}`);
+  };
+
+  const total = Object.fromEntries(KOLOM.map(({ key }) => [key, data.items.reduce((acc, it) => acc + angka(it[key]), 0)]));
+  const errorPertama = Object.entries(errors).find(([k]) => k.startsWith('items'))?.[1];
+
+  const simpan = (e) => {
+    e.preventDefault();
+    form.put(`/admin/rencana/${rekap.tahun}`, {
+      preserveScroll: true,
+      onSuccess: () => form.setDefaults(),
+    });
+  };
+
+  return (
+    <section aria-labelledby="judul-rekap" className="rounded-2xl border border-[#E2E2DC] bg-white p-4 sm:p-6">
+      <h2 id="judul-rekap" className="text-base font-bold text-[#2B3056]">Rekap tahun {rekap.tahun}</h2>
+      <p className="text-sm text-slate-500 mb-5">Salin angka dari Excel. Isi 0 jika memang tidak ada. Harmonisasi boleh lebih besar dari target.</p>
+
+      <form onSubmit={simpan} className="space-y-5" noValidate>
+        <div className="max-w-xl">
+          <label htmlFor="sumber" className="block text-sm font-semibold text-[#2B3056] mb-1.5">Sumber data</label>
+          <input
+            id="sumber"
+            type="text"
+            maxLength={255}
+            value={data.sumber}
+            onChange={(e) => { setData('sumber', e.target.value); clearErrors('sumber'); }}
+            placeholder="Contoh: Rekap Kanwil Kemenkum Riau tahun 2026"
+            aria-invalid={Boolean(errors.sumber)}
+            className="w-full min-h-[44px] rounded-xl border border-slate-300 px-3.5 text-sm focus:border-[#2B3056] focus:outline-none focus:ring-2 focus:ring-[#2B3056]/30"
+          />
+          <p className="mt-1.5 text-xs text-slate-500">Tampil di landing page sebagai keterangan sumber.</p>
+          {errors.sumber && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.sumber}</p>}
+        </div>
+
+        <div className="md:overflow-hidden md:rounded-xl md:border md:border-slate-200">
+          {/* Kepala tabel (hanya layar md ke atas) */}
+          <div className="hidden md:block border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600" aria-hidden="true">
+            <div className={GRID}>
+              <span /><span />
+              <span className="col-span-2 rounded bg-blue-100/70 py-1 text-center text-blue-900">Raperda</span>
+              <span className="col-span-2 rounded bg-amber-100/70 py-1 text-center text-amber-900">Raperkada</span>
+            </div>
+            <div className={`${GRID} mt-1.5`}>
+              <span>No</span>
+              <span>Nama Daerah</span>
+              {KOLOM.map((k, i) => <span key={i} className="text-center">{k.label}</span>)}
+            </div>
+          </div>
+  
+          <div className="space-y-4 md:space-y-0">
+            {KELOMPOK.map((kelompok) => {
+              const baris = data.items
+                .map((it, index) => ({ it, index, info: rekap.wilayah[index] }))
+                .filter(({ info }) => info.kelompok === kelompok);
+              if (baris.length === 0) return null;
+  
+              return (
+                <div key={kelompok}>
+                  <h3 className="mb-2 md:mb-0 rounded-lg md:rounded-none bg-[#FFF3DC] px-3 py-1.5 text-center text-sm font-bold text-[#2B3056]">{kelompok}</h3>
+                  <div className="space-y-3 md:space-y-0 md:divide-y md:divide-slate-100">
+                    {baris.map(({ it, index, info }, no) => (
+                      <div key={it.kabupaten_id} className={`rounded-xl border border-slate-200 p-3 md:rounded-none md:border-0 md:px-3 md:py-2 ${GRID}`}>
+                        <span className="hidden md:block text-sm font-semibold text-slate-400">{no + 1}</span>
+                        <span className="block text-sm font-bold text-[#2B3056] break-words">{info.nama_kabupaten}</span>
+                        <div className="mt-3 grid grid-cols-2 gap-3 md:contents">
+                          {KOLOM.map((k) => {
+                            const error = errors[`items.${index}.${k.key}`];
+                            return (
+                              <label key={k.key} className="block">
+                                <span className="mb-1 block text-xs font-semibold text-slate-600 md:sr-only">
+                                  {k.mobile}<span className="sr-only"> {info.nama_kabupaten}</span>
+                                </span>
+                                <input
+                                  type="number"
+                                  inputMode="numeric"
+                                  min="0"
+                                  max="9999"
+                                  step="1"
+                                  value={it[k.key]}
+                                  onChange={(e) => ubahAngka(index, k.key, e.target.value)}
+                                  aria-invalid={Boolean(error)}
+                                  title={error}
+                                  className={`w-full min-h-[44px] rounded-lg border px-2.5 text-right text-sm font-semibold tabular-nums focus:outline-none focus:ring-2 focus:ring-[#2B3056]/30 ${error ? 'border-rose-400 bg-rose-50' : 'border-slate-300'}`}
+                                />
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+  
+            {/* Total = penjumlahan isian, untuk dicocokkan dengan Excel */}
+            <div className={`rounded-xl bg-[#E6F0D8] p-3 md:rounded-none md:px-3 md:py-2.5 ${GRID}`}>
+              <span className="hidden md:block" />
+              <span className="block text-sm font-extrabold text-[#2B3056]">Total</span>
+              <dl className="mt-2 grid grid-cols-2 gap-2 md:contents">
+                {KOLOM.map((k) => (
+                  <div key={k.key} className="md:text-right md:pr-2.5">
+                    <dt className="text-xs text-slate-600 md:sr-only">{k.mobile}</dt>
+                    <dd className="text-sm font-extrabold tabular-nums text-[#2B3056]">{total[k.key]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
         </div>
 
-        {/* Input Form & Table */}
-        <form onSubmit={handleSaveAll} className="space-y-6">
-          {/* Metadata Bar */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-xs font-bold text-[#2B3056] mb-1.5">
-                  Sumber Rujukan Resmi Dataset {year}:
-                </label>
-                <input
-                  type="text"
-                  value={sumberResmi}
-                  onChange={(e) => setSumberResmi(e.target.value)}
-                  placeholder="Contoh: SK DPRD Riau No. 14 Tahun 2026 & Keputusan Kepala Daerah"
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2 text-xs font-medium text-slate-800 focus:border-[#2B3056] focus:bg-white focus:ring-1 focus:ring-[#2B3056]"
-                />
-              </div>
+        {errorPertama && (
+          <p role="alert" className="text-sm font-semibold text-rose-600">Ada isian yang belum valid (ditandai merah): {errorPertama}</p>
+        )}
 
-              <div className="flex items-center justify-end sm:pt-4">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] px-6 text-xs font-bold text-[#2B3056] shadow-sm hover:brightness-105 transition duration-200 cursor-pointer disabled:opacity-50"
-                >
-                  <Save className="h-4 w-4" />
-                  <span>{saving ? 'Menyimpan...' : 'Simpan Seluruh Target'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Table */}
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-            <div className="border-b border-slate-100 bg-slate-50/80 px-6 py-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-extrabold text-[#2B3056]">
-                  Rincian 13 Wilayah di Provinsi Riau
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Angka 0 diperbolehkan jika memang terkonfirmasi tidak ada rencana regulasi pada tahun tersebut.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4 text-xs font-bold text-slate-600">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                  ProPem Ranperda: {totalPropem} (Selesai: {totalHarmPerda})
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-                  Progsun Ranperkada: {totalProgsun} (Selesai: {totalHarmPerkada})
-                </span>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-100/60 font-extrabold text-slate-700 uppercase tracking-wider text-[11px]">
-                    <th className="py-3 px-4 w-12 text-center">No</th>
-                    <th className="py-3 px-4 min-w-[200px]">Nama Wilayah</th>
-                    <th className="py-3 px-4 w-28 text-center">Kelompok</th>
-                    <th className="py-3 px-4 min-w-[150px] bg-blue-50/60 border-l border-r border-blue-100 text-blue-950 text-center">
-                      ProPem Ranperda (Target)
-                    </th>
-                    <th className="py-3 px-4 w-32 bg-blue-50/30 text-blue-900 text-center">
-                      Realisasi Harm.
-                    </th>
-                    <th className="py-3 px-4 min-w-[150px] bg-amber-50/60 border-l border-r border-amber-100 text-amber-950 text-center">
-                      Progsun Ranperkada (Target)
-                    </th>
-                    <th className="py-3 px-4 w-32 bg-amber-50/30 text-amber-900 text-center">
-                      Realisasi Harm.
-                    </th>
-                    <th className="py-3 px-4 w-32 text-center bg-slate-50 font-black">
-                      Total Rencana
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {items.map((row, index) => {
-                    const rowTotalRencana = (row.propem || 0) + (row.progsun || 0);
-                    const rowTotalHarm = (row.harm_ranperda || 0) + (row.harm_ranperkada || 0);
-
-                    return (
-                      <tr key={row.kabupaten_id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 px-4 text-center font-bold text-slate-400">
-                          {index + 1}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#2B3056] text-[#FFD82B]">
-                              {row.kelompok === 'Provinsi' ? (
-                                <Landmark className="h-3.5 w-3.5" />
-                              ) : row.kelompok === 'Kota' ? (
-                                <Building2 className="h-3.5 w-3.5" />
-                              ) : (
-                                <MapPin className="h-3.5 w-3.5" />
-                              )}
-                            </span>
-                            <span className="font-bold text-[#2B3056]">{row.nama_kabupaten}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              row.kelompok === 'Provinsi'
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : row.kelompok === 'Kota'
-                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                : 'bg-slate-200/80 text-slate-700'
-                            }`}
-                          >
-                            {row.kelompok}
-                          </span>
-                        </td>
-
-                        {/* ProPem Input */}
-                        <td className="py-2.5 px-4 bg-blue-50/30 border-l border-blue-100 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={row.propem}
-                            onChange={(e) =>
-                              handleValueChange(row.kabupaten_id, 'propem', e.target.value)
-                            }
-                            className="w-24 h-9 rounded-lg border border-blue-200 bg-white px-2.5 text-center font-bold text-blue-950 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                          />
-                        </td>
-                        <td className="py-3 px-4 text-center bg-blue-50/10 font-bold text-slate-700">
-                          {row.harm_ranperda}
-                        </td>
-
-                        {/* Progsun Input */}
-                        <td className="py-2.5 px-4 bg-amber-50/30 border-l border-amber-100 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={row.progsun}
-                            onChange={(e) =>
-                              handleValueChange(row.kabupaten_id, 'progsun', e.target.value)
-                            }
-                            className="w-24 h-9 rounded-lg border border-amber-200 bg-white px-2.5 text-center font-bold text-amber-950 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                          />
-                        </td>
-                        <td className="py-3 px-4 text-center bg-amber-50/10 font-bold text-slate-700 border-r border-amber-100">
-                          {row.harm_ranperkada}
-                        </td>
-
-                        {/* Total */}
-                        <td className="py-3 px-4 text-center bg-slate-50 font-black text-[#2B3056]">
-                          {rowTotalRencana}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
-                    <td colSpan={3} className="py-3.5 px-4 text-right uppercase tracking-wider text-xs">
-                      Total Seluruh Wilayah (13 Daerah):
-                    </td>
-                    <td className="py-3.5 px-4 text-center text-blue-950 bg-blue-100/50 text-sm">
-                      {totalPropem}
-                    </td>
-                    <td className="py-3.5 px-4 text-center text-blue-900 bg-blue-50/50 text-sm">
-                      {totalHarmPerda}
-                    </td>
-                    <td className="py-3.5 px-4 text-center text-amber-950 bg-amber-100/50 text-sm">
-                      {totalProgsun}
-                    </td>
-                    <td className="py-3.5 px-4 text-center text-amber-900 bg-amber-50/50 text-sm">
-                      {totalHarmPerkada}
-                    </td>
-                    <td className="py-3.5 px-4 text-center bg-slate-200 text-sm">
-                      {totalPropem + totalProgsun}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            <div className="border-t border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-end">
-              <button
-                type="submit"
-                disabled={saving}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FFD82B] to-[#FFB943] px-7 text-xs font-bold text-[#2B3056] shadow-sm hover:brightness-105 transition duration-200 cursor-pointer disabled:opacity-50"
-              >
-                <Save className="h-4 w-4" />
-                <span>{saving ? 'Menyimpan...' : 'Simpan Seluruh Target'}</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </AppLayout>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button type="submit" disabled={processing || !isDirty} className={`${tombol} w-full sm:w-auto bg-[#2B3056] text-white hover:bg-[#1A1A5E]`}>
+            {processing ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
+            Simpan rekap {rekap.tahun}
+          </button>
+          <p role="status" className="text-sm font-semibold">
+            {recentlySuccessful ? (
+              <span className="inline-flex items-center gap-1.5 text-emerald-700"><Check className="w-4 h-4" aria-hidden="true" /> Tersimpan</span>
+            ) : isDirty ? (
+              <span className="text-amber-700">Ada perubahan yang belum disimpan.</span>
+            ) : null}
+          </p>
+        </div>
+      </form>
+    </section>
   );
 };
 

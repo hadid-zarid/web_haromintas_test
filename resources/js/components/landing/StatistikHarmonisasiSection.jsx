@@ -164,10 +164,9 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   
-  // Polling & network states
+  // Network states (data dimuat ulang saat pengunjung memilih tahun)
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(initialData?.last_updated_at ? new Date(initialData.last_updated_at) : new Date());
 
   // Fetch updated data from secure backend aggregation endpoint
   const fetchData = useCallback(async (tahunTarget, isBackground = false) => {
@@ -190,7 +189,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
       const json = await res.json();
       if (json.status === 'success' && json.data) {
         setData(json.data);
-        setLastUpdated(new Date(json.data.last_updated_at || Date.now()));
+        setActiveYear(json.data.tahun); // server bisa jatuh ke tahun default jika tahun diminta tidak tayang
       } else {
         throw new Error('Format data tidak sesuai');
       }
@@ -208,30 +207,6 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
     setActiveYear(y);
     fetchData(y, false);
   };
-
-  // Periodic polling (30-60 detik) HANYA jika mode sistem tahun berjalan aktif (is_live = true)
-  useEffect(() => {
-    if (!data?.is_live) return;
-
-    let pollInterval = setInterval(() => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-        fetchData(activeYear, true);
-      }
-    }, 45000); // 45 detik interval
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchData(activeYear, true);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      clearInterval(pollInterval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [data?.is_live, activeYear, fetchData]);
 
   // Filter & Sort Regions
   const filteredAndSortedWilayah = useMemo(() => {
@@ -500,7 +475,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
               <div className="min-w-0">
                 <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
-                  {data?.is_live ? 'Permohonan:' : 'Target ProPem:'}
+                  Target ProPem:
                 </span>
                 <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.ranperda.rencana}
@@ -535,7 +510,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
               <div className="min-w-0">
                 <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
-                  {data?.is_live ? 'Permohonan:' : 'Target Progsun:'}
+                  Target Progsun:
                 </span>
                 <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.ranperkada.rencana}
@@ -570,7 +545,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
             <div className="grid grid-cols-2 gap-2 text-xs pt-1">
               <div className="min-w-0">
                 <span className="text-[10.5px] sm:text-xs text-slate-500 font-medium block truncate">
-                  {data?.is_live ? 'Total Permohonan:' : 'Total Rencana:'}
+                  Total Rencana:
                 </span>
                 <span className="text-base sm:text-lg font-mono font-black text-[#2B3056]">
                   {selectedWilayah.total.rencana}
@@ -603,9 +578,9 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
           </div>
 
           <div>
-            <p className="font-bold text-[#2B3056]">Kapan Berkas Dihitung Selesai?</p>
+            <p className="font-bold text-[#2B3056]">Dari Mana Angka Ini Berasal?</p>
             <p className="mt-0.5">
-              Hanya dihitung setelah seluruh dokumen wajib harmonisasi 1–5 lengkap dan surat hasil harmonisasi resmi disahkan oleh Kanwil Kemenkum Riau. Status proses berjalan tidak dihitung sebagai selesai.
+              Seluruh angka merupakan rekap resmi tahunan Kanwil Kementerian Hukum Riau. Rancangan dihitung telah diharmonisasi setelah surat hasil harmonisasi disahkan oleh Kanwil.
             </p>
           </div>
 
@@ -655,43 +630,20 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                     </span>
                     {data.available_years.map((y) => {
                       const isActive = activeYear === y.tahun;
-                      const isLive = y.tipe === 'sistem';
 
                       return (
                         <button
                           key={y.tahun}
                           type="button"
                           onClick={() => handleYearChange(y.tahun)}
-                          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          aria-pressed={isActive}
+                          className={`flex min-h-[44px] sm:min-h-0 items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                             isActive
                               ? 'bg-[#2B3056] text-white shadow-xs font-black'
                               : 'text-slate-600 hover:text-[#2B3056] hover:bg-slate-100'
                           }`}
-                          title={y.badge}
                         >
-                          <span>{y.label}</span>
-                          {isLive ? (
-                            <span
-                              className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.2 text-[9.5px] font-extrabold ${
-                                isActive
-                                  ? 'bg-emerald-500 text-white'
-                                  : 'bg-emerald-100 text-emerald-800'
-                              }`}
-                            >
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                              Live
-                            </span>
-                          ) : (
-                            <span
-                              className={`rounded-full px-1.5 py-0.2 text-[9.5px] font-bold ${
-                                isActive
-                                  ? 'bg-slate-700 text-slate-200'
-                                  : 'bg-slate-100 text-slate-500'
-                              }`}
-                            >
-                              Historis
-                            </span>
-                          )}
+                          {y.label}
                         </button>
                       );
                     })}
@@ -699,25 +651,14 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                 ) : (
                   <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1 font-bold text-[#2B3056] shadow-2xs">
                     <Calendar className="h-3.5 w-3.5 text-[#B3912D]" />
-                    <span>{data?.label_sumber || `Data historis ${activeYear}`}</span>
+                    <span>{data?.label_sumber || `Rekap tahun ${activeYear}`}</span>
                   </span>
                 )}
 
-                {/* Live Polling Status */}
-                {data?.is_live ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-[11px] font-extrabold text-emerald-800">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                    </span>
-                    <span>Sistem Berjalan (Pembaruan Otomatis)</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
-                    <Lock className="h-3 w-3 text-slate-500" />
-                    <span>Rekap Historis Terverifikasi</span>
-                  </span>
-                )}
+                <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
+                  <Lock className="h-3 w-3 text-slate-500" />
+                  <span>Rekap Resmi Kanwil Riau</span>
+                </span>
               </div>
             </div>
 
@@ -738,7 +679,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
                 <div className="flex items-start sm:items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-                  <span>Pembaruan otomatis sementara tertunda: {fetchError}. Angka yang ditampilkan tetap menggunakan data valid terakhir.</span>
+                  <span>Gagal memuat data tahun ini: {fetchError}. Angka yang ditampilkan masih data sebelumnya.</span>
                 </div>
                 <button
                   type="button"
@@ -817,7 +758,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               {/* Honest Ratio Indicator Bar */}
               <div className="mt-4 sm:mt-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-3 sm:p-4 space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs font-bold">
-                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
+                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap rencana:</span>
                   <span className="shrink-0 font-mono text-blue-900 text-sm font-black">
                     <AnimatedNumber value={ringkasan.ranperda.rasio} formatDecimal={true} />%
                   </span>
@@ -895,7 +836,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               {/* Honest Ratio Indicator Bar */}
               <div className="mt-4 sm:mt-5 rounded-2xl border border-amber-100 bg-amber-50/50 p-3 sm:p-4 space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 text-xs font-bold">
-                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap {data?.is_live ? 'permohonan' : 'rencana'}:</span>
+                  <span className="text-slate-700 text-[11px] sm:text-xs">Rasio jumlah harmonisasi terhadap rencana:</span>
                   <span className="shrink-0 font-mono text-amber-950 text-sm font-black">
                     <AnimatedNumber value={ringkasan.ranperkada.rasio} formatDecimal={true} />%
                   </span>
@@ -1146,7 +1087,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
               <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-slate-600 font-semibold text-[10.5px] sm:text-xs">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2.5 w-4 sm:h-3 sm:w-5 rounded-xs bg-[#3A4070] shrink-0" />
-                  <span>{data?.is_live ? 'Permohonan Masuk' : 'Direncanakan'} ({data?.is_live ? 'Diajukan' : 'Target'} {activeRegulasi === 'ranperda' ? 'ProPem' : activeRegulasi === 'ranperkada' ? 'Progsun' : 'Total'})</span>
+                  <span>Direncanakan (Target {activeRegulasi === 'ranperda' ? 'ProPem' : activeRegulasi === 'ranperkada' ? 'Progsun' : 'Total'})</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2.5 w-4 sm:h-3 sm:w-5 rounded-xs bg-[#FFC800] shrink-0" />
@@ -1180,7 +1121,6 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                 selectedWilayahId={selectedWilayahId}
                 onSelectWilayah={setSelectedWilayahId}
                 activeRegulasi={activeRegulasi}
-                isLive={data?.is_live}
               />
             </ScrollReveal>
 
@@ -1292,7 +1232,7 @@ export const StatistikHarmonisasiSection = ({ initialData }) => {
                       {/* Lane 1: Target Rencana (Navy / Indigo) */}
                       <div className="flex items-center gap-1.5 sm:gap-3 text-xs">
                         <span className="w-20 sm:w-28 text-slate-500 font-bold shrink-0 text-[10px] sm:text-[11px] truncate">
-                          {data?.is_live ? 'Permohonan:' : 'Target Rencana:'}
+                          Target Rencana:
                         </span>
                         <div className="flex-1 h-5 bg-slate-100 rounded-md overflow-hidden p-0.5 relative">
                           <div

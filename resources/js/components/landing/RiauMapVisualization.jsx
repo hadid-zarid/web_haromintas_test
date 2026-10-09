@@ -68,7 +68,6 @@ export const RiauMapVisualization = ({
   selectedWilayahId = 3,
   onSelectWilayah = () => {},
   activeRegulasi = 'gabungan',
-  isLive = false,
 }) => {
   const [hoveredWilayahId, setHoveredWilayahId] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0, visible: false });
@@ -558,7 +557,7 @@ export const RiauMapVisualization = ({
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="rounded-lg bg-slate-50 p-2 border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-400 block">
-                          {isLive ? 'Permohonan' : 'Target Rencana'}
+                          Target Rencana
                         </span>
                         <span className="text-sm font-black font-mono text-[#2B3056]">
                           {reg.rencana}

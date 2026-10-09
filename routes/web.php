@@ -334,9 +334,12 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
 
-        // Target Rencana ProPem & Progsun (Publikasi Dataset Tahunan)
+        // Target ProPem & Progsun: rekap tahunan manual yang tampil di landing page
         Route::get('/rencana', [AdminRencanaController::class, 'index'])->name('rencana.index');
-        Route::post('/rencana', [AdminRencanaController::class, 'storeOrUpdate'])->name('rencana.store');
-        Route::post('/rencana/publish', [AdminRencanaController::class, 'togglePublishYear'])->name('rencana.publish');
+        Route::post('/rencana/tahun', [AdminRencanaController::class, 'storeTahun'])->name('rencana.tahun.store');
+        Route::put('/rencana/{tahun}', [AdminRencanaController::class, 'update'])->whereNumber('tahun')->name('rencana.update');
+        Route::put('/rencana/{tahun}/publikasi', [AdminRencanaController::class, 'updatePublikasi'])->whereNumber('tahun')->name('rencana.publikasi');
+        Route::put('/rencana/{tahun}/utama', [AdminRencanaController::class, 'updateUtama'])->whereNumber('tahun')->name('rencana.utama');
+        Route::delete('/rencana/{tahun}', [AdminRencanaController::class, 'destroy'])->whereNumber('tahun')->name('rencana.destroy');
     });
 });

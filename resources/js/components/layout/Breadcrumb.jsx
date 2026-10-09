@@ -14,6 +14,8 @@ export const Breadcrumb = () => {
     panduan: 'Panduan Penggunaan',
     ai: 'Harmonitas AI',
     profil: 'Profil Saya',
+    admin: 'Admin',
+    rencana: 'Target ProPem & Progsun',
   };
 
   return (

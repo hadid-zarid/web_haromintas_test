@@ -4,291 +4,278 @@ namespace Tests\Feature;
 
 use App\Models\HistorisHarmonisasi;
 use App\Models\Kabupaten;
-use App\Models\RancanganRegulasi;
-use App\Models\RencanaRegulasi;
+use App\Models\RekapTahun;
 use App\Models\User;
 use App\Services\StatistikHarmonisasiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class StatistikHarmonisasiTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $admin;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed', ['--class' => 'MasterDataSeeder']);
         $this->artisan('db:seed', ['--class' => 'HistorisHarmonisasiSeeder']);
+
+        $this->admin = User::factory()->create(['role_id' => 1]);
     }
+
     /**
-     * Uji data historis 2025: transkripsi 13 wilayah wajib sama persis,
+     * 13 wilayah dengan angka yang sama untuk dikirim ke form admin.
+     */
+    private function items(array $angka = ['propem' => 2, 'harm_ranperda' => 1, 'progsun' => 3, 'harm_ranperkada' => 4]): array
+    {
+        return Kabupaten::pluck('kabupaten_id')
+            ->map(fn ($id) => ['kabupaten_id' => $id, ...$angka])
+            ->all();
+    }
+
+    private function buatTahun(int $tahun)
+    {
+        return $this->actingAs($this->admin)->post('/admin/rencana/tahun', ['tahun' => $tahun]);
+    }
+
+    private function simpan(int $tahun, ?array $items = null)
+    {
+        return $this->actingAs($this->admin)->put("/admin/rencana/{$tahun}", [
+            'sumber' => "Rekap Kanwil {$tahun}",
+            'items' => $items ?? $this->items(),
+        ]);
+    }
+
+    private function publikasi(int $tahun, bool $tayang)
+    {
+        return $this->actingAs($this->admin)->put("/admin/rencana/{$tahun}/publikasi", ['is_published' => $tayang]);
+    }
+
+    /**
+     * Data 2025: transkripsi 13 wilayah wajib sama persis dengan rekap Excel,
      * total 212, 49, 817, 456, serta kasus realisasi melebihi rencana (surplus).
      */
     public function test_2025_historical_data_matches_exact_transcription_and_totals(): void
     {
-        $service = app(StatistikHarmonisasiService::class);
-        $data = $service->getStatistik(2025);
+        $data = app(StatistikHarmonisasiService::class)->getStatistik(2025);
 
-        // 1. Validasi Jumlah Wilayah
-        $this->assertCount(13, $data['wilayah'], 'Harus terdapat tepat 13 wilayah di Provinsi Riau.');
-
-        // 2. Validasi Angka Agregat Total Ranperda & Ranperkada
-        $this->assertSame(212, $data['ringkasan']['ranperda']['rencana'], 'Total ProPem Ranperda harus tepat 212.');
-        $this->assertSame(49, $data['ringkasan']['ranperda']['harmonisasi'], 'Total Harmonisasi Ranperda harus tepat 49.');
-        $this->assertSame(817, $data['ringkasan']['ranperkada']['rencana'], 'Total Progsun Ranperkada harus tepat 817.');
-        $this->assertSame(456, $data['ringkasan']['ranperkada']['harmonisasi'], 'Total Harmonisasi Ranperkada harus tepat 456.');
-
-        // 3. Validasi Total Gabungan
-        $this->assertSame(1029, $data['ringkasan']['gabungan']['rencana'], 'Total Gabungan Rencana harus 1029.');
-        $this->assertSame(505, $data['ringkasan']['gabungan']['harmonisasi'], 'Total Gabungan Harmonisasi harus 505.');
-
-        // 4. Validasi Label dan Sumber Data
-        $this->assertSame('Data historis 2025', $data['label_sumber']);
+        $this->assertCount(13, $data['wilayah']);
+        $this->assertSame(212, $data['ringkasan']['ranperda']['rencana']);
+        $this->assertSame(49, $data['ringkasan']['ranperda']['harmonisasi']);
+        $this->assertSame(817, $data['ringkasan']['ranperkada']['rencana']);
+        $this->assertSame(456, $data['ringkasan']['ranperkada']['harmonisasi']);
+        $this->assertSame(1029, $data['ringkasan']['gabungan']['rencana']);
+        $this->assertSame(505, $data['ringkasan']['gabungan']['harmonisasi']);
         $this->assertSame('Sumber: rekap 2025 yang diberikan', $data['keterangan_sumber']);
-        $this->assertFalse($data['is_live'], 'Data historis 2025 tidak boleh berlabel live/real-time.');
 
-        // 5. Validasi Kasus Khusus: Realisasi Melebihi Rencana (Surplus)
-        // Indragiri Hilir Ranperda: 5 Rencana vs 6 Harmonisasi
-        $inhil = collect($data['wilayah'])->firstWhere('nama_singkat', 'Indragiri Hilir');
-        $this->assertNotNull($inhil);
-        $this->assertSame(5, $inhil['ranperda']['rencana']);
-        $this->assertSame(6, $inhil['ranperda']['harmonisasi']);
-        $this->assertTrue($inhil['ranperda']['surplus']);
-        $this->assertSame(1, $inhil['ranperda']['surplus_selisih']);
+        // Urutan baku rekap: Kampar pertama, Provinsi Riau terakhir
+        $this->assertSame('Kampar', $data['wilayah'][0]['nama_singkat']);
+        $this->assertSame('Provinsi Riau', $data['wilayah'][12]['nama_singkat']);
 
-        // Rokan Hulu Ranperkada: 35 Rencana vs 54 Harmonisasi
-        $rohul = collect($data['wilayah'])->firstWhere('nama_singkat', 'Rokan Hulu');
-        $this->assertNotNull($rohul);
-        $this->assertSame(35, $rohul['ranperkada']['rencana']);
-        $this->assertSame(54, $rohul['ranperkada']['harmonisasi']);
-        $this->assertTrue($rohul['ranperkada']['surplus']);
-        $this->assertSame(19, $rohul['ranperkada']['surplus_selisih']);
-
-        // Siak Ranperkada: 12 Rencana vs 78 Harmonisasi
-        $siak = collect($data['wilayah'])->firstWhere('nama_singkat', 'Siak');
-        $this->assertNotNull($siak);
-        $this->assertSame(12, $siak['ranperkada']['rencana']);
-        $this->assertSame(78, $siak['ranperkada']['harmonisasi']);
-        $this->assertTrue($siak['ranperkada']['surplus']);
-        $this->assertSame(66, $siak['ranperkada']['surplus_selisih']);
+        $surplus = [
+            'Indragiri Hilir' => ['ranperda', 5, 6, 1],
+            'Rokan Hulu' => ['ranperkada', 35, 54, 19],
+            'Siak' => ['ranperkada', 12, 78, 66],
+        ];
+        foreach ($surplus as $nama => [$jenis, $rencana, $harm, $selisih]) {
+            $w = collect($data['wilayah'])->firstWhere('nama_singkat', $nama);
+            $this->assertSame($rencana, $w[$jenis]['rencana'], $nama);
+            $this->assertSame($harm, $w[$jenis]['harmonisasi'], $nama);
+            $this->assertTrue($w[$jenis]['surplus'], $nama);
+            $this->assertSame($selisih, $w[$jenis]['surplus_selisih'], $nama);
+        }
     }
 
-    /**
-     * Uji Landing Page publik memuat props statistikData dengan default 2025.
-     */
     public function test_landing_page_renders_with_statistik_data(): void
     {
-        $response = $this->get('/');
-        $response->assertStatus(200);
-
-        $response->assertInertia(fn ($page) =>
-            $page->component('LandingPage')
-                ->has('statistikData')
-                ->where('statistikData.tahun', 2025)
-                ->where('statistikData.tipe_sumber', 'historis')
-                ->where('statistikData.ringkasan.ranperda.rencana', 212)
-                ->where('statistikData.ringkasan.ranperkada.harmonisasi', 456)
+        $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('LandingPage')
+            ->where('statistikData.tahun', 2025)
+            ->where('statistikData.ringkasan.ranperda.rencana', 212)
+            ->where('statistikData.ringkasan.ranperkada.harmonisasi', 456)
+            ->where('statistikData.available_years', [['tahun' => 2025, 'label' => 'Tahun 2025']])
         );
     }
 
-    /**
-     * Uji Endpoint API Publik mengembalikan JSON agregat aman tanpa informasi sensitif.
-     */
     public function test_api_statistik_endpoint_returns_clean_and_safe_aggregates(): void
     {
-        $response = $this->getJson('/api/statistik-harmonisasi?tahun=2025');
-
-        $response->assertStatus(200)
+        $response = $this->getJson('/api/statistik-harmonisasi?tahun=2025')
+            ->assertOk()
             ->assertJson([
                 'status' => 'success',
                 'data' => [
                     'tahun' => 2025,
-                    'tipe_sumber' => 'historis',
                     'ringkasan' => [
-                        'ranperda' => [
-                            'rencana' => 212,
-                            'harmonisasi' => 49,
-                        ],
-                        'ranperkada' => [
-                            'rencana' => 817,
-                            'harmonisasi' => 456,
-                        ],
+                        'ranperda' => ['rencana' => 212, 'harmonisasi' => 49],
+                        'ranperkada' => ['rencana' => 817, 'harmonisasi' => 456],
                     ],
                 ],
             ]);
 
         $content = $response->getContent();
-
-        // Pastikan tidak ada kebocoran informasi pengguna atau path berkas
         $this->assertStringNotContainsString('password', $content);
         $this->assertStringNotContainsString('path_file', $content);
         $this->assertStringNotContainsString('remember_token', $content);
     }
 
-    public function test_admin_can_manage_rencana_and_toggle_publication(): void
+    public function test_tahun_draf_tidak_bocor_ke_landing_maupun_api(): void
     {
-        $admin = User::where('role_id', 1)->first();
-        if (! $admin) {
-            $admin = User::create([
-                'nama' => 'Admin Penguji',
-                'email' => 'admin.test@kemenkum.go.id',
-                'password' => bcrypt('password123'),
-                'role_id' => 1,
-                'status' => 'ACTIVE',
-            ]);
-        }
+        $this->buatTahun(2026)->assertRedirect()->assertSessionHasNoErrors();
+        $this->simpan(2026, $this->items(['propem' => 7, 'harm_ranperda' => 7, 'progsun' => 7, 'harm_ranperkada' => 7]));
 
-        $payload = [
-            'tahun' => 2026,
-            'sumber_resmi' => 'SK Propemperda DPRD Riau 2026',
-            'items' => [
-                ['kabupaten_id' => 1, 'propem' => 25, 'progsun' => 50],
-                ['kabupaten_id' => 2, 'propem' => 10, 'progsun' => 20],
-            ],
+        $this->getJson('/api/statistik-harmonisasi?tahun=2026')
+            ->assertOk()
+            ->assertJsonPath('data.tahun', 2025)
+            ->assertJsonPath('data.available_years', [['tahun' => 2025, 'label' => 'Tahun 2025']]);
+    }
+
+    public function test_alur_admin_buat_isi_tayangkan_dan_jadikan_tampil_pertama(): void
+    {
+        $this->buatTahun(2026)->assertRedirect(route('admin.rencana.index', ['tahun' => 2026]));
+        $this->assertDatabaseHas('rekap_statistik_tahun', ['tahun' => 2026, 'is_published' => false, 'is_default' => false]);
+
+        $this->simpan(2026)->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertSame(26, HistorisHarmonisasi::where('tahun', 2026)->count());
+
+        $this->publikasi(2026, true)->assertSessionHasNoErrors();
+        $this->actingAs($this->admin)->put('/admin/rencana/2026/utama')->assertSessionHasNoErrors();
+
+        $this->assertFalse(RekapTahun::find(2025)->is_default);
+        $this->get('/')->assertInertia(fn (Assert $page) => $page
+            ->where('statistikData.tahun', 2026)
+            ->where('statistikData.keterangan_sumber', 'Sumber: Rekap Kanwil 2026')
+            ->where('statistikData.ringkasan.ranperda.rencana', 26)
+            ->where('statistikData.ringkasan.ranperkada.harmonisasi', 52)
+            ->where('statistikData.available_years.0.tahun', 2026)
+            ->where('statistikData.available_years.1.tahun', 2025)
+        );
+
+        // 2025 tetap bisa dipilih pengunjung
+        $this->getJson('/api/statistik-harmonisasi?tahun=2025')->assertJsonPath('data.ringkasan.ranperda.rencana', 212);
+
+        foreach (['REKAP_TAHUN_CREATE', 'REKAP_UPDATE', 'REKAP_PUBLISH', 'REKAP_SET_UTAMA'] as $aksi) {
+            $this->assertDatabaseHas('audit_logs', ['action' => $aksi, 'target_id' => '2026', 'user_id' => $this->admin->user_id]);
+        }
+    }
+
+    public function test_admin_bisa_mengedit_angka_2025(): void
+    {
+        $items = collect($this->items())->map(fn ($it) => $it['kabupaten_id'] === 3 ? [...$it, 'propem' => 31] : $it)->all();
+        $this->simpan(2025, $items)->assertSessionHasNoErrors();
+
+        $kampar = collect(app(StatistikHarmonisasiService::class)->getStatistik(2025)['wilayah'])->firstWhere('kabupaten_id', 3);
+        $this->assertSame(31, $kampar['ranperda']['rencana']);
+    }
+
+    public function test_aksi_yang_melanggar_aturan_ditolak(): void
+    {
+        // Tahun tampil pertama tidak boleh ditarik
+        $this->publikasi(2025, false)->assertSessionHasErrors('rekap');
+        $this->assertTrue(RekapTahun::find(2025)->is_published);
+
+        // Tahun tanpa angka tidak boleh ditayangkan
+        $this->buatTahun(2026);
+        $this->publikasi(2026, true)->assertSessionHasErrors('rekap');
+
+        // Draf tidak boleh dijadikan tampil pertama
+        $this->actingAs($this->admin)->put('/admin/rencana/2026/utama')->assertSessionHasErrors('rekap');
+
+        // Tahun yang tayang tidak boleh dihapus
+        $this->actingAs($this->admin)->delete('/admin/rencana/2025')->assertSessionHasErrors('rekap');
+        $this->assertDatabaseHas('rekap_statistik_tahun', ['tahun' => 2025]);
+
+        // Tahun ganda dan di luar rentang ditolak
+        $this->buatTahun(2026)->assertSessionHasErrors('tahun');
+        $this->buatTahun(2019)->assertSessionHasErrors('tahun');
+        $this->buatTahun(now()->year + 2)->assertSessionHasErrors('tahun');
+
+        // Draf boleh dihapus beserta angkanya
+        $this->simpan(2026);
+        $this->actingAs($this->admin)->delete('/admin/rencana/2026')->assertSessionHasNoErrors();
+        $this->assertDatabaseMissing('rekap_statistik_tahun', ['tahun' => 2026]);
+        $this->assertSame(0, HistorisHarmonisasi::where('tahun', 2026)->count());
+    }
+
+    public function test_validasi_angka_rekap(): void
+    {
+        $this->buatTahun(2026);
+        $valid = $this->items();
+
+        $kasus = [
+            'negatif' => [[...$valid[0], 'propem' => -1], ...array_slice($valid, 1)],
+            'pecahan' => [[...$valid[0], 'progsun' => 1.5], ...array_slice($valid, 1)],
+            'kosong' => [[...$valid[0], 'harm_ranperda' => ''], ...array_slice($valid, 1)],
+            'terlalu besar' => [[...$valid[0], 'harm_ranperkada' => 10000], ...array_slice($valid, 1)],
+            'wilayah tidak dikenal' => [[...$valid[0], 'kabupaten_id' => 999], ...array_slice($valid, 1)],
+            'wilayah ganda' => [$valid[0], $valid[0], ...array_slice($valid, 2)],
+            'kurang dari 13 wilayah' => array_slice($valid, 1),
         ];
 
-        // 1. Simpan target rencana
-        $response = $this->actingAs($admin)->post('/admin/rencana', $payload);
-        $response->assertRedirect();
+        foreach ($kasus as $nama => $items) {
+            $this->assertNotEmpty($this->simpan(2026, $items)->getSession()->get('errors'), "Kasus '{$nama}' seharusnya ditolak.");
+            $this->flushSession();
+        }
 
-        $this->assertDatabaseHas('rencana_regulasi', [
-            'tahun' => 2026,
-            'kabupaten_id' => 1,
-            'jenis_regulasi_id' => 1,
-            'jumlah_rencana' => 25,
-            'is_published' => false,
-        ]);
-
-        // 2. Aktifkan publikasi
-        $publishResponse = $this->actingAs($admin)->post('/admin/rencana/publish', [
-            'tahun' => 2026,
-            'is_published' => true,
-        ]);
-        $publishResponse->assertRedirect();
-
-        $this->assertDatabaseHas('rencana_regulasi', [
-            'tahun' => 2026,
-            'is_published' => true,
-        ]);
-
-        // 3. Verifikasi service sekarang mengenali 2026 sebagai tahun sistem yang aktif
-        $service = app(StatistikHarmonisasiService::class);
-        $availableYears = $service->getAvailableYears();
-        $this->assertTrue(collect($availableYears)->contains('tahun', 2026));
-
-        // 4. Nonaktifkan kembali untuk menjaga kebersihan data uji
-        $this->actingAs($admin)->post('/admin/rencana/publish', [
-            'tahun' => 2026,
-            'is_published' => false,
-        ]);
-
-        RencanaRegulasi::where('tahun', 2026)->delete();
+        $this->assertSame(0, HistorisHarmonisasi::where('tahun', 2026)->count());
+        $this->simpan(2026, $this->items(['propem' => 0, 'harm_ranperda' => 5, 'progsun' => 0, 'harm_ranperkada' => 0]))
+            ->assertSessionHasNoErrors(); // surplus (harmonisasi > target) boleh
     }
 
-    /**
-     * Uji tonggak harmonisasi_completed_at: diisi satu kali saat dokumen harmonisasi 1-5 lengkap,
-     * tidak hilang meski berkas kemudian berstatus revisi (5) atau selesai fasilitasi (4),
-     * dan dihitung tepat satu kali per berkas.
-     */
-    public function test_harmonisasi_completed_at_milestone_and_unique_counting(): void
+    public function test_non_admin_tidak_bisa_mengakses(): void
     {
-        $user = User::where('role_id', 1)->first() ?? User::create([
-            'nama' => 'User Uji',
-            'email' => 'user.uji@kemenkum.go.id',
-            'password' => bcrypt('password123'),
-            'role_id' => 1,
-            'status' => 'ACTIVE',
-        ]);
+        $timKerja = User::factory()->create(['role_id' => 2]);
 
-        $rancangan = RancanganRegulasi::create([
-            'judul_rancangan' => 'Ranperda Uji Tonggak Harmonisasi',
-            'jenis_regulasi_id' => 1,
-            'kabupaten_id' => 3, // Kampar
-            'tim_kerja_id' => 1,
-            'pokja_id' => $user->user_id,
-            'user_id' => $user->user_id,
-            'status_id' => 2, // Proses Harmonisasi
-            'tanggal_dibuat' => '2026-03-01',
-        ]);
-
-        $this->assertNull($rancangan->harmonisasi_completed_at);
-
-        // Simulasikan penyelesaian harmonisasi (Dokumen 1-5 terunggah)
-        $completedTimestamp = now()->subDays(5);
-        $rancangan->update([
-            'harmonisasi_completed_at' => $completedTimestamp,
-            'status_id' => 3, // Beralih ke Fasilitasi
-        ]);
-
-        // Simulasikan berkas kemudian masuk revisi (status 5)
-        $rancangan->update([
-            'status_id' => 5,
-        ]);
-
-        // Tonggak harus tetap tersimpan dan tidak terhapus
-        $rancangan->refresh();
-        $this->assertNotNull($rancangan->harmonisasi_completed_at);
-        $this->assertSame($completedTimestamp->toDateTimeString(), $rancangan->harmonisasi_completed_at->toDateTimeString());
-
-        // Verifikasi pada query agregasi sistem: berkas dihitung tepat 1 kali
-        $totalSelesaiKampar = RancanganRegulasi::where('kabupaten_id', 3)
-            ->where('jenis_regulasi_id', 1)
-            ->whereNotNull('harmonisasi_completed_at')
-            ->whereYear('harmonisasi_completed_at', 2026)
-            ->distinct('rancangan_id')
-            ->count('rancangan_id');
-
-        $this->assertGreaterThanOrEqual(1, $totalSelesaiKampar);
-
-        // Bersihkan data uji
-        $rancangan->delete();
+        $this->actingAs($timKerja)->get('/admin/rencana')->assertForbidden();
+        $this->actingAs($timKerja)->put('/admin/rencana/2025', ['items' => $this->items()])->assertForbidden();
+        $this->actingAs($timKerja)->put('/admin/rencana/2025/publikasi', ['is_published' => false])->assertForbidden();
+        $this->assertSame(212, app(StatistikHarmonisasiService::class)->getStatistik(2025)['ringkasan']['ranperda']['rencana']);
     }
 
-    /**
-     * Uji data sistem 2026: jika belum ada target rencana resmi diinput admin,
-     * sistem secara otomatis menghitung dari jumlah permohonan masuk pada tahun 2026
-     * dan harmonisasi yang telah selesai pada tahun tersebut, tanpa dummy mockup 209 dan 771.
-     */
-    public function test_2026_system_data_calculates_dynamically_from_submissions(): void
+    public function test_seed_ulang_tidak_menimpa_angka_yang_diedit_admin(): void
     {
-        $user = User::first() ?? User::create([
-            'nama' => 'User Uji 2026',
-            'email' => 'user.uji2026@kemenkum.go.id',
-            'password' => bcrypt('password123'),
-            'role_id' => 1,
-            'status' => 'ACTIVE',
-        ]);
+        $this->simpan(2025, $this->items());
+        $this->artisan('db:seed', ['--class' => 'HistorisHarmonisasiSeeder']);
 
-        // Buat berkas permohonan 2026: 1 Ranperda selesai harmonisasi di Pekanbaru
-        $ranperda = RancanganRegulasi::create([
-            'judul_rancangan' => 'Ranperda Uji 2026',
-            'jenis_regulasi_id' => 1,
-            'kabupaten_id' => 13, // Pekanbaru
-            'tim_kerja_id' => 1,
-            'pokja_id' => $user->user_id,
-            'user_id' => $user->user_id,
-            'status_id' => 3,
-            'tanggal_dibuat' => '2026-02-01',
-            'harmonisasi_completed_at' => '2026-02-15 10:00:00',
-        ]);
+        $this->assertSame(26, app(StatistikHarmonisasiService::class)->getStatistik(2025)['ringkasan']['ranperda']['rencana']);
 
-        $service = app(StatistikHarmonisasiService::class);
-        $data = $service->getStatistik(2026);
+        // Tahun yang sudah dihapus admin juga tidak muncul lagi setelah seed ulang
+        $this->buatTahun(2026);
+        $this->simpan(2026);
+        $this->publikasi(2026, true);
+        $this->actingAs($this->admin)->put('/admin/rencana/2026/utama');
+        $this->publikasi(2025, false);
+        $this->actingAs($this->admin)->delete('/admin/rencana/2025')->assertSessionHasNoErrors();
 
-        $this->assertSame(2026, $data['tahun']);
-        $this->assertSame('sistem', $data['tipe_sumber']);
-        $this->assertTrue($data['is_live']);
+        $this->artisan('db:seed', ['--class' => 'HistorisHarmonisasiSeeder']);
+        $this->assertDatabaseMissing('rekap_statistik_tahun', ['tahun' => 2025]);
+        $this->assertSame(1, RekapTahun::where('is_default', true)->count());
+    }
 
-        // Pastikan tidak ada target dummy 209 dan 771
-        $this->assertNotSame(209, $data['ringkasan']['ranperda']['rencana']);
-        $this->assertNotSame(771, $data['ringkasan']['ranperkada']['rencana']);
+    public function test_landing_tanpa_tahun_tayang_tidak_error(): void
+    {
+        RekapTahun::query()->update(['is_published' => false, 'is_default' => false]);
 
-        // Ranperda rencana harus >= 1 dan harmonisasi >= 1
-        $this->assertGreaterThanOrEqual(1, $data['ringkasan']['ranperda']['rencana']);
-        $this->assertGreaterThanOrEqual(1, $data['ringkasan']['ranperda']['harmonisasi']);
+        $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page->where('statistikData', null));
+        $this->getJson('/api/statistik-harmonisasi')->assertOk()->assertJsonPath('data', null);
+    }
 
-        // Bersihkan
-        $ranperda->delete();
+    public function test_halaman_admin_menampilkan_daftar_tahun_dan_rekap(): void
+    {
+        $this->buatTahun(2026);
+
+        $this->actingAs($this->admin)->get('/admin/rencana')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/RencanaRegulasiPage')
+            ->where('daftarTahun.0.tahun', 2026)
+            ->where('daftarTahun.1.is_default', true)
+            ->where('rekap.tahun', 2025) // default membuka tahun tampil pertama
+            ->has('rekap.wilayah', 13)
+            ->where('rekap.wilayah.0.propem', 30)
+        );
+
+        $this->actingAs($this->admin)->get('/admin/rencana?tahun=2026')
+            ->assertInertia(fn (Assert $page) => $page->where('rekap.tahun', 2026)->where('rekap.wilayah.0.propem', 0));
     }
 }

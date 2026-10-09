@@ -3,231 +3,128 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SimpanRekapRequest;
 use App\Models\AuditLog;
-use App\Models\Kabupaten;
-use App\Models\RancanganRegulasi;
-use App\Models\RencanaRegulasi;
+use App\Models\RekapTahun;
 use App\Services\StatistikHarmonisasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Menu "Target ProPem & Progsun": rekap angka per tahun yang tampil di landing page.
+ * Semua angka diisi manual oleh Admin; logika ada di StatistikHarmonisasiService.
+ */
 class AdminRencanaController extends Controller
 {
-    /**
-     * Tampilkan Halaman Pengelolaan Target Rencana ProPem & Progsun (Admin)
-     */
+    public function __construct(
+        protected StatistikHarmonisasiService $service
+    ) {}
+
     public function index(Request $request): Response
     {
-        $currentYear = (int) date('Y');
-        $selectedYear = (int) $request->query('tahun', $currentYear);
+        $daftarTahun = RekapTahun::orderByDesc('tahun')->get();
 
-        $allKabupaten = Kabupaten::with('timKerja')->orderBy('kabupaten_id')->get();
-
-        // Ambil data rencana yang tersimpan di DB untuk tahun terpilih
-        $rencanaRows = RencanaRegulasi::where('tahun', $selectedYear)->get();
-
-        // Hitung realisasi harmonisasi yang sudah selesai di sistem pada tahun tersebut
-        $realisasiHarmonisasi = RancanganRegulasi::whereNotNull('harmonisasi_completed_at')
-            ->whereYear('harmonisasi_completed_at', $selectedYear)
-            ->select('kabupaten_id', 'jenis_regulasi_id', DB::raw('COUNT(DISTINCT rancangan_id) as total_selesai'))
-            ->groupBy('kabupaten_id', 'jenis_regulasi_id')
-            ->get();
-
-        // Cek status publikasi tahun ini
-        $isPublished = $rencanaRows->first()?->is_published ?? false;
-        $publishedAt = $rencanaRows->first()?->published_at?->format('d/m/Y H:i');
-        $sumberResmi = $rencanaRows->first()?->sumber_resmi ?? '';
-
-        $items = [];
-        foreach ($allKabupaten as $kab) {
-            $kabId = (int) $kab->kabupaten_id;
-
-            $rowPerda = $rencanaRows->first(
-                fn ($r) => (int) $r->kabupaten_id === $kabId && (int) $r->jenis_regulasi_id === 1
-            );
-            $rowPerkada = $rencanaRows->first(
-                fn ($r) => (int) $r->kabupaten_id === $kabId && (int) $r->jenis_regulasi_id === 2
-            );
-
-            $propem = $rowPerda ? (int) $rowPerda->jumlah_rencana : 0;
-            $progsun = $rowPerkada ? (int) $rowPerkada->jumlah_rencana : 0;
-
-            $harmPerda = (int) ($realisasiHarmonisasi->first(
-                fn ($r) => (int) $r->kabupaten_id === $kabId && (int) $r->jenis_regulasi_id === 1
-            )?->total_selesai ?? 0);
-
-            $harmPerkada = (int) ($realisasiHarmonisasi->first(
-                fn ($r) => (int) $r->kabupaten_id === $kabId && (int) $r->jenis_regulasi_id === 2
-            )?->total_selesai ?? 0);
-
-            $items[] = [
-                'kabupaten_id' => $kabId,
-                'nama_kabupaten' => $kab->nama_kabupaten,
-                'nama_singkat' => StatistikHarmonisasiService::NAMA_SINGKAT_WILAYAH[$kabId] ?? $kab->nama_kabupaten,
-                'kelompok' => StatistikHarmonisasiService::KELOMPOK_WILAYAH[$kabId] ?? 'Kabupaten',
-                'urutan' => StatistikHarmonisasiService::URUTAN_BAKU_KABUPATEN[$kabId] ?? 99,
-                'propem' => $propem,
-                'progsun' => $progsun,
-                'harm_ranperda' => $harmPerda,
-                'harm_ranperkada' => $harmPerkada,
-            ];
-        }
-
-        // Urutkan baku
-        usort($items, fn ($a, $b) => $a['urutan'] <=> $b['urutan']);
-
-        // Daftar tahun yang ada rencananya di database
-        $distinctYears = RencanaRegulasi::select('tahun')
-            ->distinct()
-            ->orderByDesc('tahun')
-            ->pluck('tahun')
-            ->toArray();
-
-        if (! in_array($currentYear, $distinctYears)) {
-            $distinctYears[] = $currentYear;
-            sort($distinctYears);
-        }
+        $terpilih = $daftarTahun->firstWhere('tahun', (int) $request->query('tahun'))
+            ?? $daftarTahun->firstWhere('is_default', true)
+            ?? $daftarTahun->first();
 
         return Inertia::render('Admin/RencanaRegulasiPage', [
-            'selectedYear' => $selectedYear,
-            'availableYears' => array_values(array_unique($distinctYears)),
-            'items' => $items,
-            'isPublished' => $isPublished,
-            'publishedAt' => $publishedAt,
-            'sumberResmi' => $sumberResmi,
+            'daftarTahun' => $daftarTahun->map(fn (RekapTahun $r) => [
+                'tahun' => $r->tahun,
+                'is_published' => $r->is_published,
+                'is_default' => $r->is_default,
+                'published_at' => $r->published_at?->format('d/m/Y H:i'),
+            ])->values(),
+            'rekap' => $terpilih ? [
+                'tahun' => $terpilih->tahun,
+                'sumber' => $terpilih->sumber ?? '',
+                'wilayah' => $this->service->rekapWilayah($terpilih->tahun),
+            ] : null,
         ]);
     }
 
-    /**
-     * Simpan / Perbarui Rencana ProPem & Progsun Per Wilayah
-     */
-    public function storeOrUpdate(Request $request): RedirectResponse
+    public function storeTahun(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'tahun' => ['required', 'integer', 'min:2020', 'max:2100'],
-            'sumber_resmi' => ['nullable', 'string', 'max:255'],
-            'keterangan' => ['nullable', 'string', 'max:1000'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.kabupaten_id' => ['required', 'integer', 'exists:kabupaten,kabupaten_id'],
-            'items.*.propem' => ['required', 'integer', 'min:0'],
-            'items.*.progsun' => ['required', 'integer', 'min:0'],
+            'tahun' => ['required', 'integer', 'min:2020', 'max:'.(now()->year + 1), Rule::unique('rekap_statistik_tahun', 'tahun')],
+        ], [
+            'tahun.required' => 'Tahun wajib diisi.',
+            'tahun.integer' => 'Tahun harus berupa angka.',
+            'tahun.min' => 'Tahun minimal 2020.',
+            'tahun.max' => 'Tahun maksimal :max.',
+            'tahun.unique' => 'Rekap tahun ini sudah ada.',
         ]);
 
-        $tahun = (int) $validated['tahun'];
-        $sumberResmi = $validated['sumber_resmi'] ?? 'Surat Keputusan Resmi Pemda/DPRD';
-        $user = Auth::user();
-        $now = now();
+        $rekap = RekapTahun::create(['tahun' => $validated['tahun'], 'updated_by' => $request->user()->user_id]);
 
-        // Cek status publikasi saat ini untuk tahun tersebut
-        $currentPublished = RencanaRegulasi::where('tahun', $tahun)->value('is_published') ?? false;
+        $this->catatAudit($request, 'REKAP_TAHUN_CREATE', $rekap->tahun);
 
-        DB::transaction(function () use ($validated, $tahun, $sumberResmi, $user, $now, $currentPublished) {
-            foreach ($validated['items'] as $item) {
-                $kabId = (int) $item['kabupaten_id'];
-                $propem = (int) $item['propem'];
-                $progsun = (int) $item['progsun'];
+        return to_route('admin.rencana.index', ['tahun' => $rekap->tahun])
+            ->with('success', "Rekap tahun {$rekap->tahun} dibuat sebagai draf. Isi angkanya lalu simpan.");
+    }
 
-                // Ranperda (1)
-                RencanaRegulasi::updateOrCreate(
-                    [
-                        'tahun' => $tahun,
-                        'kabupaten_id' => $kabId,
-                        'jenis_regulasi_id' => 1,
-                    ],
-                    [
-                        'jumlah_rencana' => $propem,
-                        'sumber_resmi' => $sumberResmi,
-                        'is_published' => $currentPublished,
-                        'updated_by' => $user?->user_id,
-                        'updated_at' => $now,
-                    ]
-                );
+    public function update(SimpanRekapRequest $request, int $tahun): RedirectResponse
+    {
+        $rekap = RekapTahun::findOrFail($tahun);
+        $total = function () use ($tahun) {
+            $wilayah = $this->service->rekapWilayah($tahun);
 
-                // Ranperkada (2)
-                RencanaRegulasi::updateOrCreate(
-                    [
-                        'tahun' => $tahun,
-                        'kabupaten_id' => $kabId,
-                        'jenis_regulasi_id' => 2,
-                    ],
-                    [
-                        'jumlah_rencana' => $progsun,
-                        'sumber_resmi' => $sumberResmi,
-                        'is_published' => $currentPublished,
-                        'updated_by' => $user?->user_id,
-                        'updated_at' => $now,
-                    ]
-                );
-            }
-        });
+            return collect(SimpanRekapRequest::KOLOM_ANGKA)
+                ->mapWithKeys(fn ($kolom) => [$kolom => array_sum(array_column($wilayah, $kolom))])
+                ->all();
+        };
 
+        $sebelum = $total();
+        $this->service->simpanRekap($rekap, $request->validated('sumber'), $request->validated('items'), $request->user()->user_id);
+
+        $this->catatAudit($request, 'REKAP_UPDATE', $tahun, ['total_sebelum' => $sebelum, 'total_sesudah' => $total()]);
+
+        return back()->with('success', "Rekap tahun {$tahun} berhasil disimpan.");
+    }
+
+    public function updatePublikasi(Request $request, int $tahun): RedirectResponse
+    {
+        $tayang = $request->validate(['is_published' => ['required', 'boolean']])['is_published'];
+        $rekap = RekapTahun::findOrFail($tahun);
+
+        $this->service->setPublikasi($rekap, (bool) $tayang, $request->user()->user_id);
+        $this->catatAudit($request, $tayang ? 'REKAP_PUBLISH' : 'REKAP_UNPUBLISH', $tahun);
+
+        return back()->with('success', $tayang
+            ? "Rekap tahun {$tahun} sekarang tayang di landing page."
+            : "Rekap tahun {$tahun} ditarik dari landing page dan kembali menjadi draf.");
+    }
+
+    public function updateUtama(Request $request, int $tahun): RedirectResponse
+    {
+        $this->service->setTampilPertama(RekapTahun::findOrFail($tahun), $request->user()->user_id);
+        $this->catatAudit($request, 'REKAP_SET_UTAMA', $tahun);
+
+        return back()->with('success', "Landing page sekarang pertama kali menampilkan rekap tahun {$tahun}.");
+    }
+
+    public function destroy(Request $request, int $tahun): RedirectResponse
+    {
+        $this->service->hapusDraf(RekapTahun::findOrFail($tahun));
+        $this->catatAudit($request, 'REKAP_TAHUN_DELETE', $tahun);
+
+        return to_route('admin.rencana.index')->with('success', "Draf rekap tahun {$tahun} dihapus.");
+    }
+
+    private function catatAudit(Request $request, string $action, int $tahun, array $payload = []): void
+    {
         AuditLog::create([
-            'user_id' => $user?->user_id,
-            'action' => 'UPDATE_RENCANA_REGULASI',
+            'user_id' => $request->user()->user_id,
+            'action' => $action,
             'module' => 'STATISTIK_PROPEM_PROGSUN',
             'target_id' => (string) $tahun,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'payload' => [
-                'tahun' => $tahun,
-                'sumber_resmi' => $sumberResmi,
-                'total_wilayah' => count($validated['items']),
-            ],
-            'created_at' => $now,
+            'payload' => ['tahun' => $tahun, ...$payload],
+            'created_at' => now(),
         ]);
-
-        return back()->with('success', "Target rencana ProPem dan Progsun tahun {$tahun} berhasil disimpan.");
-    }
-
-    /**
-     * Aktifkan / Nonaktifkan Publikasi Dataset Tahun Berjalan ke Landing Page
-     */
-    public function togglePublishYear(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'tahun' => ['required', 'integer', 'min:2020', 'max:2100'],
-            'is_published' => ['required', 'boolean'],
-        ]);
-
-        $tahun = (int) $validated['tahun'];
-        $isPublished = (bool) $validated['is_published'];
-        $user = Auth::user();
-        $now = now();
-
-        $rowsCount = RencanaRegulasi::where('tahun', $tahun)->count();
-        if ($rowsCount === 0 && $isPublished) {
-            return back()->with('error', "Gagal mempublikasikan: data rencana tahun {$tahun} belum diinput.");
-        }
-
-        RencanaRegulasi::where('tahun', $tahun)->update([
-            'is_published' => $isPublished,
-            'published_at' => $isPublished ? $now : null,
-            'updated_by' => $user?->user_id,
-            'updated_at' => $now,
-        ]);
-
-        AuditLog::create([
-            'user_id' => $user?->user_id,
-            'action' => $isPublished ? 'PUBLISH_RENCANA_REGULASI' : 'UNPUBLISH_RENCANA_REGULASI',
-            'module' => 'STATISTIK_PROPEM_PROGSUN',
-            'target_id' => (string) $tahun,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'payload' => [
-                'tahun' => $tahun,
-                'is_published' => $isPublished,
-            ],
-            'created_at' => $now,
-        ]);
-
-        $msg = $isPublished
-            ? "Publikasi data sistem tahun {$tahun} BERHASIL DIAKTIFKAN pada landing page publik."
-            : "Publikasi data sistem tahun {$tahun} DINONAKTIFKAN. Tampilan publik kembali ke data historis 2025.";
-
-        return back()->with('success', $msg);
     }
 }

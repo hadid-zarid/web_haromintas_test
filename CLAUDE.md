@@ -55,7 +55,14 @@ There are no Laravel Policies; this trait is the single source of the rules.
 
 **Other services.**
 - `PasalDiffService` + `DocumentTextExtractionService` (smalot/pdfparser, docx zip) handle per-Pasal (article-by-article) document comparison.
-- `StatistikHarmonisasiService` feeds the public landing page and `/api/statistik-harmonisasi`.
+- `StatistikHarmonisasiService` feeds the landing-page statistics and `/api/statistik-harmonisasi`. Every number is entered by hand by Admin on `/admin/rencana` (menu "Target ProPem & Progsun"), copied from the official Excel recap. Never compute these numbers from permohonan data.
+  - Per-region numbers live in `historis_harmonisasi`: one row per year × kabupaten × jenis.
+  - Per-year state lives in `rekap_statistik_tahun` (`RekapTahun`):
+    - `is_published`: whether the year is shown on the landing page.
+    - `is_default`: the year shown first; exactly one, and it must be published.
+  - Draft years must never reach the public: `getStatistik()` falls back to the default year.
+  - `HistorisHarmonisasiSeeder` only runs on a fresh install, so re-seeding never overwrites admin edits.
+  - `rencana_regulasi` is a legacy table (unused, like `nip`). `harmonisasi_completed_at` is still set on upload but is not used by the statistics.
 
 **Database conventions.** Table names are singular and Indonesian (`user`, `rancangan_regulasi`, `dokumen`, `kabupaten`) with custom PKs (`user_id`, `rancangan_id`, …). Always check `$table` / `$primaryKey` on the model. Migrations must be idempotent: guard them with `Schema::hasColumn`/`hasTable`, because production DBs were originally built from SQL dumps and migrate+seed runs again on every deploy. Seeders use `upsert`. `AkunDefaultSeeder` (demo accounts) runs only outside production. `database/*.sql` files are gitignored legacy patches.
 

@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\HistorisHarmonisasi;
-use App\Models\Kabupaten;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -11,13 +9,18 @@ use Illuminate\Support\Facades\DB;
  * Seeder Snapshot Data Historis Tahun 2025 HARMONITAS
  * Transkripsi data resmi rekap 2025 (13 Wilayah di Provinsi Riau).
  *
- * Sifat: Idempotent (menggunakan upsert pada unique [tahun, kabupaten_id, jenis_regulasi_id]),
- * aman dijalankan berulang kali tanpa membuat duplikasi data atau membuat permohonan palsu.
+ * Hanya berjalan pada instalasi baru (belum ada rekap tahun apa pun). Setelah itu rekap
+ * dikelola Admin lewat menu Target ProPem & Progsun, jadi seed ulang tidak boleh menimpa
+ * angka yang sudah diedit atau memunculkan lagi tahun yang sudah dihapus.
  */
 class HistorisHarmonisasiSeeder extends Seeder
 {
     public function run(): void
     {
+        if (DB::table('rekap_statistik_tahun')->exists()) {
+            return;
+        }
+
         $sumber = 'rekap 2025 yang diberikan';
         $now = now();
 
@@ -75,10 +78,16 @@ class HistorisHarmonisasiSeeder extends Seeder
             ];
         }
 
-        DB::table('historis_harmonisasi')->upsert(
-            $records,
-            ['tahun', 'kabupaten_id', 'jenis_regulasi_id'],
-            ['jumlah_rencana', 'jumlah_harmonisasi', 'sumber', 'catatan', 'updated_at']
-        );
+        DB::table('historis_harmonisasi')->insertOrIgnore($records);
+
+        DB::table('rekap_statistik_tahun')->insertOrIgnore([
+            'tahun' => 2025,
+            'sumber' => $sumber,
+            'is_published' => true,
+            'is_default' => true,
+            'published_at' => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
     }
 }
