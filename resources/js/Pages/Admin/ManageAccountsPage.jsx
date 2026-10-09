@@ -212,12 +212,11 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
       result = result.filter(u => {
         const name = (u.nama || u.name || '').toLowerCase();
         const email = (u.email || '').toLowerCase();
-        const nip = (u.nip || '').toLowerCase();
         const noHp = (u.no_hp || '').toLowerCase();
         const timName = (u.tim_kerja?.nama_tim_kerja || u.timKerja?.nama_tim_kerja || '').toLowerCase();
         const roleName = (u.role || u.role_relation?.nama_role || '').toLowerCase();
         const wilayahName = getWilayahBiroLabel(u).toLowerCase();
-        return name.includes(term) || email.includes(term) || nip.includes(term) || noHp.includes(term) || timName.includes(term) || roleName.includes(term) || wilayahName.includes(term);
+        return name.includes(term) || email.includes(term) || noHp.includes(term) || timName.includes(term) || roleName.includes(term) || wilayahName.includes(term);
       });
     }
 
@@ -310,7 +309,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
     nama: '',
     email: '',
     password: '',
-    nip: '',
     no_hp: '',
     role_id: 2, // Default: Tim Kerja
     tim_kerja_id: unitList[0]?.tim_kerja_id || unitList[0]?.id || 1,
@@ -322,7 +320,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
     nama: '',
     email: '',
     password: '',
-    nip: '',
     no_hp: '',
     role_id: 2,
     status: 'ACTIVE',
@@ -355,7 +352,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
       nama: user.nama || user.name || '',
       email: user.email || '',
       password: '',
-      nip: user.nip || '',
       no_hp: user.no_hp || '',
       role_id: user.role_id || (user.role === 'ADMIN' ? 1 : user.role === 'BIRO_HUKUM' ? 3 : user.role === 'PIMPINAN' ? 4 : 2),
       status: user.status || 'ACTIVE',
@@ -504,7 +500,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder="Cari nama, email, atau NIP pegawai..."
+                placeholder="Cari nama, email, atau nomor HP..."
                 className="w-full pl-10 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B] transition-all"
               />
               {searchTerm && (
@@ -686,7 +682,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
 
                     return (
                       <tr key={userId} className="hover:bg-slate-50/80 transition-colors">
-                        {/* Nama & NIP */}
+                        {/* Nama */}
                         <td className="py-3.5 px-4">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-[#2B3056] font-black flex items-center justify-center shrink-0 shadow-2xs">
@@ -700,9 +696,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                                     Akun Anda
                                   </span>
                                 )}
-                              </p>
-                              <p className="text-[10px] font-semibold text-slate-400 mt-0.5 font-mono">
-                                NIP: {u.nip || '-'}
                               </p>
                             </div>
                           </div>
@@ -854,9 +847,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                                 Anda
                               </span>
                             )}
-                          </p>
-                          <p className="text-[10px] font-semibold text-slate-400 font-mono">
-                            NIP: {u.nip || '-'}
                           </p>
                         </div>
                       </div>
@@ -1085,29 +1075,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                     )}
                   </div>
 
-                  {/* NIP */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-extrabold text-[#2B3056]">
-                        NIP Pegawai
-                      </label>
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {(addForm.data.nip || '').length}/18 digit
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      maxLength={18}
-                      value={addForm.data.nip}
-                      onChange={(e) => addForm.setData('nip', e.target.value.replace(/\D/g, '').slice(0, 18))}
-                      placeholder="Contoh: 198801012015011001"
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
-                    />
-                    {addForm.errors.nip && (
-                      <p className="mt-1 text-[10px] text-rose-600 font-bold">{addForm.errors.nip}</p>
-                    )}
-                  </div>
-
                   {/* No HP */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
@@ -1132,7 +1099,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                   </div>
 
                   {/* Role / Hak Akses */}
-                  <div className="sm:col-span-2">
+                  <div>
                     <label className="block text-xs font-extrabold text-[#2B3056] mb-1">
                       Hak Akses (Role) <span className="text-rose-500">*</span>
                     </label>
@@ -1318,29 +1285,6 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                     )}
                   </div>
 
-                  {/* NIP */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-extrabold text-[#2B3056]">
-                        NIP Pegawai
-                      </label>
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {(editForm.data.nip || '').length}/18 digit
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      maxLength={18}
-                      value={editForm.data.nip}
-                      onChange={(e) => editForm.setData('nip', e.target.value.replace(/\D/g, '').slice(0, 18))}
-                      placeholder="Contoh: 198801012015011001"
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-[#2B3056] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFD82B]"
-                    />
-                    {editForm.errors.nip && (
-                      <p className="mt-1 text-[10px] text-rose-600 font-bold">{editForm.errors.nip}</p>
-                    )}
-                  </div>
-
                   {/* No HP */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
@@ -1365,7 +1309,7 @@ export const ManageAccountsPage = ({ users, stats, timKerjas = [], pokjas = [], 
                   </div>
 
                   {/* Role */}
-                  <div className="sm:col-span-2">
+                  <div>
                     <label className="block text-xs font-extrabold text-[#2B3056] mb-1">
                       Hak Akses (Role) <span className="text-rose-500">*</span>
                     </label>

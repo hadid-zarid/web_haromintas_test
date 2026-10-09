@@ -64,7 +64,7 @@ erDiagram
         string name
         string email UK
         string password
-        string nip "Nullable"
+        string nip "Nullable, legacy"
         string jabatan "Nullable"
         string no_hp "Nullable"
         enum role "ADMIN, POKJA, BIRO_HUKUM, PIMPINAN"
@@ -230,7 +230,7 @@ Menyimpan seluruh data pengguna aplikasi dengan Role-Based Access Control (RBAC)
 | `name` | `VARCHAR(255)` | No | - | Nama lengkap pengguna |
 | `email` | `VARCHAR(255)` | No | - | Email login pengguna (Unique) |
 | `password` | `VARCHAR(255)` | No | - | Hash kata sandi (Bcrypt/Argon2) |
-| `nip` | `VARCHAR(30)` | Yes | NULL | NIP ASN (opsional) |
+| `nip` | `VARCHAR(30)` | Yes | NULL | Legacy — tidak dipakai aplikasi lagi (kolom dibiarkan agar data lama tidak hilang) |
 | `jabatan` | `VARCHAR(100)` | Yes | NULL | Jabatan struktural/fungsional |
 | `no_hp` | `VARCHAR(20)` | Yes | NULL | Kontak WhatsApp / Telepon |
 | `role` | `ENUM` | No | - | Nilai: `'ADMIN'`, `'POKJA'`, `'BIRO_HUKUM'`, `'PIMPINAN'` |

@@ -23,7 +23,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'nip',
         'no_hp',
         'tim_kerja_id',
         'wilayah_biro_hukum_id',
@@ -36,6 +35,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'google_id',
+        'nip', // kolom legacy, tidak dipakai aplikasi lagi
     ];
 
     protected $appends = [

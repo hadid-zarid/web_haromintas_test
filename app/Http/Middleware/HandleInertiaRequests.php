@@ -83,7 +83,6 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->nama,
                     'nama' => $user->nama,
                     'email' => $user->email,
-                    'nip' => $user->nip,
                     'no_hp' => $user->no_hp,
                     'role' => $user->role,
                     'role_id' => $user->role_id,

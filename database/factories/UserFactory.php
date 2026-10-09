@@ -32,7 +32,6 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'nip' => fake()->numerify('##################'),
             'no_hp' => fake()->numerify('08##########'),
             'role_id' => 2, // Tim Kerja
             'tim_kerja_id' => null,

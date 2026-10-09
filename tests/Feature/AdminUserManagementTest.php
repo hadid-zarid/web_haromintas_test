@@ -74,7 +74,6 @@ class AdminUserManagementTest extends TestCase
             'name' => 'Operator Pokja Baru',
             'email' => 'operator.pokjabaru@harmonitas.go.id',
             'password' => 'Harmonitas@2026',
-            'nip' => '199501012022011002',
             'no_hp' => '081345678901',
             'role' => 'POKJA',
             'pokja_id' => $pokja->id,
@@ -107,7 +106,6 @@ class AdminUserManagementTest extends TestCase
         $response = $this->actingAs($admin)->put("/admin/users/{$targetUser->id}", [
             'name' => 'Nama Telah Diubah',
             'email' => 'target.user@harmonitas.go.id',
-            'nip' => '1990000000',
             'no_hp' => '081234567890',
             'role' => 'POKJA',
             'status' => 'ACTIVE',

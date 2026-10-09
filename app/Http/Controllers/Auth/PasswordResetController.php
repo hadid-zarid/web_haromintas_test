@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -141,12 +142,8 @@ class PasswordResetController extends Controller
             'password' => [
                 'required',
                 'string',
-                'min:8',
                 'confirmed',
-                'regex:/[a-z]/',      // minimal 1 huruf kecil
-                'regex:/[A-Z]/',      // minimal 1 huruf besar
-                'regex:/[0-9]/',      // minimal 1 angka
-                'regex:/[^A-Za-z0-9]/',// minimal 1 karakter khusus
+                Password::defaults(),
             ],
         ], [
             'email.required' => 'Alamat email wajib diisi.',
@@ -154,7 +151,6 @@ class PasswordResetController extends Controller
             'password.required' => 'Kata sandi baru wajib diisi.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-            'password.regex' => 'Kata sandi harus mengandung kombinasi huruf besar, huruf kecil, angka, dan karakter spesial.',
         ]);
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();

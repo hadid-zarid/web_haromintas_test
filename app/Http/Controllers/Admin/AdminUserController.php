@@ -98,7 +98,6 @@ class AdminUserController extends Controller
             'nama' => $validated['nama'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'nip' => $validated['nip'] ?? null,
             'no_hp' => $validated['no_hp'] ?? null,
             'role_id' => $roleId,
             'status' => 'ACTIVE', // Otomatis aktif saat dibuat
@@ -148,7 +147,6 @@ class AdminUserController extends Controller
         $payloadUpdate = [
             'nama' => $validated['nama'],
             'email' => $validated['email'],
-            'nip' => $validated['nip'] ?? null,
             'no_hp' => $validated['no_hp'] ?? null,
             'role_id' => $roleId,
             'status' => $validated['status'],

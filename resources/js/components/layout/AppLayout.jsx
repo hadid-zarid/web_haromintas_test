@@ -17,11 +17,11 @@ import {
   ChevronRight,
   FileText,
   BookOpen,
-  IdCard,
   LogOut,
   Menu,
   Sparkles,
   User,
+  UserCog,
 } from "lucide-react";
 
 export const AppLayout = ({
@@ -126,7 +126,6 @@ export const AppLayout = ({
   const displayName = user?.name || user?.nama || "Operator Kanwil Kemenkum";
   const displayEmail = user?.email || "operator@kemenkumham.go.id";
   const displayUnit = user?.unit || user?.unit_kerja || "Kementerian Hukum & HAM Riau";
-  const displayNip = user?.nip || "-";
 
   return (
     <div className="flex min-h-screen bg-[#F7F8FC] text-[#20283D] font-sans">
@@ -250,21 +249,25 @@ export const AppLayout = ({
                     </div>
                   </div>
 
-                  {/* Metadata Mini Chip */}
-                  <div className="space-y-1.5 py-0.5">
-                    <div className="flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                      <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
-                        <IdCard className="w-3.5 h-3.5 text-[#2B3056]" />
-                        <span>NIP Pegawai</span>
-                      </span>
-                      <span className="font-mono font-bold text-[#2B3056] text-[10.5px]">
-                        {displayNip}
-                      </span>
-                    </div>
+                  {/* Unit Kerja */}
+                  <div className="flex items-start gap-2 text-[11px] px-2.5 py-2 rounded-xl bg-slate-50 border border-slate-200/60">
+                    <Building2 className="w-3.5 h-3.5 mt-px shrink-0 text-[#2B3056]" />
+                    <span className="font-semibold text-[#2B3056] leading-snug">
+                      {displayUnit}
+                    </span>
                   </div>
 
-                  {/* Logout Action */}
-                  <div className="pt-2 border-t border-slate-100">
+                  {/* Profil & Logout */}
+                  <div className="pt-2 border-t border-slate-100 space-y-1">
+                    <Link
+                      href="/profil"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="w-full flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-[#2B3056] hover:bg-slate-100 font-bold text-xs transition"
+                    >
+                      <UserCog className="w-3.5 h-3.5" />
+                      <span>Profil Saya</span>
+                    </Link>
                     <button
                       type="button"
                       onClick={() => {

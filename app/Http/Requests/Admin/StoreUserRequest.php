@@ -44,13 +44,8 @@ class StoreUserRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                Password::min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols(),
+                Password::defaults(),
             ],
-            'nip' => ['nullable', 'string', 'max:18', 'regex:/^[0-9]+$/'],
             'no_hp' => ['nullable', 'string', 'max:13', 'regex:/^[0-9]+$/'],
             'role_id' => ['required', 'integer', Rule::in([1, 2, 3, 4])],
             'tim_kerja_id' => ['nullable', 'required_if:role_id,2', 'exists:tim_kerja,tim_kerja_id'],
@@ -66,8 +61,6 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
             'password.required' => 'Kata sandi / password akun wajib ditentukan.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
-            'nip.max' => 'NIP pegawai maksimal 18 digit angka.',
-            'nip.regex' => 'NIP pegawai hanya boleh berupa digit angka.',
             'no_hp.max' => 'Nomor WhatsApp / HP maksimal 13 digit angka.',
             'no_hp.regex' => 'Nomor WhatsApp / HP hanya boleh berupa digit angka.',
             'role_id.required' => 'Hak akses / role akun wajib dipilih.',

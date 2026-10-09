@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Permohonan\DokumenPerbandinganController;
 use App\Http\Controllers\Permohonan\PermohonanController;
 use App\Http\Controllers\Permohonan\UploadPerbandinganController;
+use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\Public\StatistikHarmonisasiController;
 use App\Services\StatistikHarmonisasiService;
 use Illuminate\Http\Request;
@@ -109,9 +110,17 @@ Route::middleware('guest')->group(function () {
 // ==========================================
 // 3. AUTHENTICATED USER ROUTES
 // ==========================================
-Route::middleware('auth')->group(function () {
+// auth.session: sesi otomatis keluar bila kata sandi akun diubah dari perangkat/sesi lain.
+Route::middleware(['auth', 'auth.session'])->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Profil Saya (data diri & ganti kata sandi)
+    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
+    Route::put('/profil/password', [ProfilController::class, 'updatePassword'])
+        ->middleware('throttle:5,1')
+        ->name('profil.password.update');
 
     // Dashboard Beranda Real-Time
     Route::get('/home', [HomeController::class, 'index'])->name('home');

@@ -60,8 +60,20 @@ There are no Laravel Policies; this trait is the single source of the rules.
 **Database conventions.** Table names are singular and Indonesian (`user`, `rancangan_regulasi`, `dokumen`, `kabupaten`) with custom PKs (`user_id`, `rancangan_id`, …). Always check `$table` / `$primaryKey` on the model. Migrations must be idempotent: guard them with `Schema::hasColumn`/`hasTable`, because production DBs were originally built from SQL dumps and migrate+seed runs again on every deploy. Seeders use `upsert`. `AkunDefaultSeeder` (demo accounts) runs only outside production. `database/*.sql` files are gitignored legacy patches.
 
 **Auth.** Email/password login with reCAPTCHA v2 (`Rules/Recaptcha`), Google OAuth via Socialite (`GoogleAuthController`, which only matches existing accounts), and password reset by email. `Rules/NoHtmlContent` is applied to free-text input to block XSS.
+- `/profil` (`ProfilController`) lets any logged-in user edit their own `nama`/`no_hp` and change their password. Email, role, status, and unit stay admin-only.
+- Password strength lives in one place: `Password::defaults()` in `AppServiceProvider`. Use `Password::defaults()` in every rule; the Indonesian messages for it are in `lang/en/validation.php` (app locale is still `en`).
+- The `auth` route group also runs `auth.session`, so any password change (by the user, an admin, or a reset) logs out that user's other sessions. Changing a password must also rotate `remember_token`.
+- `user.nip` is a legacy column: it is hidden on the model and not used anywhere. Don't reintroduce it.
 
 **Frontend.** `app.jsx` wraps every page in `AuthProvider` → `PeraturanProvider` → `ToastProvider`. Authenticated pages use `components/layout/AppLayout` (Sidebar + NotificationDropdown). Color tokens are documented in `docs/PANDUAN_COLOR_PALETTE.md` (navy + golden yellow). `resources/js/mock/` is legacy; real data comes from Inertia props.
+
+**Responsive.** Every page must work on phones, tablets, and desktops. Write Tailwind mobile-first (`sm` 640, `md` 768, `lg` 1024) and check each page at 360, 768, and 1280px:
+- No horizontal page scroll (`document.documentElement.scrollWidth` equals `clientWidth`).
+- Touch targets at least 44px tall (`min-h-[44px]`); primary buttons full width on mobile (`w-full sm:w-auto`).
+- Forms are one column on mobile; split into columns only from `sm`/`lg` up.
+- Wide tables get `overflow-x-auto`, or switch to cards on mobile (see `ManageAccountsPage`).
+- Dropdowns/popovers on mobile are anchored to the viewport with `fixed inset-x-3` (pattern in `NotificationDropdown` and the account menu in `AppLayout`).
+- Long text (names, emails) must wrap or truncate (`break-words`, `break-all`, `truncate`), never push the layout wider.
 
 **AI assistant.** `Pages/AIAssistantPage.jsx` calls a separate Python service through the same-origin `/ai-api/*` path. That service lives in its own repo, cloned to `./ai-dokumen` and gitignored. Laravel does not proxy these calls.
 

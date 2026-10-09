@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production' && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
+
+        // Satu sumber aturan kekuatan kata sandi untuk seluruh form (admin, reset, profil).
+        // Pesan berbahasa Indonesia ada di lang/en/validation.php.
+        Password::defaults(fn () => Password::min(8)->letters()->mixedCase()->numbers()->symbols());
     }
 }

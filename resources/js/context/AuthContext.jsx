@@ -1,6 +1,5 @@
 import React, { createContext, useContext } from 'react';
 import { usePage, router } from '@inertiajs/react';
-import { MOCK_USERS } from '../mock/mockUsers';
 
 const AuthContext = createContext(null);
 
@@ -41,7 +40,8 @@ export const useAuth = () => {
     id: authUser.user_id || authUser.id,
     name: authUser.nama || authUser.name,
     unit,
-    avatar: authUser.avatar_path || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
+    // Tanpa foto → null, sehingga UI menampilkan ikon/inisial (bukan foto stok orang lain).
+    avatar: authUser.avatar_path || null,
   } : null;
 
   const role = user?.role || null;
@@ -66,7 +66,6 @@ export const useAuth = () => {
     isPimpinan: role === 'PIMPINAN',
     login,
     logout,
-    availableUsers: MOCK_USERS,
   };
 };
 

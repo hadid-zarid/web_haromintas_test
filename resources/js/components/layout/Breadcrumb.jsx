@@ -12,7 +12,8 @@ export const Breadcrumb = () => {
     peraturan: 'Daftar Peraturan',
     'draft-generate': 'Draft Generate Surat',
     panduan: 'Panduan Penggunaan',
-    ai: 'Harmonitas AI'
+    ai: 'Harmonitas AI',
+    profil: 'Profil Saya',
   };
 
   return (
