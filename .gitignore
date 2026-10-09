@@ -29,5 +29,6 @@ Thumbs.db
 database/*.sql
 env
 /data
+/backups
 /ai-dokumen
 .env.docker

@@ -6,6 +6,7 @@ vendor
 tests
 deploy
 data
+backups
 ai-dokumen
 storage/app
 storage/logs
