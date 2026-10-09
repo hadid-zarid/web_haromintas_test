@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   FileOutput,
   Layers,
+  UserCog,
 } from "lucide-react";
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
@@ -50,6 +51,11 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
             label: "Buku Panduan",
             path: "/panduan",
             icon: BookOpen,
+        },
+        {
+            label: "Profil Saya",
+            path: "/profil",
+            icon: UserCog,
         },
     ];
 

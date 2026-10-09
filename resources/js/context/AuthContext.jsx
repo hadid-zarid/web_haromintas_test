@@ -41,7 +41,7 @@ export const useAuth = () => {
     name: authUser.nama || authUser.name,
     unit,
     // Tanpa foto → null, sehingga UI menampilkan ikon/inisial (bukan foto stok orang lain).
-    avatar: authUser.avatar_path || null,
+    avatar: authUser.avatar_url || null,
   } : null;
 
   const role = user?.role || null;

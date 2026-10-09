@@ -64,6 +64,11 @@ There are no Laravel Policies; this trait is the single source of the rules.
 - Password strength lives in one place: `Password::defaults()` in `AppServiceProvider`. Use `Password::defaults()` in every rule; the Indonesian messages for it are in `lang/en/validation.php` (app locale is still `en`).
 - The `auth` route group also runs `auth.session`, so any password change (by the user, an admin, or a reset) logs out that user's other sessions. Changing a password must also rotate `remember_token`.
 - `user.nip` is a legacy column: it is hidden on the model and not used anywhere. Don't reintroduce it.
+- Profile photos:
+  - Uploads go through `AvatarService`, which always decodes and re-encodes them with GD into a 256px JPEG with a random name. They are stored on the private `local` disk under `avatars/` and served only by `GET /avatar/{user}` (auth). Never put them in `storage/app/public`.
+  - `avatar_path` is hidden. The frontend gets `auth.user.avatar_url` from `User::avatarUrl()`: a Google URL as-is, or the private route with `?v=<filename>` for cache busting.
+  - `avatar_google_aktif` becomes false when a user deletes their photo, so Google login won't put the Google photo back.
+  - Cropping happens in the browser (`components/modals/AvatarCropModal.jsx`, lazy-loaded `react-easy-crop`).
 
 **Frontend.** `app.jsx` wraps every page in `AuthProvider` → `PeraturanProvider` → `ToastProvider`. Authenticated pages use `components/layout/AppLayout` (Sidebar + NotificationDropdown). Color tokens are documented in `docs/PANDUAN_COLOR_PALETTE.md` (navy + golden yellow). `resources/js/mock/` is legacy; real data comes from Inertia props.
 

@@ -121,6 +121,13 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::put('/profil/password', [ProfilController::class, 'updatePassword'])
         ->middleware('throttle:5,1')
         ->name('profil.password.update');
+    Route::post('/profil/avatar', [ProfilController::class, 'updateAvatar'])
+        ->middleware('throttle:10,1')
+        ->name('profil.avatar.update');
+    Route::delete('/profil/avatar', [ProfilController::class, 'destroyAvatar'])
+        ->middleware('throttle:10,1')
+        ->name('profil.avatar.destroy');
+    Route::get('/avatar/{user}', [ProfilController::class, 'showAvatar'])->name('avatar.show');
 
     // Dashboard Beranda Real-Time
     Route::get('/home', [HomeController::class, 'index'])->name('home');

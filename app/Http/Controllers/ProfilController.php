@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Profil\UpdateAvatarRequest;
 use App\Http\Requests\Profil\UpdatePasswordRequest;
 use App\Http\Requests\Profil\UpdateProfilRequest;
 use App\Mail\PasswordChangedMail;
 use App\Models\AuditLog;
+use App\Models\User;
+use App\Services\AvatarService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProfilController extends Controller
 {
@@ -31,17 +36,8 @@ class ProfilController extends Controller
         $user = $request->user();
         $user->update($request->validated());
 
-        AuditLog::create([
-            'user_id' => $user->user_id,
-            'action' => 'PROFIL_UPDATE',
-            'module' => 'USER_PROFILE',
-            'target_id' => (string) $user->user_id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'payload' => [
-                'changed_fields' => array_keys($user->getChanges()),
-            ],
-            'created_at' => now(),
+        $this->catatAudit($request, 'PROFIL_UPDATE', 'USER_PROFILE', [
+            'changed_fields' => array_keys($user->getChanges()),
         ]);
 
         return back()->with('success', 'Profil Anda berhasil diperbarui.');
@@ -63,18 +59,9 @@ class ProfilController extends Controller
 
         $request->session()->regenerate();
 
-        AuditLog::create([
-            'user_id' => $user->user_id,
-            'action' => 'AUTH_PASSWORD_CHANGED',
-            'module' => 'AUTHENTICATION',
-            'target_id' => (string) $user->user_id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'payload' => [
-                'email' => $user->email,
-                'changed_at' => now()->toIso8601String(),
-            ],
-            'created_at' => now(),
+        $this->catatAudit($request, 'AUTH_PASSWORD_CHANGED', 'AUTHENTICATION', [
+            'email' => $user->email,
+            'changed_at' => now()->toIso8601String(),
         ]);
 
         try {
@@ -87,5 +74,56 @@ class ProfilController extends Controller
         }
 
         return back()->with('success', 'Kata sandi berhasil diubah. Sesi di perangkat lain telah dikeluarkan.');
+    }
+
+    /**
+     * Ganti foto profil (gambar sudah dipotong persegi di browser; server tetap meng-encode ulang).
+     */
+    public function updateAvatar(UpdateAvatarRequest $request, AvatarService $avatar): RedirectResponse
+    {
+        $avatar->simpan($request->user(), $request->file('avatar'));
+        $this->catatAudit($request, 'PROFIL_AVATAR_UPDATE', 'USER_PROFILE', []);
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function destroyAvatar(Request $request, AvatarService $avatar): RedirectResponse
+    {
+        $avatar->hapus($request->user());
+        $this->catatAudit($request, 'PROFIL_AVATAR_DELETE', 'USER_PROFILE', []);
+
+        return back()->with('success', 'Foto profil berhasil dihapus.');
+    }
+
+    /**
+     * Sajikan foto profil unggahan. Boleh dilihat semua pengguna yang login (rute di grup auth).
+     */
+    public function showAvatar(User $user): StreamedResponse
+    {
+        abort_unless(
+            AvatarService::fileLokal($user->avatar_path) && AvatarService::disk()->exists($user->avatar_path),
+            404
+        );
+
+        // URL selalu memuat ?v=<nama file acak>, jadi aman di-cache lama.
+        return AvatarService::disk()->response($user->avatar_path, null, [
+            'Content-Type' => 'image/jpeg',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, max-age=31536000, immutable',
+        ]);
+    }
+
+    private function catatAudit(Request $request, string $action, string $module, array $payload): void
+    {
+        AuditLog::create([
+            'user_id' => $request->user()->user_id,
+            'action' => $action,
+            'module' => $module,
+            'target_id' => (string) $request->user()->user_id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'payload' => $payload,
+            'created_at' => now(),
+        ]);
     }
 }

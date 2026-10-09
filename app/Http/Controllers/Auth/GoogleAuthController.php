@@ -68,10 +68,11 @@ class GoogleAuthController extends Controller
                 );
             }
 
-            // 4. Hubungkan google_id dan perbarui avatar jika ada
+            // 4. Hubungkan google_id; pasang foto Google hanya bila belum ada foto
+            //    dan user tidak pernah menghapus fotonya sendiri (avatar_google_aktif).
             $user->update([
                 'google_id' => $googleId,
-                'avatar_path' => $user->avatar_path ?: $googleUser->getAvatar(),
+                'avatar_path' => $user->avatar_path ?: ($user->avatar_google_aktif ? $googleUser->getAvatar() : null),
             ]);
 
             // 5. Login pengguna dan regenerasi sesi

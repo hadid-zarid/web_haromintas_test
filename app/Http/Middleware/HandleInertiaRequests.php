@@ -87,7 +87,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role,
                     'role_id' => $user->role_id,
                     'status' => $user->status,
-                    'avatar_path' => $user->avatar_path,
+                    'avatar_url' => $user->avatarUrl(),
                     'tim_kerja_id' => $user->tim_kerja_id,
                     'wilayah_biro_hukum_id' => $user->wilayahBiroHukumId(),
                     'wilayah_biro_hukum_nama' => \App\Models\Kabupaten::namaWilayahBiroHukum($user->wilayahBiroHukumId()),

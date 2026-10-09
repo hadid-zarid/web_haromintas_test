@@ -29,6 +29,7 @@ class User extends Authenticatable
         'status',
         'google_id',
         'avatar_path',
+        'avatar_google_aktif',
     ];
 
     protected $hidden = [
@@ -36,6 +37,7 @@ class User extends Authenticatable
         'remember_token',
         'google_id',
         'nip', // kolom legacy, tidak dipakai aplikasi lagi
+        'avatar_path', // path internal; frontend memakai avatarUrl()
     ];
 
     protected $appends = [
@@ -49,7 +51,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'wilayah_biro_hukum_id' => 'integer',
+            'avatar_google_aktif' => 'boolean',
         ];
+    }
+
+    /**
+     * URL foto profil untuk frontend: URL Google apa adanya, atau rute privat
+     * untuk foto unggahan (nama file acak ikut sebagai ?v= agar cache ter-reset).
+     */
+    public function avatarUrl(): ?string
+    {
+        if (! $this->avatar_path) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $this->avatar_path)) {
+            return $this->avatar_path;
+        }
+
+        return route('avatar.show', ['user' => $this->user_id, 'v' => basename($this->avatar_path, '.jpg')]);
     }
 
     /**
