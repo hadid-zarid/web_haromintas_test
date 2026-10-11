@@ -49,6 +49,7 @@ const UploadCard = ({ onFile, disabled }) => {
       </span>
       <span className="block text-[1.15rem] font-bold text-[#2B3056] mb-1">Unggah Dokumen (DOCX, DOC, PDF, TXT, RTF, MD)</span>
       <span className="block text-sm text-slate-500">Tarik &amp; lepaskan file dokumen di sini, atau klik untuk memilih file dari komputer</span>
+      <span className="block text-xs text-slate-400 mt-1.5">PDF hasil scan dibaca otomatis dengan OCR (membutuhkan waktu lebih lama)</span>
       <span className="flex flex-wrap justify-center gap-2 mt-3">
         {FORMATS.map(({ label, color }) => (
           <span key={label} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-sm">

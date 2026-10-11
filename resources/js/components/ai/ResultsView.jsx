@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Bot, FileText, MessagesSquare, ClipboardCheck, TriangleAlert } from 'lucide-react';
+import { Bot, FileText, MessagesSquare, ClipboardCheck, ScanText, TriangleAlert } from 'lucide-react';
 import ScoreBanner from './ScoreBanner';
 import StatsGrid from './StatsGrid';
 import FilterBar from './FilterBar';
@@ -107,6 +107,13 @@ const ResultsView = ({ report, middle, commentsAvailable, onOpenChat, onAskAi })
           </p>
         </div>
       )}
+
+      {(report.extraction_notes || []).map((note, i) => (
+        <div key={i} role="note" className="flex items-start gap-2.5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-900">
+          <ScanText className="w-4 h-4 mt-0.5 shrink-0 text-amber-700" aria-hidden="true" />
+          <p className="leading-relaxed">{note}</p>
+        </div>
+      ))}
 
       <FilterBar counts={counts} active={filter} onChange={setFilter} onAcceptAll={acceptAll} onRejectAll={rejectAll} />
 

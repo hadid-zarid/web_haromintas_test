@@ -19,6 +19,11 @@ const ProgressCard = ({ fileName, completed, total, eta, errors }) => {
         Mengekstrak teks, analisis kepatuhan pedoman, validasi struktur UU, serta ejaan &amp; tanda baca...
       </p>
       {fileName && <p className="mt-1 text-xs text-slate-400 truncate" title={fileName}>{fileName}</p>}
+      {total === 0 && (
+        <p className="mt-2 text-xs text-slate-500">
+          Membaca dokumen... PDF hasil scan dibaca dengan OCR sehingga tahap ini bisa memakan waktu lebih lama.
+        </p>
+      )}
 
       <div
         className="mt-5 mx-auto max-w-xl h-2.5 rounded-full bg-slate-100 overflow-hidden"
