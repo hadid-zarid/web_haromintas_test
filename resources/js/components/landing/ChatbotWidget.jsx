@@ -14,6 +14,26 @@ const SUGGESTIONS = [
   'Siapa yang bisa saya hubungi?',
 ];
 
+const TEASER_DELAY_MS = 2500;
+const TEASER_VISIBLE_MS = 16000;
+const TEASER_KEY = 'harmonitas_chatbot_teaser';
+
+// Sapaan hanya sekali per sesi tab. Penyimpanan bisa diblokir browser, jadi selalu dibungkus try/catch.
+const teaserSeen = () => {
+  try {
+    return sessionStorage.getItem(TEASER_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const markTeaserSeen = () => {
+  try {
+    sessionStorage.setItem(TEASER_KEY, '1');
+  } catch {
+    /* abaikan */
+  }
+};
+
 const GREETING =
   'Halo! Saya **Asisten HARMONITAS**. Saya bisa membantu menjelaskan sistem ini dan cara memakainya. Silakan pilih pertanyaan di bawah atau ketik sendiri.';
 
@@ -56,6 +76,7 @@ const ChatbotWidget = () => {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [teaser, setTeaser] = useState(false);
   const inputRef = useRef(null);
   const listRef = useRef(null);
   const messagesRef = useRef(messages);
@@ -64,6 +85,31 @@ const ChatbotWidget = () => {
   useEffect(() => {
     if (open) inputRef.current?.focus();
   }, [open]);
+
+  // Gelembung sapaan: muncul sebentar setelah halaman terbuka, hilang sendiri, dan tidak
+  // muncul lagi di sesi yang sama setelah ditutup/dibuka/dilihat.
+  useEffect(() => {
+    if (teaserSeen()) return undefined;
+    const show = setTimeout(() => setTeaser(true), TEASER_DELAY_MS);
+    const hide = setTimeout(() => {
+      setTeaser(false);
+      markTeaserSeen();
+    }, TEASER_DELAY_MS + TEASER_VISIBLE_MS);
+    return () => {
+      clearTimeout(show);
+      clearTimeout(hide);
+    };
+  }, []);
+
+  const dismissTeaser = useCallback(() => {
+    setTeaser(false);
+    markTeaserSeen();
+  }, []);
+
+  const openFromTeaser = () => {
+    dismissTeaser();
+    setOpen(true);
+  };
 
   // Gulir ke pesan terbaru hanya saat ada percakapan; memakai scrollTop (bukan scrollIntoView)
   // supaya halaman landing di belakang panel tidak ikut tergulir.
@@ -145,7 +191,7 @@ const ChatbotWidget = () => {
                 onClick={reset}
                 aria-label="Mulai percakapan baru"
                 title="Percakapan baru"
-                className="flex h-11 w-11 items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white cursor-pointer"
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -154,7 +200,7 @@ const ChatbotWidget = () => {
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Tutup asisten"
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white cursor-pointer"
+              className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white cursor-pointer"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -229,7 +275,7 @@ const ChatbotWidget = () => {
                 type="submit"
                 disabled={sending || !draft.trim()}
                 aria-label="Kirim pertanyaan"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] hover:bg-[#3F4780] cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-xl bg-[#2B3056] text-[#FFD82B] hover:bg-[#3F4780] cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -242,15 +288,51 @@ const ChatbotWidget = () => {
         </section>
       )}
 
+      {teaser && !open && (
+        <div
+          role="status"
+          className="fixed z-[70] bottom-[84px] right-4 sm:bottom-24 sm:right-6 w-[min(264px,calc(100vw-2rem))] motion-safe:animate-[chatbotPop_0.45s_ease-out]"
+        >
+          <div className="relative rounded-2xl rounded-br-md border border-[#2B3056]/10 bg-white shadow-xl shadow-[#2B3056]/20">
+            <button
+              type="button"
+              onClick={openFromTeaser}
+              className="block w-full cursor-pointer rounded-2xl rounded-br-md py-3 pl-4 pr-12 text-left hover:bg-[#F3F4FA]"
+            >
+              <span className="block text-sm font-bold text-[#2B3056]">Hai! Mau tanya-tanya tentang HARMONITAS?</span>
+              <span className="mt-0.5 block text-xs text-slate-500">Tanya aku ya, siap bantu cara pakainya.</span>
+            </button>
+            <button
+              type="button"
+              onClick={dismissTeaser}
+              aria-label="Tutup sapaan"
+              className="absolute right-0 top-0 flex h-[44px] w-[44px] items-center justify-center rounded-full text-slate-400 hover:text-slate-700 cursor-pointer"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+            <span aria-hidden="true" className="absolute -bottom-1.5 right-6 h-3 w-3 rotate-45 border-b border-r border-[#2B3056]/10 bg-white" />
+          </div>
+        </div>
+      )}
+
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          dismissTeaser();
+          setOpen((v) => !v);
+        }}
         aria-expanded={open}
         aria-label={open ? 'Tutup asisten bantuan' : 'Buka asisten bantuan'}
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[70] flex h-14 items-center gap-2 rounded-full bg-gradient-to-br from-[#2B3056] to-[#3F4780] pl-4 pr-4 sm:pr-5 text-white shadow-xl shadow-[#2B3056]/30 ring-2 ring-[#FFD82B] hover:scale-105 transition-transform cursor-pointer"
       >
         {open ? <X className="h-5 w-5 text-[#FFD82B]" aria-hidden="true" /> : <MessageCircle className="h-5 w-5 text-[#FFD82B]" aria-hidden="true" />}
         <span className="hidden sm:inline text-sm font-bold">{open ? 'Tutup' : 'Tanya Asisten'}</span>
+        {teaser && !open && (
+          <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 flex h-4 w-4">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-[#FFD82B] opacity-75 motion-safe:animate-ping" />
+            <span className="relative inline-flex h-4 w-4 rounded-full bg-[#FFD82B] ring-2 ring-white" />
+          </span>
+        )}
       </button>
     </>
   );
