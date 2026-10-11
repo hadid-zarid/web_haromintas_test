@@ -49,6 +49,20 @@ return [
      * widget menampilkan peringatan "for testing purposes only").
      * Di production key WAJIB diisi; jika kosong login email/password akan ditolak.
      */
+    /*
+     * Chatbot bantuan di landing page. Memakai API yang kompatibel dengan OpenAI (JuanRouter).
+     * Kunci WAJIB diisi agar fitur aktif; jika kosong, tombol chat tidak tampil dan endpoint mati.
+     * `daily_limit` = batas total pesan per hari untuk seluruh pengunjung, agar saldo API
+     * tidak habis jika ada yang menyalahgunakan.
+     */
+    'chatbot' => [
+        'api_key' => env('CHATBOT_API_KEY'),
+        'base_url' => env('CHATBOT_BASE_URL', 'https://api.juanrouter.com/v1'),
+        'model' => env('CHATBOT_MODEL', 'gemini-3.8-flash-high'),
+        'daily_limit' => (int) env('CHATBOT_DAILY_LIMIT', 1000),
+        'timeout' => (int) env('CHATBOT_TIMEOUT', 40),
+    ],
+
     'recaptcha' => [
         'enabled' => (bool) env('RECAPTCHA_ENABLED', true),
         'site_key' => env('RECAPTCHA_SITE_KEY') ?: (env('APP_ENV') === 'production' ? null : '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),

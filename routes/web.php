@@ -11,7 +11,9 @@ use App\Http\Controllers\Permohonan\DokumenPerbandinganController;
 use App\Http\Controllers\Permohonan\PermohonanController;
 use App\Http\Controllers\Permohonan\UploadPerbandinganController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\Public\ChatbotController;
 use App\Http\Controllers\Public\StatistikHarmonisasiController;
+use App\Services\ChatbotService;
 use App\Services\StatistikHarmonisasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,11 +28,17 @@ use Inertia\Inertia;
 // ==========================================
 // 1. PUBLIC ROUTES
 // ==========================================
-Route::get('/', function (StatistikHarmonisasiService $service) {
+Route::get('/', function (StatistikHarmonisasiService $service, ChatbotService $chatbot) {
     return Inertia::render('LandingPage', [
         'statistikData' => $service->getStatistik(),
+        'chatbotAktif' => $chatbot->enabled(),
     ]);
 })->name('landing');
+
+// Chatbot bantuan landing page: publik, jadi dibatasi per IP (selain batas harian global di service).
+Route::post('/api/chatbot', [ChatbotController::class, 'chat'])
+    ->middleware('throttle:12,1')
+    ->name('chatbot.chat');
 
 Route::get('/api/statistik-harmonisasi', [StatistikHarmonisasiController::class, 'getStatistik'])->name('api.statistik-harmonisasi');
 

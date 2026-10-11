@@ -64,6 +64,8 @@ There are no Laravel Policies; this trait is the single source of the rules.
   - `HistorisHarmonisasiSeeder` only runs on a fresh install, so re-seeding never overwrites admin edits.
   - `rencana_regulasi` is a legacy table (unused, like `nip`). `harmonisasi_completed_at` is still set on upload but is not used by the statistics.
 
+- `ChatbotService` + `Public/ChatbotController` (`POST /api/chatbot`, public, `throttle:12,1`) power the help chatbot on the landing page (`components/landing/ChatbotWidget.jsx`). It calls an OpenAI-compatible API (JuanRouter) and answers only from `resources/knowledge/harmonitas.md`: keep that file public-only and update it when menus, roles, or the workflow change. Enabled only when `CHATBOT_API_KEY` is set (also `CHATBOT_BASE_URL`, `CHATBOT_MODEL`, `CHATBOT_DAILY_LIMIT` = global messages per day). It has no database access and never logs the visitor's question.
+
 **Database conventions.** Table names are singular and Indonesian (`user`, `rancangan_regulasi`, `dokumen`, `kabupaten`) with custom PKs (`user_id`, `rancangan_id`, …). Always check `$table` / `$primaryKey` on the model. Migrations must be idempotent: guard them with `Schema::hasColumn`/`hasTable`, because production DBs were originally built from SQL dumps and migrate+seed runs again on every deploy. Seeders use `upsert`. `AkunDefaultSeeder` (demo accounts) runs only outside production. `database/*.sql` files are gitignored legacy patches.
 
 **Auth.** Email/password login with reCAPTCHA v2 (`Rules/Recaptcha`), Google OAuth via Socialite (`GoogleAuthController`, which only matches existing accounts), and password reset by email. `Rules/NoHtmlContent` is applied to free-text input to block XSS.

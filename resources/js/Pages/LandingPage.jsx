@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import StatistikHarmonisasiSection from '../components/landing/StatistikHarmonisasiSection';
+import ChatbotWidget from '../components/landing/ChatbotWidget';
 import logoHarmonitas from '../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../assets/logo_pengayoman_official.png';
 import harmonitasMascot3d from '../assets/harmonitas_mascot_3d.png';
@@ -181,7 +182,7 @@ const Reveal = ({ children, className = '', delay = 0, direction = 'up' }) => {
   );
 };
 
-export const LandingPage = ({ statistikData }) => {
+export const LandingPage = ({ statistikData, chatbotAktif = false }) => {
   const { auth } = usePage().props || {};
   const user = auth?.user;
 
@@ -1200,6 +1201,8 @@ export const LandingPage = ({ statistikData }) => {
           </Reveal>
         </div>
       </footer>
+
+      {chatbotAktif && <ChatbotWidget />}
     </div>
   );
 };
