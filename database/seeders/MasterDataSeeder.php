@@ -65,6 +65,8 @@ class MasterDataSeeder extends Seeder
             ['jenis_dokumen_id' => 5, 'nama_dokumen' => 'Surat Hasil Harmonisasi', 'tahap' => 'Harmonisasi', 'urutan' => 5],
             ['jenis_dokumen_id' => 6, 'nama_dokumen' => 'Matriks Hasil Fasilitasi', 'tahap' => 'Fasilitasi', 'urutan' => 6],
             ['jenis_dokumen_id' => 7, 'nama_dokumen' => 'Surat Hasil Fasilitasi', 'tahap' => 'Fasilitasi', 'urutan' => 7],
+            // Slot 8 bukan kartu dokumen: hanya menampung surat penolakan Biro Hukum.
+            ['jenis_dokumen_id' => 8, 'nama_dokumen' => 'Surat Penolakan Fasilitasi', 'tahap' => 'Fasilitasi', 'urutan' => 8],
         ], ['jenis_dokumen_id'], ['nama_dokumen', 'tahap', 'urutan']);
     }
 }

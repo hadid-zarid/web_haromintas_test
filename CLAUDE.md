@@ -48,10 +48,14 @@ There are no Laravel Policies; this trait is the single source of the rules.
 - `jenis_dokumen` has 7 document slots.
 - Status changes are mostly file-driven inside `uploadDokumen`:
   - uploading doc 2, 3, or 4 while at status 1 moves the file to status 2;
-  - docs 1–5 complete moves it to status 3;
-  - docs 1–5 plus 7 complete moves it to status 4 (doc 6 is optional).
-- Manual status changes (`updateStatus`, and `status_id` in `update`) are meant for Biro Hukum and Admin only.
+  - docs 1–5 complete (from status 1 or 2) moves it to status 3;
+  - uploading doc 7 moves it to status 4 (doc 6 is optional).
+- Status 4 (Selesai) is only ever reached by Biro Hukum/Admin, through `selesaikanFasilitasi()`: uploading doc 7, or the "Terima" decision in `updateStatus` (which requires the letter if doc 7 is missing). A Tim Kerja upload must never complete a file.
+- Rejection (`updateStatus` with status 5) needs a reason. The optional rejection letter goes to `jenis_dokumen` 8 (`JenisDokumen::SURAT_PENOLAKAN`), never to slot 7. Slot 8 is not one of the 7 document cards: `RancanganRegulasi::dokumens()` excludes it and `suratPenolakan()` returns it.
+- While at status 5, uploads do not change the status. Tim Kerja sends the fix explicitly with `kirimPerbaikan` (`POST /peraturan/{id}/perbaikan`), which needs at least one doc 1–5 uploaded after the rejection, moves the file back to status 3, and notifies Biro Hukum.
+- `status_id` in `update` (the edit form) is a manual override for Biro Hukum and Admin only.
 - Changes write to `audit_logs` and send notifications through `NotifikasiService`, both in-app and by email (`NotifikasiWorkflowMail`).
+- `audit_logs.target_id` means different things per `module` (file id, user id, document id, recap year). Always filter by `module` together with `target_id`, or logs from another module with the same id leak into the file history and the dashboard feed.
 
 **Other services.**
 - `PasalDiffService` + `DocumentTextExtractionService` (smalot/pdfparser, docx zip) handle per-Pasal (article-by-article) document comparison.

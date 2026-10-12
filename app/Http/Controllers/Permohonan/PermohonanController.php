@@ -16,10 +16,12 @@ use App\Models\Kabupaten;
 use App\Models\RancanganRegulasi;
 use App\Models\StatusRegulasi;
 use App\Models\TimKerja;
+use App\Models\User;
 use App\Services\NotifikasiService;
 use App\Services\PermohonanWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -29,6 +31,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PermohonanController extends Controller
 {
     use AuthorizesRancanganAccess;
+
+    private const MODUL_AUDIT = 'PERMOHONAN_REGULASI';
 
     /**
      * Tampilkan Daftar Permohonan Peraturan dengan Filter & RBAC Scoping
@@ -290,26 +294,46 @@ class PermohonanController extends Controller
             'uploader:user_id,nama,role_id',
             'dokumens.jenisDokumen',
             'dokumens.uploader:user_id,nama,role_id',
+            'suratPenolakan',
         ])->findOrFail($id);
 
         // RBAC Check for View Details (IDOR Defense)
         $this->authorizeRancanganAccess($rancangan, $user);
 
-        $jenisDokumens = JenisDokumen::orderBy('urutan')->get();
+        $jenisDokumens = JenisDokumen::where('jenis_dokumen_id', '!=', JenisDokumen::SURAT_PENOLAKAN)
+            ->orderBy('urutan')
+            ->get();
         $statuses = StatusRegulasi::orderBy('urutan')->get();
 
-        // Audit Logs riwayat untuk berkas ini
+        // Audit Logs riwayat untuk berkas ini. Wajib difilter per modul: target_id modul lain
+        // (id user, id dokumen, tahun rekap) bisa kebetulan sama dengan id berkas.
         $auditLogs = AuditLog::with('user:user_id,nama,role_id')
+            ->where('module', self::MODUL_AUDIT)
             ->where('target_id', (string) $rancangan->rancangan_id)
-            ->where('action', '!=', 'PREVIEW_CONFIDENTIAL_DOKUMEN')
             ->latest('created_at')
+            ->latest('id')
             ->get();
 
+        // Rincian penolakan untuk banner "Perlu Perbaikan". Alasan diambil dari log penolakan,
+        // bukan dari keterangan berkas yang bisa tertimpa saat data diedit.
+        $penolakan = null;
+        if ((int) $rancangan->status_id === 5) {
+            $logPenolakan = $auditLogs->firstWhere('action', 'REJECT_FASILITASI');
+            $penolakan = [
+                'oleh' => $logPenolakan?->user?->nama,
+                'waktu' => $logPenolakan?->created_at,
+                'catatan' => $logPenolakan?->payload['catatan'] ?? $rancangan->keterangan,
+                'surat' => $rancangan->suratPenolakan?->only(['dokumen_id', 'nama_file', 'ukuran_file', 'versi']),
+                'bisa_kirim' => $this->adaPerbaikanSetelahDitolak($rancangan, $logPenolakan),
+            ];
+        }
+
         return Inertia::render('PeraturanDetailPage', [
-            'permohonan' => $rancangan,
+            'permohonan' => $rancangan->unsetRelation('suratPenolakan'),
             'jenisDokumens' => $jenisDokumens,
             'statuses' => $statuses,
             'auditLogs' => $auditLogs,
+            'penolakan' => $penolakan,
         ]);
     }
 
@@ -372,7 +396,7 @@ class PermohonanController extends Controller
      */
     public function destroy(Request $request, $id): RedirectResponse
     {
-        $rancangan = RancanganRegulasi::with('dokumens')->findOrFail($id);
+        $rancangan = RancanganRegulasi::findOrFail($id);
         $user = Auth::user();
 
         // RBAC Check for Delete (IDOR Defense)
@@ -383,14 +407,9 @@ class PermohonanController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hapus file fisik dari secure drafts & storage
-            foreach ($rancangan->dokumens as $dok) {
-                if ($dok->path_file) {
-                    $resolved = $this->resolveSecureFilePath($dok);
-                    if ($resolved && file_exists($resolved)) {
-                        @unlink($resolved);
-                    }
-                }
+            // Hapus file fisik dari secure drafts & storage (termasuk surat penolakan)
+            foreach (Dokumen::where('rancangan_id', $rancangan->rancangan_id)->get() as $dok) {
+                $this->hapusFileFisik($dok);
             }
 
             // Hapus folder direktori jika ada
@@ -477,67 +496,10 @@ class PermohonanController extends Controller
         }
 
         $file = $request->file('file');
-        $origName = $file->getClientOriginalName();
-        $fileSize = $this->formatBytes($file->getSize());
-        $ext = strtolower($file->getClientOriginalExtension());
-        $mimeType = $this->guessMimeFromExt($ext);
+        $dokumen = $this->simpanBerkasDokumen($rancangan, $jenisDokumenId, $file, $user, "dokumen{$jenisDokumenId}_");
 
-        $existingDoc = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
-            ->where('jenis_dokumen_id', $jenisDokumenId)
-            ->first();
-
-        $version = $existingDoc ? ($existingDoc->versi + 1) : 1;
-
-        $cleanFileName = "dokumen{$jenisDokumenId}_v{$version}_" . time() . "_" . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
-        $targetDir = storage_path("app/secure_drafts/{$rancangan->rancangan_id}");
-        if (! file_exists($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
-        $file->move($targetDir, $cleanFileName);
-
-        $storagePath = "secure_drafts/{$rancangan->rancangan_id}/{$cleanFileName}";
-
-        if ($existingDoc) {
-            // Hapus file lama jika ada
-            if ($existingDoc->path_file) {
-                $oldPath = $this->resolveSecureFilePath($existingDoc);
-                if ($oldPath && file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
-            }
-
-            $existingDoc->update([
-                'nama_file' => $origName,
-                'path_file' => $storagePath,
-                'ukuran_file' => $fileSize,
-                'mime_type' => $mimeType,
-                'versi' => $version,
-                'uploaded_by' => $user->user_id,
-                'uploaded_at' => now(),
-            ]);
-        } else {
-            Dokumen::create([
-                'rancangan_id' => $rancangan->rancangan_id,
-                'jenis_dokumen_id' => $jenisDokumenId,
-                'nama_file' => $origName,
-                'path_file' => $storagePath,
-                'ukuran_file' => $fileSize,
-                'mime_type' => $mimeType,
-                'versi' => 1,
-                'uploaded_by' => $user->user_id,
-                'uploaded_at' => now(),
-            ]);
-        }
-
-        // =========================================================================
-        // PERUBAHAN STATUS OTOMATIS BERBASIS KELENGKAPAN BERKAS (FILE-DRIVEN)
-        // =========================================================================
-        $allUploadedDocIds = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
-            ->pluck('jenis_dokumen_id')
-            ->toArray();
-
-        $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($allUploadedDocIds);
-        $isFasilitasiComplete = PermohonanWorkflowService::isFasilitasiComplete($allUploadedDocIds);
+        $statusLama = (int) $rancangan->status_id;
+        $isHarmonisasiComplete = PermohonanWorkflowService::isHarmonisasiComplete($this->idDokumenTerunggah($rancangan));
 
         // Tonggak Harmonisasi Selesai: catat waktu penyelesaian satu kali dan auditabel
         if ($isHarmonisasiComplete && ! $rancangan->harmonisasi_completed_at) {
@@ -546,47 +508,13 @@ class PermohonanController extends Controller
             ]);
         }
 
-        if ($isFasilitasiComplete) {
-            // Dokumen 6 bersifat opsional. Dokumen 1-5 dan Dokumen 7 lengkap -> Status beralih ke SELESAI (4)
-            if ($rancangan->status_id !== 4) {
-                $rancangan->update([
-                    'status_id' => 4,
-                    'keterangan' => 'Seluruh dokumen wajib harmonisasi dan Surat Hasil Fasilitasi telah lengkap dan disahkan tuntas.',
-                ]);
-            }
-        } elseif ($isHarmonisasiComplete) {
-            // Jika 5 dokumen harmonisasi lengkap -> Status beralih ke PROSES FASILITASI (3)
-            if ($rancangan->status_id !== 3 && $rancangan->status_id !== 4) {
-                $rancangan->update([
-                    'status_id' => 3,
-                    'keterangan' => 'Tahap Harmonisasi Kanwil selesai (5 dokumen lengkap). Berkas diteruskan ke Biro Hukum Pemprov Riau untuk Tahap Fasilitasi.',
-                ]);
-
-                // Notifikasi ke Biro Hukum bahwa berkas siap difasilitasi
-                $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
-                NotifikasiService::notifyBiroHukum(
-                    $rancangan,
-                    'Permohonan Siap Difasilitasi',
-                    "Dokumen harmonisasi Kanwil untuk '{$rancangan->judul_rancangan}' ({$kabName}) telah lengkap 5 dokumen. Berkas siap untuk ditelaah dan difasilitasi oleh Biro Hukum."
-                );
-            }
-        } else {
-            // Jika Tim Kerja mengunggah kelanjutan pembahasan (Dokumen 2, 3, atau 4) saat status masih Draf Awal (1) -> Otomatis beralih ke PROSES HARMONISASI (2)
-            if (in_array($jenisDokumenId, [2, 3, 4]) && $rancangan->status_id === 1) {
-                $rancangan->update([
-                    'status_id' => 2,
-                    'keterangan' => 'Dokumen pembahasan harmonisasi sedang dilengkapi dan diproses oleh Tim Kerja Kanwil Kemenkum Riau.',
-                ]);
-            }
-        }
-
         $jenisDoc = JenisDokumen::find($jenisDokumenId);
         $namaDoc = $jenisDoc ? $jenisDoc->nama_dokumen : "Dokumen #{$jenisDokumenId}";
 
         AuditLog::create([
             'user_id' => $user->user_id,
             'action' => 'UPLOAD_DOKUMEN',
-            'module' => 'PERMOHONAN_REGULASI',
+            'module' => self::MODUL_AUDIT,
             'target_id' => (string) $rancangan->rancangan_id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
@@ -594,18 +522,49 @@ class PermohonanController extends Controller
                 'rancangan_id' => $rancangan->rancangan_id,
                 'jenis_dokumen_id' => $jenisDokumenId,
                 'nama_dokumen' => $namaDoc,
-                'file_name' => $origName,
-                'versi' => $version,
-                'current_status_id' => $rancangan->fresh()->status_id,
+                'file_name' => $dokumen->nama_file,
+                'versi' => $dokumen->versi,
             ],
             'created_at' => now(),
         ]);
 
-        return back()->with('success', "Berkas '{$namaDoc}' ({$origName}) berhasil diunggah (Versi {$version}).");
+        // =========================================================================
+        // PERUBAHAN STATUS OTOMATIS BERBASIS KELENGKAPAN BERKAS (FILE-DRIVEN)
+        // Status Selesai hanya lahir dari Dokumen 7 (wewenang Biro Hukum/Admin). Saat berkas
+        // Perlu Perbaikan (5), unggahan Tim Kerja tidak mengubah status: perbaikan dikirim
+        // secara eksplisit lewat kirimPerbaikan().
+        // =========================================================================
+        if ($jenisDokumenId === 7) {
+            // Dokumen 1-5 sudah dijamin lengkap oleh syarat di atas; Dokumen 6 opsional.
+            if ($statusLama !== 4) {
+                $this->selesaikanFasilitasi($request, $rancangan, null, $dokumen->nama_file);
+            }
+        } elseif ($isHarmonisasiComplete && in_array($statusLama, [1, 2], true)) {
+            // 5 dokumen harmonisasi lengkap -> Status beralih ke PROSES FASILITASI (3)
+            $rancangan->update([
+                'status_id' => 3,
+                'keterangan' => 'Tahap Harmonisasi Kanwil selesai (5 dokumen lengkap). Berkas diteruskan ke Biro Hukum Pemprov Riau untuk Tahap Fasilitasi.',
+            ]);
+
+            $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
+            NotifikasiService::notifyBiroHukum(
+                $rancangan,
+                'Permohonan Siap Difasilitasi',
+                "Dokumen harmonisasi Kanwil untuk '{$rancangan->judul_rancangan}' ({$kabName}) telah lengkap 5 dokumen. Berkas siap untuk ditelaah dan difasilitasi oleh Biro Hukum."
+            );
+        } elseif (in_array($jenisDokumenId, [2, 3, 4], true) && $statusLama === 1) {
+            // Tim Kerja mengunggah kelanjutan pembahasan saat masih Draf Awal (1) -> PROSES HARMONISASI (2)
+            $rancangan->update([
+                'status_id' => 2,
+                'keterangan' => 'Dokumen pembahasan harmonisasi sedang dilengkapi dan diproses oleh Tim Kerja Kanwil Kemenkum Riau.',
+            ]);
+        }
+
+        return back()->with('success', "Berkas '{$namaDoc}' ({$dokumen->nama_file}) berhasil diunggah (Versi {$dokumen->versi}).");
     }
 
     /**
-     * Ubah Status Permohonan (Setujui / Tolak Revisi oleh Biro Hukum atau Tim Kerja beserta Surat Keputusan)
+     * Keputusan Hasil Fasilitasi oleh Biro Hukum / Admin: Terima (Selesai) atau Tolak (Perlu Perbaikan)
      */
     public function updateStatus(UpdateStatusRequest $request, $id): RedirectResponse
     {
@@ -623,134 +582,276 @@ class PermohonanController extends Controller
         }
 
         $validated = $request->validated();
-        $oldStatusId = $rancangan->status_id;
         $newStatusId = (int) $validated['status_id'];
         $catatan = $validated['catatan'] ?? null;
+        $statusLama = (int) $rancangan->status_id;
+        $idDokumen = $this->idDokumenTerunggah($rancangan);
 
-        $newStatus = StatusRegulasi::find($newStatusId);
-        $statusName = $newStatus ? $newStatus->nama_status : "Status #{$newStatusId}";
+        if ($statusLama === 4 || ! PermohonanWorkflowService::isHarmonisasiComplete($idDokumen)) {
+            return back()->with(
+                'error',
+                'Keputusan fasilitasi hanya dapat diambil untuk berkas yang Dokumen 1 s.d. 5-nya lengkap dan belum berstatus Selesai.'
+            );
+        }
 
-        // Proses Unggah Surat Keputusan (Surat Penerimaan / Surat Penolakan)
+        $surat = $request->file('surat_file');
+
+        if ($newStatusId === 4) {
+            // Berkas Selesai harus selalu memiliki Surat Hasil Fasilitasi (Dokumen 7)
+            if (! $surat && ! in_array(7, $idDokumen, true)) {
+                return back()->withErrors([
+                    'surat_file' => 'Surat Hasil Fasilitasi wajib dilampirkan untuk menyelesaikan berkas.',
+                ]);
+            }
+
+            $suratDocName = $surat
+                ? $this->simpanBerkasDokumen($rancangan, 7, $surat, $user, 'surat_persetujuan_')->nama_file
+                : null;
+
+            $this->selesaikanFasilitasi($request, $rancangan, $catatan, $suratDocName);
+
+            return back()->with(
+                'success',
+                'Permohonan berhasil disetujui tuntas (Status: Selesai)' . ($suratDocName ? " dengan lampiran Surat: '{$suratDocName}'." : '.')
+            );
+        }
+
+        // Tolak: surat penolakan punya slot sendiri, tidak boleh menempati Dokumen 7.
+        // Slot itu selalu berisi surat dari penolakan terakhir saja.
         $suratDocName = null;
-        if ($request->hasFile('surat_file')) {
-            $file = $request->file('surat_file');
-            $origName = $file->getClientOriginalName();
-            $fileSize = $this->formatBytes($file->getSize());
-            $ext = strtolower($file->getClientOriginalExtension());
-            $mimeType = $this->guessMimeFromExt($ext);
-
-            $existingDoc7 = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
-                ->where('jenis_dokumen_id', 7)
-                ->first();
-
-            $version = $existingDoc7 ? ($existingDoc7->versi + 1) : 1;
-            $prefix = $newStatusId === 4 ? 'surat_persetujuan_' : 'surat_penolakan_';
-            $cleanFileName = "{$prefix}v{$version}_" . time() . "_" . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
-
-            $targetDir = storage_path("app/secure_drafts/{$rancangan->rancangan_id}");
-            if (! file_exists($targetDir)) {
-                mkdir($targetDir, 0755, true);
-            }
-            $file->move($targetDir, $cleanFileName);
-
-            $storagePath = "secure_drafts/{$rancangan->rancangan_id}/{$cleanFileName}";
-
-            if ($existingDoc7) {
-                if ($existingDoc7->path_file) {
-                    $oldPath = $this->resolveSecureFilePath($existingDoc7);
-                    if ($oldPath && file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
-                }
-
-                $existingDoc7->update([
-                    'nama_file' => $origName,
-                    'path_file' => $storagePath,
-                    'ukuran_file' => $fileSize,
-                    'mime_type' => $mimeType,
-                    'versi' => $version,
-                    'uploaded_by' => $user->user_id,
-                    'uploaded_at' => now(),
-                ]);
-            } else {
-                Dokumen::create([
-                    'rancangan_id' => $rancangan->rancangan_id,
-                    'jenis_dokumen_id' => 7,
-                    'nama_file' => $origName,
-                    'path_file' => $storagePath,
-                    'ukuran_file' => $fileSize,
-                    'mime_type' => $mimeType,
-                    'versi' => 1,
-                    'uploaded_by' => $user->user_id,
-                    'uploaded_at' => now(),
-                ]);
-            }
-
-            $suratDocName = $origName;
+        if ($surat) {
+            $suratDocName = $this->simpanBerkasDokumen(
+                $rancangan,
+                JenisDokumen::SURAT_PENOLAKAN,
+                $surat,
+                $user,
+                'surat_penolakan_'
+            )->nama_file;
+        } elseif ($suratLama = $rancangan->suratPenolakan) {
+            $this->hapusFileFisik($suratLama);
+            $suratLama->delete();
         }
 
         $rancangan->update([
-            'status_id' => $newStatusId,
-            'keterangan' => $catatan ?: $rancangan->keterangan,
+            'status_id' => 5,
+            'keterangan' => $catatan,
         ]);
 
-        $actionName = match ($newStatusId) {
-            4 => 'APPROVE_FASILITASI',
-            5 => 'REJECT_FASILITASI',
-            default => 'CHANGE_PERATURAN_STATUS',
-        };
-
-        // Notifikasi ke Tim Kerja terkait & Pimpinan saat Biro Hukum mengambil keputusan
-        if ($newStatusId === 4) {
-            if ($rancangan->tim_kerja_id) {
-                NotifikasiService::notifyTimKerja(
-                    (int) $rancangan->tim_kerja_id,
-                    $rancangan,
-                    'Fasilitasi Disetujui & Selesai',
-                    "Biro Hukum Provinsi Riau telah menyetujui fasilitasi untuk '{$rancangan->judul_rancangan}'" . ($suratDocName ? " dengan lampiran surat: '{$suratDocName}'." : ".")
-                );
-            }
-
-            // Notifikasi Milestone Selesai ke Pimpinan (Kakanwil & Kadiv)
-            $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
-            NotifikasiService::notifyPimpinan(
-                $rancangan,
-                'Produk Hukum Daerah Selesai',
-                "Harmonisasi & fasilitasi '{$rancangan->judul_rancangan}' ({$kabName}) telah disetujui tuntas oleh Biro Hukum Provinsi Riau."
-            );
-        } elseif ($newStatusId === 5 && $rancangan->tim_kerja_id) {
+        if ($rancangan->tim_kerja_id) {
             NotifikasiService::notifyTimKerja(
                 (int) $rancangan->tim_kerja_id,
                 $rancangan,
                 'Permohonan Memerlukan Perbaikan',
-                "Biro Hukum Provinsi Riau mengembalikan berkas '{$rancangan->judul_rancangan}'. Catatan: " . ($catatan ?: 'Harap periksa dan perbaiki draf regulasi.')
+                "Biro Hukum Provinsi Riau mengembalikan berkas '{$rancangan->judul_rancangan}'. Catatan: {$catatan}"
             );
         }
 
+        $this->catatAudit($request, $rancangan, 'REJECT_FASILITASI', [
+            'from_status_id' => $statusLama,
+            'to_status_id' => 5,
+            'to_status_name' => 'Perlu Perbaikan',
+            'catatan' => $catatan,
+            'surat_terlampir' => $suratDocName,
+        ]);
+
+        return back()->with(
+            'success',
+            'Permohonan dikembalikan ke Tim Kerja Kanwil (Status: Perlu Perbaikan)' . ($suratDocName ? " dengan lampiran Surat Penolakan: '{$suratDocName}'." : '.')
+        );
+    }
+
+    /**
+     * Tim Kerja mengirim hasil perbaikan berkas yang ditolak kembali ke Biro Hukum
+     */
+    public function kirimPerbaikan(Request $request, $id): RedirectResponse
+    {
+        $rancangan = RancanganRegulasi::findOrFail($id);
+        $user = Auth::user();
+
+        $this->authorizeRancanganAccess($rancangan, $user);
+
+        if (! ($user->isTimKerja() || $user->isAdmin())) {
+            abort(403, 'Akses Ditolak: Hanya Tim Kerja Kanwil yang berwenang mengirim perbaikan berkas.');
+        }
+
+        if ((int) $rancangan->status_id !== 5) {
+            return back()->with('error', 'Berkas ini tidak sedang berstatus Perlu Perbaikan.');
+        }
+
+        if (! $this->adaPerbaikanSetelahDitolak($rancangan, $this->penolakanTerakhir($rancangan))) {
+            return back()->with('error', 'Unggah dulu dokumen yang diperbaiki sebelum mengirim perbaikan ke Biro Hukum.');
+        }
+
+        $rancangan->update([
+            'status_id' => 3,
+            'keterangan' => 'Perbaikan berkas telah dikirim Tim Kerja Kanwil. Menunggu telaah ulang Biro Hukum.',
+        ]);
+
+        $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
+        NotifikasiService::notifyBiroHukum(
+            $rancangan,
+            'Perbaikan Berkas Telah Dikirim',
+            "Tim Kerja Kanwil telah memperbaiki berkas '{$rancangan->judul_rancangan}' ({$kabName}) yang sebelumnya dikembalikan. Berkas siap ditelaah ulang oleh Biro Hukum."
+        );
+
+        $this->catatAudit($request, $rancangan, 'SUBMIT_PERBAIKAN', [
+            'from_status_id' => 5,
+            'to_status_id' => 3,
+            'to_status_name' => 'Proses Fasilitasi',
+        ]);
+
+        return back()->with('success', 'Perbaikan berkas berhasil dikirim ke Biro Hukum untuk ditelaah ulang.');
+    }
+
+    /**
+     * Satu-satunya jalur menuju status Selesai: ubah status, kabari Tim Kerja & Pimpinan, catat audit.
+     */
+    private function selesaikanFasilitasi(Request $request, RancanganRegulasi $rancangan, ?string $catatan, ?string $namaSurat): void
+    {
+        $statusLama = (int) $rancangan->status_id;
+
+        $rancangan->update([
+            'status_id' => 4,
+            'keterangan' => $catatan ?: 'Seluruh dokumen wajib harmonisasi dan Surat Hasil Fasilitasi telah lengkap dan disahkan tuntas.',
+        ]);
+
+        if ($rancangan->tim_kerja_id) {
+            NotifikasiService::notifyTimKerja(
+                (int) $rancangan->tim_kerja_id,
+                $rancangan,
+                'Fasilitasi Disetujui & Selesai',
+                "Biro Hukum Provinsi Riau telah menyetujui fasilitasi untuk '{$rancangan->judul_rancangan}'" . ($namaSurat ? " dengan lampiran surat: '{$namaSurat}'." : '.')
+            );
+        }
+
+        // Notifikasi Milestone Selesai ke Pimpinan (Kakanwil & Kadiv)
+        $kabName = $rancangan->kabupaten ? $rancangan->kabupaten->nama_kabupaten : 'Kabupaten/Kota';
+        NotifikasiService::notifyPimpinan(
+            $rancangan,
+            'Produk Hukum Daerah Selesai',
+            "Harmonisasi & fasilitasi '{$rancangan->judul_rancangan}' ({$kabName}) telah disetujui tuntas oleh Biro Hukum Provinsi Riau."
+        );
+
+        $this->catatAudit($request, $rancangan, 'APPROVE_FASILITASI', [
+            'from_status_id' => $statusLama,
+            'to_status_id' => 4,
+            'to_status_name' => 'Selesai',
+            'catatan' => $catatan,
+            'surat_terlampir' => $namaSurat,
+        ]);
+    }
+
+    /**
+     * Simpan (atau ganti) berkas pada satu slot dokumen di direktori privat, lalu naikkan versinya.
+     */
+    private function simpanBerkasDokumen(
+        RancanganRegulasi $rancangan,
+        int $jenisDokumenId,
+        UploadedFile $file,
+        User $user,
+        string $awalanNama
+    ): Dokumen {
+        $origName = $file->getClientOriginalName();
+        $fileSize = $this->formatBytes($file->getSize());
+        $mimeType = $this->guessMimeFromExt(strtolower($file->getClientOriginalExtension()));
+
+        $existingDoc = Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+            ->where('jenis_dokumen_id', $jenisDokumenId)
+            ->first();
+
+        $version = $existingDoc ? ($existingDoc->versi + 1) : 1;
+
+        $cleanFileName = "{$awalanNama}v{$version}_" . time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $origName);
+        $targetDir = storage_path("app/secure_drafts/{$rancangan->rancangan_id}");
+        if (! file_exists($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+        $file->move($targetDir, $cleanFileName);
+
+        $atribut = [
+            'nama_file' => $origName,
+            'path_file' => "secure_drafts/{$rancangan->rancangan_id}/{$cleanFileName}",
+            'ukuran_file' => $fileSize,
+            'mime_type' => $mimeType,
+            'versi' => $version,
+            'uploaded_by' => $user->user_id,
+            'uploaded_at' => now(),
+        ];
+
+        if ($existingDoc) {
+            $this->hapusFileFisik($existingDoc);
+            $existingDoc->update($atribut);
+
+            return $existingDoc;
+        }
+
+        return Dokumen::create($atribut + [
+            'rancangan_id' => $rancangan->rancangan_id,
+            'jenis_dokumen_id' => $jenisDokumenId,
+        ]);
+    }
+
+    /**
+     * Hanya menghapus path milik dokumen itu sendiri. resolveSecureFilePath() tidak dipakai
+     * di sini karena punya fallback ke berkas lain (mis. sample_draft.pdf) yang tidak boleh terhapus.
+     */
+    private function hapusFileFisik(Dokumen $dokumen): void
+    {
+        $path = $dokumen->path_file ? storage_path('app/' . $dokumen->path_file) : null;
+        if ($path && is_file($path)) {
+            @unlink($path);
+        }
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function idDokumenTerunggah(RancanganRegulasi $rancangan): array
+    {
+        return Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+            ->pluck('jenis_dokumen_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    private function penolakanTerakhir(RancanganRegulasi $rancangan): ?AuditLog
+    {
+        return AuditLog::where('module', self::MODUL_AUDIT)
+            ->where('action', 'REJECT_FASILITASI')
+            ->where('target_id', (string) $rancangan->rancangan_id)
+            ->latest('created_at')
+            ->latest('id')
+            ->first();
+    }
+
+    /**
+     * Perbaikan dianggap ada bila minimal satu Dokumen 1-5 diunggah setelah penolakan terakhir.
+     * Berkas lama tanpa log penolakan tidak ditahan.
+     */
+    private function adaPerbaikanSetelahDitolak(RancanganRegulasi $rancangan, ?AuditLog $penolakan): bool
+    {
+        if (! $penolakan) {
+            return true;
+        }
+
+        return Dokumen::where('rancangan_id', $rancangan->rancangan_id)
+            ->whereIn('jenis_dokumen_id', [1, 2, 3, 4, 5])
+            ->where('uploaded_at', '>=', $penolakan->created_at)
+            ->exists();
+    }
+
+    private function catatAudit(Request $request, RancanganRegulasi $rancangan, string $action, array $payload): void
+    {
         AuditLog::create([
-            'user_id' => $user->user_id,
-            'action' => $actionName,
-            'module' => 'PERMOHONAN_REGULASI',
+            'user_id' => $request->user()->user_id,
+            'action' => $action,
+            'module' => self::MODUL_AUDIT,
             'target_id' => (string) $rancangan->rancangan_id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'payload' => [
-                'from_status_id' => $oldStatusId,
-                'to_status_id' => $newStatusId,
-                'to_status_name' => $statusName,
-                'catatan' => $catatan,
-                'surat_terlampir' => $suratDocName,
-            ],
+            'payload' => $payload,
             'created_at' => now(),
         ]);
-
-        $pesanSukses = match ($newStatusId) {
-            4 => "Permohonan berhasil disetujui tuntas (Status: Selesai)" . ($suratDocName ? " dengan lampiran Surat: '{$suratDocName}'." : "."),
-            5 => "Permohonan dikembalikan ke Tim Kerja Kanwil (Status: Perlu Perbaikan)" . ($suratDocName ? " dengan lampiran Surat Penolakan: '{$suratDocName}'." : "."),
-            default => "Status permohonan berhasil diubah menjadi: {$statusName}.",
-        };
-
-        return back()->with('success', $pesanSukses);
     }
 
     /**

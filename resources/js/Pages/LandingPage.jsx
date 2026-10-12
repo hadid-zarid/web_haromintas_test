@@ -1168,7 +1168,7 @@ export const LandingPage = ({ statistikData, chatbotAktif = false }) => {
                     </span>
                     <div className="min-w-0">
                       <p className="font-semibold text-white">Email Resmi:</p>
-                      <span className="text-slate-300 break-all">harmonitas.kanwil@kemenkum.go.id</span>
+                      <a href="mailto:humaskumriau@gmail.com" className="text-slate-300 break-all hover:text-[#FFD82B] transition">humaskumriau@gmail.com</a>
                     </div>
                   </li>
                   <li className="flex items-start gap-2.5">
@@ -1176,8 +1176,8 @@ export const LandingPage = ({ statistikData, chatbotAktif = false }) => {
                       <PhoneCall className="h-4 w-4" />
                     </span>
                     <div>
-                      <p className="font-semibold text-white">Telepon / Hotline:</p>
-                      <span className="text-slate-300">(0761) 853000</span>
+                      <p className="font-semibold text-white">Telepon / WhatsApp:</p>
+                      <a href="tel:+628116904422" className="text-slate-300 hover:text-[#FFD82B] transition">+62 811-6904-422</a>
                     </div>
                   </li>
                   <li className="flex items-start gap-2.5">

@@ -171,7 +171,7 @@ export const PanduanPage = () => {
           highlight: 'bg-emerald-50/70 border-emerald-200 text-emerald-950',
         },
       ],
-      tip: 'Catatan: Dokumen 6 bersifat opsional. Dokumen 7 tetap menjadi dokumen utama hasil fasilitasi. Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil.',
+      tip: 'Catatan: Dokumen 6 bersifat opsional. Dokumen 7 tetap menjadi dokumen utama hasil fasilitasi. Jika berkas memerlukan perbaikan, Biro Hukum dapat mengeklik "Tolak & Terbitkan Surat Penolakan" untuk dikembalikan ke Kanwil. Tim Kerja lalu mengganti dokumen yang diminta dan mengeklik "Kirim Perbaikan ke Biro Hukum".',
     },
     {
       id: 5,

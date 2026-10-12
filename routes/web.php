@@ -148,6 +148,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::delete('/peraturan/{id}', [PermohonanController::class, 'destroy'])->name('peraturan.destroy');
     Route::post('/peraturan/{id}/dokumen', [PermohonanController::class, 'uploadDokumen'])->name('peraturan.dokumen.upload');
     Route::post('/peraturan/{id}/status', [PermohonanController::class, 'updateStatus'])->name('peraturan.status.update');
+    Route::post('/peraturan/{id}/perbaikan', [PermohonanController::class, 'kirimPerbaikan'])->name('peraturan.perbaikan');
     Route::get('/dokumen/{dokumen}/view', [PermohonanController::class, 'viewDokumen'])->name('dokumen.view');
     Route::get('/dokumen/{dokumen}/download', [PermohonanController::class, 'downloadDokumen'])->name('dokumen.download');
 

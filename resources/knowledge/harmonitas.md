@@ -38,7 +38,9 @@ Total ada 7 dokumen: Tahap I berisi 5 dokumen, Tahap II berisi 2 dokumen. Dokume
 Ada 5 status: Draf Awal, Proses Harmonisasi, Proses Fasilitasi, Selesai, dan Perlu Perbaikan.
 - Status banyak berubah otomatis mengikuti dokumen yang diunggah: saat Dokumen 2, 3, atau 4 diunggah pada status Draf Awal, berkas masuk Proses Harmonisasi. Saat Dokumen 1 sampai 5 lengkap, berkas masuk Proses Fasilitasi. Saat Dokumen 7 terunggah, berkas menjadi Selesai.
 - Perubahan status secara manual hanya dapat dilakukan Biro Hukum dan Admin.
-- Jika berkas perlu diperbaiki, Biro Hukum dapat menolaknya dengan menerbitkan surat penolakan sehingga berkas kembali ke Kanwil.
+- Jika berkas perlu diperbaiki, Biro Hukum dapat menolaknya dengan menuliskan alasan (dan melampirkan surat penolakan) sehingga berkas kembali ke Kanwil dengan status "Perlu Perbaikan".
+- Tim Kerja lalu mengganti dokumen yang diminta lewat tombol "Ganti", kemudian mengeklik "Kirim Perbaikan ke Biro Hukum". Berkas kembali ke Proses Fasilitasi dan Biro Hukum mendapat pemberitahuan.
+- Status Selesai hanya terjadi setelah Biro Hukum menerbitkan Surat Hasil Fasilitasi.
 
 ## Cara memakai (setelah masuk/login)
 **Masuk ke sistem**
@@ -82,8 +84,8 @@ Landing page menampilkan statistik dan peta wilayah rekap ProPem (Program Pemben
 Buku Petunjuk Penggunaan HARMONITAS tersedia di halaman Panduan (tautan "Panduan Sistem" di bagian bawah landing page, dan menu "Buku Panduan" di sidebar setelah masuk), dapat dibaca langsung atau diunduh dalam bentuk PDF.
 
 ## Kontak resmi
-- Email: harmonitas.kanwil@kemenkum.go.id
-- Telepon / hotline: (0761) 853000
+- Email: humaskumriau@gmail.com
+- Telepon / WhatsApp: +62 811-6904-422
 - Alamat: Jl. Jend. Sudirman No. 233, Kota Pekanbaru, Riau (Kantor Wilayah Kementerian Hukum Riau).
 
 ## Hal yang tidak dijawab oleh chatbot

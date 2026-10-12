@@ -11,6 +11,12 @@ class JenisDokumen extends Model
     protected $primaryKey = 'jenis_dokumen_id';
     public $timestamps = false;
 
+    /**
+     * Surat penolakan Biro Hukum. Bukan bagian dari 7 dokumen berkas: tidak tampil
+     * sebagai kartu dan tidak ikut dihitung dalam kelengkapan.
+     */
+    public const SURAT_PENOLAKAN = 8;
+
     protected $fillable = [
         'nama_dokumen',
         'tahap',

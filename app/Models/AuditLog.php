@@ -25,6 +25,15 @@ class AuditLog extends Model
         'created_at',
     ];
 
+    /**
+     * Jejak teknis pelaku tidak boleh ikut terkirim ke browser pengguna lain
+     * (feed beranda & riwayat berkas mengirim log apa adanya).
+     */
+    protected $hidden = [
+        'ip_address',
+        'user_agent',
+    ];
+
     protected function casts(): array
     {
         return [

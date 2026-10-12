@@ -55,7 +55,7 @@ class ChatbotTest extends TestCase
             return $request->url() === 'https://llm.test/v1/chat/completions'
                 && $request->hasHeader('Authorization', 'Bearer kunci-uji')
                 && $body['model'] === 'model-uji'
-                && str_contains($body['messages'][0]['content'], '(0761) 853000') // kontak dari berkas pengetahuan
+                && str_contains($body['messages'][0]['content'], 'humaskumriau@gmail.com') // kontak dari berkas pengetahuan
                 && end($body['messages']) === ['role' => 'user', 'content' => 'Apa itu HARMONITAS?'];
         });
         $this->assertStringNotContainsString('kunci-uji', $response->getContent());

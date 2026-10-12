@@ -4,6 +4,7 @@ namespace App\Http\Requests\Permohonan;
 
 use App\Rules\NoHtmlContent;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateStatusRequest extends FormRequest
 {
@@ -15,8 +16,9 @@ class UpdateStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status_id' => ['required', 'integer', 'exists:status_regulasi,status_id'],
-            'catatan' => ['nullable', 'string', 'max:2000', new NoHtmlContent()],
+            // Endpoint ini hanya untuk keputusan fasilitasi: 4 = Selesai, 5 = Perlu Perbaikan
+            'status_id' => ['required', 'integer', Rule::in([4, 5])],
+            'catatan' => ['nullable', 'required_if:status_id,5', 'string', 'max:2000', new NoHtmlContent()],
             'surat_file' => [
                 'nullable',
                 'file',
@@ -42,7 +44,8 @@ class UpdateStatusRequest extends FormRequest
     {
         return [
             'status_id.required' => 'Status baru wajib dipilih.',
-            'status_id.exists' => 'Status yang dipilih tidak valid.',
+            'status_id.in' => 'Keputusan fasilitasi hanya dapat berupa Selesai atau Perlu Perbaikan.',
+            'catatan.required_if' => 'Alasan pengembalian berkas wajib diisi.',
             'surat_file.max' => 'Ukuran file surat tidak boleh melebihi 25MB.',
         ];
     }

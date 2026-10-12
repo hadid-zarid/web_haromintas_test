@@ -39,8 +39,10 @@ import {
   Folder,
   FolderOpen,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Send
 } from 'lucide-react';
+import Modal from '../components/common/Modal';
 
 /**
  * MapDokumenCard Component
@@ -280,6 +282,7 @@ export const PeraturanDetailPage = ({
   jenisDokumens = [],
   statuses = [],
   auditLogs = [],
+  penolakan = null,
 }) => {
   const { user, isTimKerja, isAdmin, isBiroHukum, isPimpinan } = useAuth();
   const { flash } = usePage().props;
@@ -288,6 +291,8 @@ export const PeraturanDetailPage = ({
   const [activeUploadDoc, setActiveUploadDoc] = useState(null);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isKirimModalOpen, setIsKirimModalOpen] = useState(false);
+  const kirimForm = useForm({});
   const [statusAction, setStatusAction] = useState('APPROVE');
   const [activityPage, setActivityPage] = useState(1);
   const ACTIVITIES_PER_PAGE = 5;
@@ -312,6 +317,10 @@ export const PeraturanDetailPage = ({
       case 'REJECT_FASILITASI':
         return (
           <span>Mengembalikan berkas fasilitasi (Perlu Perbaikan). Catatan: &quot;{log.payload?.catatan || 'Perlu perbaikan naskah harmonisasi.'}&quot;</span>
+        );
+      case 'SUBMIT_PERBAIKAN':
+        return (
+          <span>Mengirim perbaikan berkas ke Biro Hukum untuk ditelaah ulang (kembali ke <strong>Proses Fasilitasi</strong>).</span>
         );
       case 'CHANGE_PERATURAN_STATUS':
         if (log.payload?.from_status_name && log.payload?.to_status_name) {
@@ -343,6 +352,8 @@ export const PeraturanDetailPage = ({
         return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
       case 'REJECT_FASILITASI':
         return <XCircle className="w-4 h-4 text-rose-600" />;
+      case 'SUBMIT_PERBAIKAN':
+        return <Send className="w-4 h-4 text-blue-600" />;
       case 'CHANGE_PERATURAN_STATUS':
         return <RefreshCw className="w-4 h-4 text-amber-600" />;
       case 'DELETE_PERMOHONAN':
@@ -625,13 +636,67 @@ export const PeraturanDetailPage = ({
           </div>
         </div>
 
-        {/* CATATAN BERKAS BANNER */}
-        {permohonan.keterangan && (
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs shadow-2xs">
-            <MessageSquare className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold text-amber-950">Catatan Berkas:</p>
-              <p className="font-normal text-amber-900 mt-0.5 leading-relaxed">{permohonan.keterangan}</p>
+        {/* BANNER PENOLAKAN (PERLU PERBAIKAN) / KETERANGAN TAHAP */}
+        {penolakan ? (
+          <div className="p-4 sm:p-5 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 text-xs shadow-2xs space-y-3" role="alert">
+            <div className="flex items-start gap-3">
+              <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-sm font-extrabold text-rose-900">Berkas dikembalikan Biro Hukum — perlu perbaikan</p>
+                {penolakan.oleh && (
+                  <p className="text-[11px] text-rose-800 font-medium mt-0.5 break-words">
+                    Dikembalikan oleh {penolakan.oleh}
+                    {penolakan.waktu ? ` pada ${new Date(penolakan.waktu).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}` : ''}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white border border-rose-200">
+              <p className="font-bold text-rose-900">Alasan pengembalian:</p>
+              <p className="text-slate-800 mt-1 leading-relaxed whitespace-pre-wrap break-words">
+                {penolakan.catatan || 'Biro Hukum tidak menuliskan alasan.'}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              {penolakan.surat && (
+                <button
+                  type="button"
+                  onClick={() => setPreviewDoc(penolakan.surat)}
+                  className="w-full sm:w-auto min-h-[44px] px-4 rounded-xl bg-white border border-rose-300 text-rose-800 font-bold hover:bg-rose-100 transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Lihat Surat Penolakan</span>
+                </button>
+              )}
+              {(isTimKerja || isAdmin) && (
+                <button
+                  type="button"
+                  disabled={!penolakan.bisa_kirim}
+                  onClick={() => setIsKirimModalOpen(true)}
+                  className="w-full sm:w-auto min-h-[44px] px-4 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white font-bold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-4 h-4 text-[#FFD82B]" />
+                  <span>Kirim Perbaikan ke Biro Hukum</span>
+                </button>
+              )}
+            </div>
+
+            <p className="text-[11px] text-rose-800 font-medium leading-relaxed">
+              {isTimKerja || isAdmin
+                ? penolakan.bisa_kirim
+                  ? 'Dokumen perbaikan sudah diunggah. Jika semua perbaikan selesai, klik "Kirim Perbaikan ke Biro Hukum" agar berkas ditelaah ulang.'
+                  : 'Langkah selanjutnya: ganti dokumen yang diminta lewat tombol "Ganti" pada kartu dokumen di bawah, lalu kirim perbaikan ke Biro Hukum.'
+                : 'Menunggu Tim Kerja Kanwil mengunggah dan mengirim perbaikan.'}
+            </p>
+          </div>
+        ) : permohonan.keterangan && (
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3 text-slate-700 text-xs shadow-2xs">
+            <MessageSquare className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="font-bold text-[#2B3056]">Keterangan Tahap Saat Ini:</p>
+              <p className="font-normal mt-0.5 leading-relaxed break-words">{permohonan.keterangan}</p>
             </div>
           </div>
         )}
@@ -1091,7 +1156,9 @@ export const PeraturanDetailPage = ({
               }`}>
                 {statusAction === 'APPROVE' ? (
                   <p>
-                    Rancangan peraturan ini akan disahkan sebagai <strong>SELESAI (TUNTAS)</strong>. Anda dapat melampirkan file <strong>Surat Fasilitasi Rancangan Peraturan</strong> resmi (format PDF) di bawah ini.
+                    Rancangan peraturan ini akan disahkan sebagai <strong>SELESAI (TUNTAS)</strong>. {uploadedDocsMap[7]
+                      ? <>Surat Hasil Fasilitasi sudah tersedia; lampirkan file baru hanya jika ingin menggantinya.</>
+                      : <>Lampirkan file <strong>Surat Fasilitasi Rancangan Peraturan</strong> resmi (format PDF) di bawah ini.</>}
                   </p>
                 ) : (
                   <p>
@@ -1103,7 +1170,9 @@ export const PeraturanDetailPage = ({
               {/* Upload Surat Keputusan */}
               <div>
                 <label className="block text-xs font-bold text-[#2B3056] mb-2">
-                  {statusAction === 'APPROVE' ? 'Lampiran Surat Fasilitasi Rancangan Peraturan (Opsional, PDF)' : 'Lampiran Surat Penolakan / Pengembalian Berkas (Opsional, PDF)'}
+                  {statusAction === 'APPROVE'
+                    ? `Lampiran Surat Fasilitasi Rancangan Peraturan (${uploadedDocsMap[7] ? 'Opsional' : 'Wajib'}, PDF)`
+                    : 'Lampiran Surat Penolakan / Pengembalian Berkas (Opsional, PDF)'}
                 </label>
 
                 {!statusForm.data.surat_file ? (
@@ -1198,6 +1267,36 @@ export const PeraturanDetailPage = ({
           </div>
         </div>
       )}
+
+      {/* MODAL: KONFIRMASI KIRIM PERBAIKAN (TIM KERJA) */}
+      <Modal isOpen={isKirimModalOpen} onClose={() => setIsKirimModalOpen(false)} title="Kirim Perbaikan ke Biro Hukum" size="sm">
+        <div className="space-y-4 text-xs text-slate-700">
+          <p className="leading-relaxed">
+            Berkas akan kembali ke tahap <strong>Proses Fasilitasi</strong> dan Biro Hukum menerima pemberitahuan untuk menelaah ulang. Pastikan semua dokumen yang diminta sudah diganti.
+          </p>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setIsKirimModalOpen(false)}
+              className="w-full sm:w-auto min-h-[44px] px-4 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={kirimForm.processing}
+              onClick={() => kirimForm.post(`/peraturan/${permohonan.rancangan_id}/perbaikan`, {
+                preserveScroll: true,
+                onFinish: () => setIsKirimModalOpen(false),
+              })}
+              className="w-full sm:w-auto min-h-[44px] px-4 rounded-xl bg-[#2B3056] hover:bg-[#3A4070] text-white font-bold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <Send className="w-4 h-4 text-[#FFD82B]" />
+              <span>{kirimForm.processing ? 'Mengirim...' : 'Ya, Kirim Perbaikan'}</span>
+            </button>
+          </div>
+        </div>
+      </Modal>
     </AppLayout>
   );
 };

@@ -248,21 +248,33 @@ class HomeController extends Controller
             ];
         }
 
-        // Recent Audit Logs: Fokus pada aktivitas berkas & alur kerja regulasi
+        // Recent Audit Logs: hanya aktivitas berkas (Admin juga melihat kelola akun).
+        // target_id baru bermakna "id berkas" di modul berkas, jadi filter cakupan wilayah
+        // selalu dipasangkan dengan modulnya agar log modul lain ber-id sama tidak ikut tampil.
+        $modulBerkas = 'PERMOHONAN_REGULASI';
         $auditQuery = AuditLog::with('user:user_id,nama,role_id')
-            ->where('module', '!=', 'AUTHENTICATION')
-            ->where('action', '!=', 'PREVIEW_CONFIDENTIAL_DOKUMEN')
-            ->latest('created_at');
+            ->latest('created_at')
+            ->latest('id');
 
         if ($isTim || $isBiroHukum) {
             $rancanganIds = $allData->pluck('rancangan_id')->map(fn($id) => (string) $id)->toArray();
-            $auditQuery->where(function ($q) use ($rancanganIds, $user) {
-                $q->whereIn('target_id', $rancanganIds)
-                  ->orWhere('user_id', $user->user_id);
-            });
+            $auditQuery->where('module', $modulBerkas)->whereIn('target_id', $rancanganIds);
+        } else {
+            $auditQuery->whereIn('module', $user->isAdmin() ? [$modulBerkas, 'USER_MANAGEMENT'] : [$modulBerkas]);
         }
-        $recentActivities = $auditQuery->limit(5)->get()->map(function ($act) {
+
+        $berkasById = $allData->keyBy('rancangan_id');
+        $recentActivities = $auditQuery->limit(5)->get()->map(function ($act) use ($berkasById, $modulBerkas) {
             $data = $act->toArray();
+
+            // Berkas terkait untuk popup detail (null bila berkas sudah dihapus / di luar tahun terpilih)
+            $berkas = $act->module === $modulBerkas ? $berkasById->get((int) $act->target_id) : null;
+            $data['berkas'] = $berkas ? [
+                'id' => $berkas->rancangan_id,
+                'nomor' => $berkas->nomor_regulasi,
+                'judul' => $berkas->judul_rancangan,
+            ] : null;
+
             $action = strtoupper(trim((string) ($act->action ?? '')));
             $userName = $act->user?->nama ?? ($act->user?->name ?? 'Sistem');
             $p = is_array($act->payload) ? $act->payload : (json_decode((string) ($act->payload ?? '[]'), true) ?: []);
@@ -283,8 +295,6 @@ class HomeController extends Controller
 
             return $data;
         });
-
-        \Illuminate\Support\Facades\Log::info('AUDIT_DEBUG_RECENT_ACTIVITIES', $recentActivities->toArray());
 
         return Inertia::render('HomePage', [
             'metrics' => $metrics,

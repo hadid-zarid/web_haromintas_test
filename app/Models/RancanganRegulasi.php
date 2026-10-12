@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class RancanganRegulasi extends Model
 {
@@ -99,11 +100,21 @@ class RancanganRegulasi extends Model
     }
 
     /**
-     * Relasi ke Dokumen-Dokumen Berkas
+     * Relasi ke 7 Dokumen Berkas (surat penolakan tidak termasuk, lihat suratPenolakan())
      */
     public function dokumens(): HasMany
     {
-        return $this->hasMany(Dokumen::class, 'rancangan_id', 'rancangan_id');
+        return $this->hasMany(Dokumen::class, 'rancangan_id', 'rancangan_id')
+            ->where('jenis_dokumen_id', '!=', JenisDokumen::SURAT_PENOLAKAN);
+    }
+
+    /**
+     * Surat penolakan terakhir dari Biro Hukum (jika ada)
+     */
+    public function suratPenolakan(): HasOne
+    {
+        return $this->hasOne(Dokumen::class, 'rancangan_id', 'rancangan_id')
+            ->where('jenis_dokumen_id', JenisDokumen::SURAT_PENOLAKAN);
     }
 
     /**

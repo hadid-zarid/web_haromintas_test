@@ -84,6 +84,28 @@ const CustomChartTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+/* Label ramah-pengguna untuk popup rincian aktivitas */
+const LABEL_RINCIAN = {
+  judul_rancangan: 'Judul berkas',
+  nomor_regulasi: 'Nomor registrasi',
+  kabupaten: 'Daerah',
+  nama_dokumen: 'Dokumen',
+  file_name: 'Nama file',
+  versi: 'Versi',
+  to_status_name: 'Status baru',
+  catatan: 'Catatan',
+  surat_terlampir: 'Surat terlampir',
+  target_name: 'Akun',
+};
+const KUNCI_IDENTITAS_BERKAS = ['judul_rancangan', 'nomor_regulasi'];
+const LABEL_PERAN = {
+  ADMIN: 'Admin',
+  TIM_KERJA: 'Tim Kerja',
+  POKJA: 'Tim Kerja',
+  BIRO_HUKUM: 'Biro Hukum',
+  PIMPINAN: 'Pimpinan',
+};
+
 export const HomePage = ({
   metrics = {
     total: 0,
@@ -192,6 +214,14 @@ export const HomePage = ({
           badgeClass: 'bg-rose-50 text-rose-800 border-rose-200/70 font-bold',
           title: `Biro Hukum mengembalikan berkas`,
           desc: p.catatan || 'Perlu perbaikan draf pasal.',
+        };
+      case 'SUBMIT_PERBAIKAN':
+        return {
+          icon: Upload,
+          badge: 'Perbaikan',
+          badgeClass: 'bg-blue-50 text-blue-800 border-blue-200/70 font-bold',
+          title: `${userName} mengirim perbaikan berkas`,
+          desc: 'Berkas dikirim kembali ke Biro Hukum untuk ditelaah ulang.',
         };
       case 'CHANGE_PERATURAN_STATUS':
         return {
@@ -324,15 +354,23 @@ export const HomePage = ({
   };
 
   const handleOpenActivityModal = (act) => {
+    const p = act.payload && typeof act.payload === 'object' ? act.payload : {};
+
+    // Hanya kunci yang terdaftar di LABEL_RINCIAN yang ditampilkan; ID dan data teknis lain tidak ikut.
+    const rincian = Object.entries(LABEL_RINCIAN)
+      .filter(([key]) => p[key] !== null && p[key] !== undefined && p[key] !== '')
+      .filter(([key]) => !(act.berkas && KUNCI_IDENTITAS_BERKAS.includes(key)))
+      .map(([key, label]) => ({ label, value: String(p[key]) }));
+
     setSelectedActivity({
-      id: act.id,
-      action: act.action,
+      ...formatAuditItem(act),
       user: act.user?.nama || act.user?.name || 'Sistem',
-      role: act.user?.role?.name || 'Operator',
-      timestamp: act.created_at ? new Date(act.created_at).toLocaleString('id-ID') : '-',
-      regulationTitle: act.payload?.judul_rancangan || act.payload?.nama_dokumen || null,
-      description: typeof act.payload === 'string' ? act.payload : JSON.stringify(act.payload, null, 2),
-      detail: typeof act.payload === 'string' ? act.payload : JSON.stringify(act.payload, null, 2),
+      role: LABEL_PERAN[act.user?.role] || null,
+      timestamp: act.created_at
+        ? new Date(act.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : '-',
+      berkas: act.berkas || null,
+      rincian,
     });
   };
 
@@ -696,28 +734,29 @@ export const HomePage = ({
                     const formatted = formatAuditItem(act);
 
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={act.id}
                         onClick={() => handleOpenActivityModal(act)}
-                        className="p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer text-xs space-y-1.5 group"
+                        className="block w-full text-left p-3 rounded-xl bg-slate-50/70 border border-slate-200/70 hover:bg-white hover:border-[#2B3056]/35 hover:shadow-2xs transition-all cursor-pointer text-xs space-y-1.5 group"
                       >
-                        <div className="flex items-center justify-between gap-2">
+                        <span className="flex items-center justify-between gap-2">
                           <span className={`px-1.5 py-0.2 rounded text-[8.5px] font-bold uppercase border ${formatted.badgeClass}`}>
                             {formatted.badge}
                           </span>
                           <span className="text-[9.5px] text-slate-400 font-mono font-medium">
                             {act.created_at ? new Date(act.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}
                           </span>
-                        </div>
+                        </span>
 
-                        <p className="font-bold text-[#2B3056] text-[11.5px] truncate group-hover:text-[#3A4070]">
+                        <span className="block font-bold text-[#2B3056] text-[11.5px] truncate group-hover:text-[#3A4070]">
                           {formatted.title}
-                        </p>
+                        </span>
 
-                        <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                        <span className="block text-[10.5px] text-slate-500 font-medium truncate">
                           {formatted.desc}
-                        </p>
-                      </div>
+                        </span>
+                      </button>
                     );
                   })
                 ) : (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LogIn, Mail, Menu, Phone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { LogIn, Mail, Menu, Phone, Smartphone, X, LayoutDashboard, ArrowRight } from 'lucide-react';
 import logoHarmonitas from '../../assets/LOGO HARMONITAS.png';
 import logoPengayoman from '../../assets/logo_pengayoman_official.png';
 
@@ -41,14 +41,18 @@ export const PublicNavbar = () => {
       <div className="bg-[#2B3056] text-white border-b border-[#3A4070] hidden sm:block">
         <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-4 text-xs font-semibold sm:px-6 lg:px-8">
           <div className="flex items-center gap-6 text-white/90">
-            <span className="inline-flex items-center gap-2">
-              <Mail className="h-3.5 w-3.5 text-[#FFD82B]" />
-              harmonitas.kanwil@kemenkum.go.id
-            </span>
-            <span className="inline-flex items-center gap-2">
+            <a href="tel:+628116904422" className="inline-flex items-center gap-2 hover:text-[#FFD82B] transition">
               <Phone className="h-3.5 w-3.5 text-[#FFD82B]" />
-              (0761) 853000
-            </span>
+              +628116904422
+            </a>
+            <a href="tel:+628116904422" className="inline-flex items-center gap-2 hover:text-[#FFD82B] transition">
+              <Smartphone className="h-3.5 w-3.5 text-[#FFD82B]" />
+              +628116904422
+            </a>
+            <a href="mailto:humaskumriau@gmail.com" className="inline-flex items-center gap-2 hover:text-[#FFD82B] transition">
+              <Mail className="h-3.5 w-3.5 text-[#FFD82B]" />
+              humaskumriau@gmail.com
+            </a>
           </div>
         </div>
       </div>
