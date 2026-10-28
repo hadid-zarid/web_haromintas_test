@@ -203,6 +203,23 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen, onTriggerLogout }) => {
                   Admin
                 </span>
               </Link>
+
+              <Link
+                href="/panduan-admin"
+                onClick={() => setIsMobileOpen(false)}
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer mt-1 ${currentPath === "/panduan-admin"
+                  ? "bg-gradient-to-r from-[#FFD82B] to-[#FFB943] text-[#2B3056] shadow-md"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <BookOpen className="w-4 h-4 shrink-0" />
+                  <span className="tracking-wide">Panduan Admin</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded bg-rose-500/30 text-rose-300 text-[9px] font-black uppercase border border-rose-400/30">
+                  Admin
+                </span>
+              </Link>
             </div>
           )}
         </div>
