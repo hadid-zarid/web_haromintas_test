@@ -1,6 +1,20 @@
 # SITE_ADDRESS diisi dari .env:
 #   uji lewat IP (tanpa HTTPS): SITE_ADDRESS=:80
 #   produksi:                   SITE_ADDRESS=harmonitas-riau.web.id, www.harmonitas-riau.web.id
+#   di belakang Cloudflare Tunnel: SITE_ADDRESS=:80
+
+# Percayai X-Forwarded-For/Proto hanya dari alamat privat (cloudflared / jaringan Docker),
+# supaya IP asli pengguna sampai ke Laravel (rate limit login per IP & log audit).
+# Header dari klien internet langsung tetap diabaikan; IP dibaca dari kanan (strict),
+# jadi nilai palsu yang dikirim pengunjung di sebelah kiri tidak terpakai.
+# Server intranet yang penggunanya ber-IP privat: ganti private_ranges dengan IP proxy yang pasti saja.
+{
+	servers {
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+	}
+}
+
 {$SITE_ADDRESS::80} {
 	encode gzip
 
