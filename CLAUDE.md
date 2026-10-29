@@ -104,7 +104,22 @@ There are no Laravel Policies; this trait is the single source of the rules.
 - `pg`: pgvector, used by the AI service. The AI code still calls its connection string `SUPABASE_DB_URL`.
 - `ai-checker`
 
-Persistent data lives in `./data/*` bind mounts; `deploy/backup.sh` backs it up.
+Persistent data lives in `./data/*` bind mounts.
+
+The step-by-step guide is `docs/PANDUAN_DOCKER.md`. It covers a fresh install, restoring from a backup, a Windows laptop acting as a temporary server, and handing over between two laptops; `.env.docker.example` is the env template.
+
+`deploy/backup.sh [dest]` writes one timestamped folder containing:
+- the MySQL dump;
+- the full pgvector dump;
+- `data/storage`;
+- `jumlah-baris.txt`;
+- `SHA256SUMS`.
+
+`deploy/restore.sh <folder>` puts that folder back. It overwrites the database and the documents, so it requires typing `YA`, and it first backs up the current state to `<parent>/sebelum-restore/`.
+
+Both scripts also run in Git Bash on Windows. The Windows laptop additionally needs an untracked `docker-compose.override.yml`, which:
+- moves the databases to named volumes, because MySQL refuses a datadir on a Windows bind mount;
+- binds the web container to `127.0.0.1:8000` only.
 
 Because `config:cache` is on in production, never call `env()` outside `config/*.php`. HTTPS is forced only when `APP_URL` starts with `https://` (`AppServiceProvider`).
 
