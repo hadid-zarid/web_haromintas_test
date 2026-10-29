@@ -351,4 +351,54 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::put('/rencana/{tahun}/utama', [AdminRencanaController::class, 'updateUtama'])->whereNumber('tahun')->name('rencana.utama');
         Route::delete('/rencana/{tahun}', [AdminRencanaController::class, 'destroy'])->whereNumber('tahun')->name('rencana.destroy');
     });
+
+    // ==========================================
+    // 5. ADMIN ONLY - BUKU PANDUAN ADMINISTRATOR
+    // ==========================================
+    Route::middleware('role:ADMIN')->group(function () {
+        // Halaman panduan interaktif khusus admin
+        Route::get('/panduan-admin', function () {
+            return Inertia::render('PanduanAdminPage');
+        })->name('panduan-admin');
+
+        // Baca PDF panduan admin (inline di browser)
+        Route::get('/panduan-admin/baca', function () {
+            $candidates = [
+                public_path('docs/buku-panduan-admin-harmonitas.pdf'),
+                base_path('docs/buku-panduan-admin-harmonitas.pdf'),
+            ];
+            $path = null;
+            foreach ($candidates as $candidate) {
+                if (file_exists($candidate)) {
+                    $path = $candidate;
+                    break;
+                }
+            }
+            abort_unless($path, 404, 'Dokumen panduan administrator tidak ditemukan.');
+            return response()->file($path, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="Buku Panduan Administrator HARMONITAS.pdf"',
+                'X-Frame-Options' => 'SAMEORIGIN',
+            ]);
+        })->name('panduan-admin.baca');
+
+        // Unduh PDF panduan admin
+        Route::get('/panduan-admin/unduh', function () {
+            $candidates = [
+                public_path('docs/buku-panduan-admin-harmonitas.pdf'),
+                base_path('docs/buku-panduan-admin-harmonitas.pdf'),
+            ];
+            $path = null;
+            foreach ($candidates as $candidate) {
+                if (file_exists($candidate)) {
+                    $path = $candidate;
+                    break;
+                }
+            }
+            abort_unless($path, 404, 'Dokumen panduan administrator tidak ditemukan.');
+            return response()->download($path, 'Buku Panduan Administrator HARMONITAS.pdf', [
+                'Content-Type' => 'application/pdf',
+            ]);
+        })->name('panduan-admin.unduh');
+    });
 });
